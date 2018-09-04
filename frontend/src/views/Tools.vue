@@ -10,6 +10,17 @@
         single-line
         hide-details
       ></v-text-field>
+      <v-flex xs12 sm6>
+          <v-select
+            :items="employees"
+            v-model="filter.employee"
+            :menu-props="{ maxHeight: '400' }"
+            label="Select"
+            multiple
+            hint="Pick your favorite states"
+            persistent-hint
+          ></v-select>
+        </v-flex>
       <v-dialog v-model="dialog">
         <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
         <v-card>
@@ -72,7 +83,7 @@
       :pagination.sync="pagination"
       class="elevation-1"
       v-model="selected"
-      item-key="supplier"
+      item-key="id"
       select-all
     >
       <template slot="items" slot-scope="props">
@@ -113,9 +124,6 @@
       <v-alert slot="no-results" :value="true" color="error" icon="warning">
           Your search for "{{ search }}" found no results.
         </v-alert>
-      <template slot="no-data">
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
-      </template>
     </v-data-table>
   </div>
 </template>
@@ -128,18 +136,22 @@
 
 
 <script>
-import {
-  map,
-  lensProp,
-  set,
-} from "ramda";
+import { map, lensProp, set, head, filter, indexOf, gte } from "ramda";
 export default {
   data: () => ({
     textFontSizeClass: "test-size-1",
     search: "",
+    filter: {
+      employee: []
+    },
     pagination: {
       sortBy: "fat"
     },
+    employees: [
+      { value: 1, text: "Tester" },
+      { value: 2, text: "Uklízečka" },
+      { value: 3, text: "Modelář" }
+    ],
     selected: [],
     dialog: false,
     headers: [
@@ -150,7 +162,10 @@ export default {
       { text: "Sériové číslo/rok výroby", value: "seriesNumber" },
       { text: "Interní – dle plánu – FB 6_0025", value: "internal" },
       { text: "Externí", value: "external" },
-      { text: "Časový interval – externí údržba", value: "externalMaintenance" },
+      {
+        text: "Časový interval – externí údržba",
+        value: "externalMaintenance"
+      },
       { text: "Poslední údržba – externí", value: "lastMaintenance" },
       { text: "Poznámka", value: "comment" },
       { text: "Zaměstnanec", value: "employeeId" },
@@ -169,7 +184,7 @@ export default {
       externalMaintenance: "",
       lastMaintenance: "",
       comment: "",
-      employee: {},
+      employee: {}
     },
     defaultItem: {
       supplier: "",
@@ -182,7 +197,7 @@ export default {
       externalMaintenance: "",
       lastMaintenance: "",
       comment: "",
-      employee: {},
+      employee: {}
     }
   }),
 
@@ -195,6 +210,15 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
+    },
+    filter: {
+      handler() {
+        this.initialize();
+        this.tools = filter(x => {
+          return gte(indexOf(x.id, this.filter.employee), 0);
+        }, this.tools);
+      },
+      deep: true
     }
   },
 
@@ -207,6 +231,7 @@ export default {
     initialize() {
       this.tools = [
         {
+          id: 1,
           supplier: "HOUFEK",
           name: "CNC frézka TITAN 623215-G5 HOUFEK",
           revizion: "",
@@ -217,9 +242,10 @@ export default {
           externalMaintenance: "Ročně",
           lastMaintenance: "2. 7. 2013 0:00:00",
           comment: "Frozen Yogurt",
-          employee: { name: "Tester" },
+          employee: { id: 1, name: "Tester" }
         },
         {
+          id: 2,
           supplier: "",
           name: "Vývěva VTLF 2.250/0-79  BECKER",
           revizion: "",
@@ -230,9 +256,10 @@ export default {
           externalMaintenance: "1x za 2 roky",
           lastMaintenance: "2. 7. 2013 0:00:00",
           comment: "Frozen Yogurt",
-          employee: { name: "Uklízečka" },
+          employee: { id: 2, name: "Uklízečka" }
         },
         {
+          id: 3,
           supplier: "",
           name: "Pila pásová UH 800 HEMA",
           revizion: "",
@@ -243,14 +270,17 @@ export default {
           externalMaintenance: "1x za 2 roky",
           lastMaintenance: "28.-29.3.2013",
           comment: "Frozen Yogurt",
-          employee: { name: "Modelář" },
-        },
+          employee: { id: 3, name: "Modelář" }
+        }
       ];
     },
 
     changeFontSize() {
       this.textFontSizeClass = "test-size-1";
-      this.headers = map(set(lensProp('class'), this.textFontSizeClass), this.headers);
+      this.headers = map(
+        set(lensProp("class"), this.textFontSizeClass),
+        this.headers
+      );
     },
 
     editItem(item) {
