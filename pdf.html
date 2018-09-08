@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 1230px;
+      margin: 20px auto;
+      font-family: Georgia;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    a {
+      color: blue;
+    }
+
+    #editor {
+      width: 600px;
+      height: 775px;
+      margin-right: 20px;
+      display: inline-block;
+    }
+
+    iframe {
+      border: 1px solid black;
+      width: 30%;
+      height: 550px;
+    }
+  </style>
+</head>
+width: 100%; height: 550px;
+
+<body>
+  <h1>PDF</h1>
+  <div id="editor"></div>
+  <iframe></iframe>
+  <script src="./pdfbundle.js"></script>
+  <script>
+
+    editor.setValue(`
+    // create a document and pipe to a blob
+var doc = new PDFDocument();
+var stream = doc.pipe(blobStream());
+ 
+// draw some text
+doc.save().rotate(-90).fontSize(16)
+   .text('Protokol o revizích a kontrolách elektrického spotřebiče, elektrického ručního nářadí ', -700, 20)
+   .text('nebo prodlužovacího přívodu provedených dle ČSN 331600 ed. 2:2009', -650, 40)
+    .fontSize(9)
+    .text('1) Viz ČSN 33 1600 ed 2:2009', -760, 552)
+    .text('2) Uveďte jmenovité hodnoty', -760, 564)
+    .text('3) Uveďte K - kontrola; R - revize', -760, 576)
+    //.text('1) Viz ČSN 33 1600 ed 2:2009', -760, 588)
+    .text('5) Uveďte', -600, 552)
+    .text('S - spotřebič měřen samostatně', -545, 552)
+    .text('P - spotřebič s pevně připojeným síťovým přívodem', -545, 564)
+    .text('O - spotřebič s odpojitelným síťovým přívodem', -545, 576)
+    .text('6) Uveďte', -315, 552)
+    .text('V - měření proudu protékajícího ochranným vodičem', -255, 552)
+    .text('VR - měření proudu ochranným vodičem jako rozdílového proudu', -255, 564)
+    .text('D - měření dotykového proudu', -255, 576)
+    .text('DR - měření rozdílného proudu', -255, 588)
+   
+   
+  doc.restore() 
+  doc.save()
+    //pravá část vršek
+    .rect(70, 30, 40, 80)
+    .rect(70, 110, 40, 80)
+    .rect(70, 190, 40, 250)
+    .rect(110, 30, 40, 80)
+    .rect(110, 110, 20, 80)
+    .rect(130, 110, 20, 80)
+    .rect(130, 190, 20, 80)
+    .rect(110, 190, 20, 80)
+    .rect(110, 270, 20, 80)
+    .rect(130, 270, 20, 80)
+    .rect(110, 350, 40, 90)
+    //levá část vršek
+    .rect(70, 450, 40, 140)
+    .rect(70, 590, 40, 170)
+    .rect(110, 450, 40, 140)
+    .rect(110, 590, 40, 170)
+    //odspodu
+    //.rect(520, 720, 28, 40).rect(520, 700, 28, 20).rect(520, 660, 28, 40).rect(520, 620, 28, 40).rect(520, 595, 28, 25)
+    //.rect(492, 720, 28, 40).rect(492, 700, 28, 20).rect(492, 660, 28, 40).rect(492, 620, 28, 40).rect(492, 595, 28, 25)
+    //.rect(464, 720, 28, 40).rect(464, 700, 28, 20).rect(464, 660, 28, 40).rect(464, 620, 28, 40).rect(464, 595, 28, 25)
+    //.rect(436, 720, 28, 40).rect(436, 700, 28, 20).rect(436, 660, 28, 40).rect(436, 620, 28, 40).rect(436, 595, 28, 25)
+    //.rect(408, 720, 28, 40).rect(408, 700, 28, 20).rect(408, 660, 28, 40).rect(408, 620, 28, 40).rect(408, 595, 28, 25)
+    //.rect(380, 720, 28, 40).rect(380, 700, 28, 20).rect(380, 660, 28, 40).rect(380, 620, 28, 40).rect(380, 595, 28, 25)
+    //.rect(352, 720, 28, 40).rect(352, 700, 28, 20).rect(352, 660, 28, 40).rect(352, 620, 28, 40).rect(352, 595, 28, 25)
+    //.rect(324, 720, 28, 40).rect(324, 700, 28, 20).rect(324, 660, 28, 40).rect(324, 620, 28, 40).rect(324, 595, 28, 25)
+    //.rect(296, 720, 28, 40).rect(296, 700, 28, 20).rect(296, 660, 28, 40).rect(296, 620, 28, 40).rect(296, 595, 28, 25)
+    //.rect(268, 720, 28, 40).rect(268, 700, 28, 20).rect(268, 660, 28, 40).rect(268, 620, 28, 40).rect(268, 595, 28, 25)
+    //.rect(240, 720, 28, 40).rect(240, 700, 28, 20).rect(240, 660, 28, 40).rect(240, 620, 28, 40).rect(240, 595, 28, 25)
+    //horní výsoký
+    .rect(160, 715, 80, 45)
+    .rect(160, 690, 80, 25)
+    .rect(180, 645, 60, 45)
+    .rect(180, 600, 60, 45)
+    .rect(160, 600, 20, 90)
+    .rect(160, 565, 80, 35)
+    .rect(160, 475, 20, 90)
+    .rect(180, 475, 60, 90)
+    .rect(180, 440, 60, 35)
+    .rect(180, 405, 60, 35)
+    .rect(160, 405, 80, 70)
+    .rect(160, 375, 80, 30)
+    .rect(180, 240, 60, 135)
+    .rect(180, 205, 60, 35)
+    .rect(160, 205, 20, 170)
+    .rect(160, 170, 80, 35)
+    .rect(180, 100, 60, 70)
+    .rect(180, 30, 60, 70)
+    .rect(160, 30, 20, 140)
+    .stroke();
+// some vector graphics
+// 760
+
+[520, 492, 464, 436, 408, 380, 352, 324, 296, 268, 240].forEach(x => {
+      var ux = 760;
+      [45, 25, 45, 45, 35, 90, 35, 35, 30, 135, 35, 35, 70, 70].forEach(y => {
+        ux = ux - y;
+        doc.save().rect(x, ux, 28, y).stroke();
+      });
+    })
+
+
+// end and display the document in the iframe to the right
+doc.end();
+stream.on('finish', function() {
+  iframe.src = stream.toBlobURL('application/pdf');
+});
+  `)
+    function l(a, s, d, f) {
+      console.log('aj')
+    }
+    var u = [520, 492, 464].forEach(x => {
+      var ux = 760;
+      [40, 20, 40, 40, 25].forEach(y => {
+        ux = ux - y;
+        l(x, ux, 28, y);
+      });
+    })
+
+    var y = 760;
+    [40, 20, 40, 40, 25].forEach(element => {
+      y = y - element;
+      console.log(y);
+    });
+    .rect(520, 720, 28, 40).rect(520, 700, 28, 20).rect(520, 660, 28, 40).rect(520, 620, 28, 40).rect(520, 635, 28, 25)
+      .rect(492, 720, 28, 40).rect(492, 700, 28, 20).rect(492, 660, 28, 40).rect(492, 620, 28, 40).rect(492, 635, 28, 25)
+      .rect(464, 720, 28, 40).rect(464, 700, 28, 20).rect(464, 660, 28, 40).rect(464, 620, 28, 40).rect(464, 635, 28, 25)
+      .rect(436, 720, 28, 40).rect(436, 700, 28, 20).rect(436, 660, 28, 40).rect(436, 620, 28, 40).rect(436, 635, 28, 25)
+      .rect(408, 720, 28, 40).rect(408, 700, 28, 20).rect(408, 660, 28, 40).rect(408, 620, 28, 40).rect(408, 635, 28, 25)
+      .rect(380, 720, 28, 40).rect(380, 700, 28, 20).rect(380, 660, 28, 40).rect(380, 620, 28, 40).rect(380, 635, 28, 25)
+      .rect(352, 720, 28, 40).rect(352, 700, 28, 20).rect(352, 660, 28, 40).rect(352, 620, 28, 40).rect(352, 635, 28, 25)
+      .rect(324, 720, 28, 40).rect(324, 700, 28, 20).rect(324, 660, 28, 40).rect(324, 620, 28, 40).rect(324, 635, 28, 25)
+      .rect(296, 720, 28, 40).rect(296, 700, 28, 20).rect(296, 660, 28, 40).rect(296, 620, 28, 40).rect(296, 635, 28, 25)
+      .rect(268, 720, 28, 40).rect(268, 700, 28, 20).rect(268, 660, 28, 40).rect(268, 620, 28, 40).rect(268, 635, 28, 25)
+      .rect(240, 720, 28, 40).rect(240, 700, 28, 20).rect(240, 660, 28, 40).rect(240, 620, 28, 40).rect(240, 635, 28, 25)
+      //horní výsoký
+      .rect(160, 720, 80, 40).rect(160, 700, 80, 20).rect(160, 660, 80, 40).rect(160, 620, 80, 40).rect(160, 635, 80, 25)
+  </script> Protokol o revizích a kontrolách elektrického spotřebiče, elektrického ručního nářadí nebo prodlužovacího přívodu provedených
+  dle ČSN 331600 ed. 2:2009
+</body>
+
+</html>
