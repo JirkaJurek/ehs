@@ -21,8 +21,19 @@
             persistent-hint
           ></v-select>
         </v-flex>
-      <v-dialog v-model="dialog">
-        <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
+      <v-flex xs12 sm6>
+          <v-select
+            :items="categories"
+            v-model="filter.categories"
+            :menu-props="{ maxHeight: '400' }"
+            label="Select"
+            multiple
+            hint="Pick your favorite states"
+            persistent-hint
+          ></v-select>
+        </v-flex>
+      <v-dialog v-model="dialogNewItem">
+        <v-btn slot="activator" color="primary" dark class="mb-2">Nový nástroj</v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -33,6 +44,9 @@
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.supplier" label="Dodavatel"></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field v-model="editedItem.category" label="Kategorie"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
@@ -64,14 +78,65 @@
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.employeeId" label="Zaměstnanec"></v-text-field>
                 </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="closeDialogNewItem">Cancel</v-btn>
             <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogAllRevisions">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Všechny revize</span>
+          </v-card-title>
+          <v-data-table
+                  :items="itemRevisions.revisions"
+                  class="elevation-1"
+                  hide-actions
+                  hide-headers
+                >
+                  <template slot="items" slot-scope="props">
+                    <td>{{ props.item.date }}</td>
+                    <td>{{ props.item.description }}</td>
+                  </template>
+                </v-data-table>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="showDialogNewRevisions(itemRevisions.id)">Nová revize</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="closeDialogAllRevisions">Cancel</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogNewRevision">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Nová revize</span>
+          </v-card-title>
+
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field v-model="newRevision.description" label="Popisek"></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="closeDialogNewRevision">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="addRevision">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -95,6 +160,7 @@
           ></v-checkbox>
         </td>
         <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
+        <td v-bind:class="textFontSizeClass">{{ props.item.category.name }}</td>
         <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
         <td v-bind:class="textFontSizeClass">{{ props.item.revizion }}</td>
         <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
@@ -105,6 +171,15 @@
         <td v-bind:class="textFontSizeClass">{{ props.item.lastMaintenance }}</td>
         <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
         <td v-bind:class="textFontSizeClass">{{ props.item.employee.name }}</td>
+        <td v-bind:class="textFontSizeClass" 
+          @click="showDialogAllRevisions(props.item)">
+          <v-chip>{{ oneRevision(props.item.revisions) }}</v-chip>
+          <span
+            v-if="props.item.revisions.length > 1"
+            class="grey--text caption"
+          >(+{{ props.item.revisions.length - 1 }} dalších)</span>
+
+        </td>
         <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
           <v-icon
             small
@@ -136,13 +211,31 @@
 
 
 <script>
-import { map, lensProp, set, head, filter, indexOf, gte } from "ramda";
+import {
+  map,
+  lensProp,
+  set,
+  head,
+  filter,
+  indexOf,
+  gte,
+  pipe,
+  ifElse,
+  always,
+  length,
+  prop,
+  identity,
+  findIndex,
+  propEq,
+} from "ramda";
+import moment from "moment";
 export default {
   data: () => ({
     textFontSizeClass: "test-size-1",
     search: "",
     filter: {
-      employee: []
+      employee: [],
+      categories: []
     },
     pagination: {
       sortBy: "fat"
@@ -152,10 +245,19 @@ export default {
       { value: 2, text: "Uklízečka" },
       { value: 3, text: "Modelář" }
     ],
+    categories: [
+      { value: 1, text: "CNS" },
+      { value: 2, text: "Ruční nářadí" },
+      { value: 3, text: "Pily" }
+    ],
     selected: [],
-    dialog: false,
+    dialogNewItem: false,
+    dialogAllRevisions: false,
+    dialogAllRevisions: false,
+    dialogNewRevision: false,
     headers: [
       { text: "Dodavatel", value: "supplier" },
+      { text: "Kategorie", value: "category" },
       { text: "Název stroje", value: "name" },
       { text: "Revizní karta el. nářadí", value: "revizion" },
       { text: "Uvedeno do provozu", value: "startWork" },
@@ -169,12 +271,17 @@ export default {
       { text: "Poslední údržba – externí", value: "lastMaintenance" },
       { text: "Poznámka", value: "comment" },
       { text: "Zaměstnanec", value: "employeeId" },
+      { text: "Revize", value: "revisions" },
       { text: "Actions", align: "center", value: "actions", sortable: false }
     ],
     tools: [],
     editedIndex: -1,
+    itemRevisions: {},
+    itemRevisionsId: 0,
+    newRevision: {},
     editedItem: {
       supplier: "",
+      category: {},
       name: "",
       revizion: "",
       startWork: "",
@@ -184,10 +291,12 @@ export default {
       externalMaintenance: "",
       lastMaintenance: "",
       comment: "",
-      employee: {}
+      employee: {},
+      revisions: []
     },
     defaultItem: {
       supplier: "",
+      category: {},
       name: "",
       revizion: "",
       startWork: "",
@@ -197,26 +306,41 @@ export default {
       externalMaintenance: "",
       lastMaintenance: "",
       comment: "",
-      employee: {}
+      employee: {},
+      revisions: []
     }
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
     }
   },
 
   watch: {
-    dialog(val) {
-      val || this.close();
+    dialogNewItem(val) {
+      val || this.closeDialogNewItem();
+    },
+    dialogAllRevisions(val) {
+      val || this.closeDialogAllRevisions();
     },
     filter: {
       handler() {
         this.initialize();
-        this.tools = filter(x => {
-          return gte(indexOf(x.id, this.filter.employee), 0);
-        }, this.tools);
+        this.tools = pipe(
+          filter(x => {
+            return this.basicFilter(
+              indexOf(x.employee.id),
+              this.filter.employee
+            );
+          }),
+          filter(x => {
+            return this.basicFilter(
+              indexOf(x.category.id),
+              this.filter.categories
+            );
+          })
+        )(this.tools);
       },
       deep: true
     }
@@ -233,6 +357,10 @@ export default {
         {
           id: 1,
           supplier: "HOUFEK",
+          category: {
+            id: 1,
+            name: "CNC"
+          },
           name: "CNC frézka TITAN 623215-G5 HOUFEK",
           revizion: "",
           startWork: "2009",
@@ -242,11 +370,19 @@ export default {
           externalMaintenance: "Ročně",
           lastMaintenance: "2. 7. 2013 0:00:00",
           comment: "Frozen Yogurt",
-          employee: { id: 1, name: "Tester" }
+          employee: { id: 1, name: "Tester" },
+          revisions: [
+            { date: "2018-01-01", description: 'popisek' }, 
+            { date: "2017-01-01", description: 'popisek' }
+          ]
         },
         {
           id: 2,
           supplier: "",
+          category: {
+            id: 2,
+            name: "Ruční nářadí"
+          },
           name: "Vývěva VTLF 2.250/0-79  BECKER",
           revizion: "",
           startWork: "2015",
@@ -256,11 +392,16 @@ export default {
           externalMaintenance: "1x za 2 roky",
           lastMaintenance: "2. 7. 2013 0:00:00",
           comment: "Frozen Yogurt",
-          employee: { id: 2, name: "Uklízečka" }
+          employee: { id: 2, name: "Uklízečka" },
+          revisions: []
         },
         {
           id: 3,
           supplier: "",
+          category: {
+            id: 3,
+            name: "Pily"
+          },
           name: "Pila pásová UH 800 HEMA",
           revizion: "",
           startWork: "2008",
@@ -270,11 +411,14 @@ export default {
           externalMaintenance: "1x za 2 roky",
           lastMaintenance: "28.-29.3.2013",
           comment: "Frozen Yogurt",
-          employee: { id: 3, name: "Modelář" }
+          employee: { id: 3, name: "Modelář" },
+          revisions: []
         }
       ];
     },
-
+    basicFilter(filterMethod, filterData) {
+      return gte(ifElse(length, filterMethod, always(1))(filterData), 0);
+    },
     changeFontSize() {
       this.textFontSizeClass = "test-size-1";
       this.headers = map(
@@ -286,7 +430,7 @@ export default {
     editItem(item) {
       this.editedIndex = this.tools.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.dialog = true;
+      this.dialogNewItem = true;
     },
 
     deleteItem(item) {
@@ -295,8 +439,8 @@ export default {
         this.tools.splice(index, 1);
     },
 
-    close() {
-      this.dialog = false;
+    closeDialogNewItem() {
+      this.dialogNewItem = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -309,8 +453,36 @@ export default {
       } else {
         this.tools.push(this.editedItem);
       }
-      this.close();
-    }
+      this.closeDialogNewItem();
+    },
+    oneRevision(revisions) {
+      const dateFormat = x => moment(prop('date', x)).format("MM, YY");
+      return ifElse(
+        prop("date"),
+        dateFormat,
+        always("Žádná revize")
+      )(head(revisions));
+    },
+    showDialogAllRevisions(item) {
+      this.itemRevisions = item;
+      this.dialogAllRevisions = true;
+    },
+    closeDialogAllRevisions() {
+      this.dialogAllRevisions = false;
+    },
+    closeDialogNewRevision() {
+      this.dialogNewRevision = false;
+    },
+    showDialogNewRevisions(itemId) {
+      this.itemRevisionsId = itemId;
+      this.dialogNewRevision = true;
+    },
+    addRevision() {
+      this.tools[findIndex(propEq('id', this.itemRevisionsId), this.tools)].revisions.push(
+        Object.assign({}, this.newRevision)
+      )
+      this.dialogNewRevision = false;
+    },
   }
 };
 </script>

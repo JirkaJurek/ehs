@@ -19,6 +19,11 @@ export default new Router({
       component: () => import('./views/Tools.vue')
     },
     {
+      path: '/pdf',
+      name: 'PDF',
+      component: () => import('./views/PDF.vue')
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
