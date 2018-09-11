@@ -32,6 +32,9 @@
             persistent-hint
           ></v-select>
         </v-flex>
+      <!--<dialog-tool
+        :editedItem=editedItem
+      ></dialog-tool>-->
       <v-dialog v-model="dialogNewItem">
         <v-btn slot="activator" color="primary" dark class="mb-2">Nový nástroj</v-btn>
         <v-card>
@@ -67,7 +70,11 @@
                   <v-text-field v-model="editedItem.external" label="Externí"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.externalMaintenance" label="Časový interval – externí údržba"></v-text-field>
+                  <v-combobox
+                    v-model="editedItem.externalMaintenance"
+                    :items="revisionInterval"
+                    label="Časový interval – externí údržba"
+                  ></v-combobox>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.lastMaintenance" label="Poslední údržba – externí"></v-text-field>
@@ -125,10 +132,13 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
+                  <v-date-picker
+                    v-model="newRevision.date"
+                  ></v-date-picker>
                   <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="newRevision.description" label="Popisek"></v-text-field>
+                  <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -152,49 +162,60 @@
       select-all
     >
       <template slot="items" slot-scope="props">
-        <td>
-          <v-checkbox
-            v-model="props.selected"
-            primary
-            hide-details
-          ></v-checkbox>
-        </td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.category.name }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.revizion }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.seriesNumber }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.internal }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.external }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.externalMaintenance }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.lastMaintenance }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
-        <td v-bind:class="textFontSizeClass">{{ props.item.employee.name }}</td>
-        <td v-bind:class="textFontSizeClass" 
-          @click="showDialogAllRevisions(props.item)">
-          <v-chip>{{ oneRevision(props.item.revisions) }}</v-chip>
-          <span
-            v-if="props.item.revisions.length > 1"
-            class="grey--text caption"
-          >(+{{ props.item.revisions.length - 1 }} dalších)</span>
+        <tr v-bind:class="{ 'red lighten-4' : props.item.nextRevision < 6 }">
+          <td>
+            <v-checkbox
+              v-model="props.selected"
+              primary
+              hide-details
+            ></v-checkbox>
+          </td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.category.name }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.revizion }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.seriesNumber }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.internal }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.external }}</td>
+          <td v-bind:class="textFontSizeClass">
+            {{ props.item.externalMaintenance.text || props.item.externalMaintenance }}
+          </td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.nextRevision }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.employee.name }}</td>
+          <td v-bind:class="textFontSizeClass" 
+            @click="showDialogAllRevisions(props.item)">
+            <v-chip>{{ oneRevision(props.item.revisions) }}</v-chip>
+            <span
+              v-if="props.item.revisions.length > 1"
+              class="grey--text caption"
+            >(+{{ props.item.revisions.length - 1 }} dalších)</span>
 
-        </td>
-        <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
-          <v-icon
-            small
-            class="mr-2"
-            @click="editItem(props.item)"
-          >
-            edit
-          </v-icon>
-          <v-icon
-            small
-            @click="deleteItem(props.item)"
-          >
-            delete
-          </v-icon>
-        </td>
+          </td>
+          <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
+            <v-icon
+              small
+              class="mr-2"
+              @click="editItem(props.item)"
+            >
+              edit
+            </v-icon>
+            <v-icon
+              small
+              class="mr-2"
+              @click="duplicationItem(props.item)"
+            >
+              filter_none
+            </v-icon>
+            <v-icon
+              small
+              @click="deleteItem(props.item)"
+            >
+              delete
+            </v-icon>
+          </td>
+        </tr>
       </template>
       <v-alert slot="no-results" :value="true" color="error" icon="warning">
           Your search for "{{ search }}" found no results.
@@ -227,12 +248,25 @@ import {
   identity,
   findIndex,
   propEq,
+  find,
+  defaultTo
 } from "ramda";
 import moment from "moment";
 export default {
   data: () => ({
     textFontSizeClass: "test-size-1",
     search: "",
+    revisionInterval: [
+      { value: "1 y", text: "Roční" },
+      { value: "6 m", text: "Půlroční" },
+      { value: "1 m", text: "Měsíční" },
+      { value: "7 d", text: "Týdení" },
+      {
+        value: "",
+        text: "Vlastní pište ve tvaru (y,m,d) např. Roční = 1 y, Měsíční = 1 m",
+        disabled: true
+      }
+    ],
     filter: {
       employee: [],
       categories: []
@@ -268,7 +302,7 @@ export default {
         text: "Časový interval – externí údržba",
         value: "externalMaintenance"
       },
-      { text: "Poslední údržba – externí", value: "lastMaintenance" },
+      { text: "Další údržba", value: "nextRevision" },
       { text: "Poznámka", value: "comment" },
       { text: "Zaměstnanec", value: "employeeId" },
       { text: "Revize", value: "revisions" },
@@ -349,6 +383,7 @@ export default {
   created() {
     this.initialize();
     this.changeFontSize();
+    this.notifyMe();
   },
 
   methods: {
@@ -367,13 +402,14 @@ export default {
           seriesNumber: "001/2009",
           internal: true,
           external: true,
-          externalMaintenance: "Ročně",
+          externalMaintenance: { value: "1 y", text: "Roční" },
           lastMaintenance: "2. 7. 2013 0:00:00",
+          nextRevision: "5",
           comment: "Frozen Yogurt",
           employee: { id: 1, name: "Tester" },
           revisions: [
-            { date: "2018-01-01", description: 'popisek' }, 
-            { date: "2017-01-01", description: 'popisek' }
+            { date: "2018-01-01", description: "popisek" },
+            { date: "2017-01-01", description: "popisek" }
           ]
         },
         {
@@ -389,8 +425,9 @@ export default {
           seriesNumber: "2701913/2013",
           internal: true,
           external: true,
-          externalMaintenance: "1x za 2 roky",
+          externalMaintenance: { value: "1 m", text: "Měsíční" },
           lastMaintenance: "2. 7. 2013 0:00:00",
+          nextRevision: "50",
           comment: "Frozen Yogurt",
           employee: { id: 2, name: "Uklízečka" },
           revisions: []
@@ -408,8 +445,9 @@ export default {
           seriesNumber: "83306/1979",
           internal: true,
           external: true,
-          externalMaintenance: "1x za 2 roky",
+          externalMaintenance: { value: "6 m", text: "Půlroční" },
           lastMaintenance: "28.-29.3.2013",
+          nextRevision: "354",
           comment: "Frozen Yogurt",
           employee: { id: 3, name: "Modelář" },
           revisions: []
@@ -426,7 +464,11 @@ export default {
         this.headers
       );
     },
-
+    duplicationItem(item) {
+      this.editedIndex = -1;
+      this.editedItem = Object.assign({}, item);
+      this.dialogNewItem = true;
+    },
     editItem(item) {
       this.editedIndex = this.tools.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -456,12 +498,10 @@ export default {
       this.closeDialogNewItem();
     },
     oneRevision(revisions) {
-      const dateFormat = x => moment(prop('date', x)).format("MM, YY");
-      return ifElse(
-        prop("date"),
-        dateFormat,
-        always("Žádná revize")
-      )(head(revisions));
+      const dateFormat = x => moment(prop("date", x)).format("MM, YY");
+      return ifElse(prop("date"), dateFormat, always("Žádná revize"))(
+        head(revisions)
+      );
     },
     showDialogAllRevisions(item) {
       this.itemRevisions = item;
@@ -478,11 +518,30 @@ export default {
       this.dialogNewRevision = true;
     },
     addRevision() {
-      this.tools[findIndex(propEq('id', this.itemRevisionsId), this.tools)].revisions.push(
-        Object.assign({}, this.newRevision)
-      )
+      this.tools[
+        findIndex(propEq("id", this.itemRevisionsId), this.tools)
+      ].revisions.push(Object.assign({}, this.newRevision));
       this.dialogNewRevision = false;
     },
+    notifyMe() {
+      setTimeout(() => {
+        if (!("Notification" in window)) {
+          alert("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+          var notification = new Notification(
+            "Důležité upozornění v intranetu!"
+          );
+        } else if (Notification.permission !== "denied") {
+          Notification.requestPermission(function(permission) {
+            if (permission === "granted") {
+              var notification = new Notification(
+                "Důležité upozornění v intranetu!"
+              );
+            }
+          });
+        }
+      }, 2000);
+    }
   }
 };
 </script>
