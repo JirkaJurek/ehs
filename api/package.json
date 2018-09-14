@@ -1,0 +1,24 @@
+{
+  "name": "intranet-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "RoSiTech s.r.o.",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "joi": "^13.6.0",
+    "koa": "^2.5.3",
+    "koa-bodyparser": "^4.2.1",
+    "koa-combine-routers": "^4.0.1",
+    "koa-logger": "^3.2.0",
+    "koa-response-time": "^2.0.0",
+    "koa-router": "^7.4.0",
+    "koa2-validation": "^0.1.0",
+    "mariasql": "^0.2.6",
+    "multy": "^0.1.5"
+  }
+}
