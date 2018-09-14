@@ -10,4 +10,8 @@ module.exports.add = (data) => {
     sql.add(data);
 };
 
+module.exports.list = (data) => {
+    return sql.list(data);
+};
+
 

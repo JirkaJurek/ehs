@@ -5,26 +5,17 @@ const router = new Router({
     prefix: '/tools'
 });
 const validate = require('koa2-validation');
-const Joi = require('joi');
 
 
 const { tools } = require('../../modules');
 
-const v = {
-    body: {
-        //name: Joi.string().required(),
-        name2: Joi.string(),
-        file: Joi.object(),
-    }
-}
-
 router.get('/', async (ctx, next) => {
-    tools.service.testConnection();
-    ctx.body = 'Hello'
+    //tools.service.testConnection();
+    ctx.body = await tools.service.list();
 })
-router.post('/', validate(v), async (ctx, next) => {
-    const { file, name2 } = ctx.request.body;
-    tools.service.add({ name: name2 })
+router.post('/', validate(tools.validate.postAddTool) , async (ctx, next) => {
+    //const { file, name2 } = ctx.request.body;
+    tools.service.add(ctx.request.body)
     ctx.body = 'Hello'
 })
 
