@@ -3,24 +3,29 @@
 const { execQuery } = require('../db');
 const tableName = 'tool';
 
-async function testConnection() {
-    const b = await execQuery('SHOW DATABASES', null, { useArray: true });
+function testConnection() {
+    const b = execQuery('SHOW DATABASES', null, { useArray: true });
     console.log(b);
 }
 
-async function add(data) {
-    return await execQuery(
+function add(data) {
+    return execQuery(
         `INSERT INTO ${tableName} (supplier, categories, name, revizion, startWork, seriesNumber, internal, external, externalMaintenance, nextRevision, comment, employee, revisions, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId) VALUES (:supplier, :categories, :name, :revizion, :startWork, :seriesNumber, :internal, :external, :externalMaintenance, :nextRevision, :comment, :employee, :revisions, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId);`,
         data
     );
 }
 
-async function list() {
-    return await execQuery(`SELECT * FROM ${tableName} LIMIT 10`);
+function list() {
+    return execQuery(`SELECT * FROM ${tableName} LIMIT 100`);
+}
+
+function showById(id) {
+    return execQuery(`SELECT * FROM ${tableName} WHERE id = ?`, [ id ]);
 }
 
 module.exports = {
     testConnection,
     add,
     list,
+    showById,
 }

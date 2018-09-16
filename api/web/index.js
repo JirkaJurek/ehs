@@ -6,6 +6,7 @@ const Koa = require('koa');
 const logger = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 const responseTime = require('koa-response-time');
+const cors = require('@koa/cors');
 const Multy = require('multy');
 
 const router = require('./router')
@@ -23,6 +24,7 @@ app.use(responseTime())
         jsonLimit: config.requestLimit,
         formLimit: config.requestLimit
     }))
+    .use(cors())
     .use(router())
     .listen(config.port);
 

@@ -1,40 +1,17 @@
 <template>
   <div>
-    <v-layout display-4 align-center justify-center >Plán údržby 2018</v-layout>
+    <v-layout display-4 align-center justify-center>Plán údržby 2018</v-layout>
     <v-toolbar flat color="white">
       <v-spacer></v-spacer>
-      <v-text-field
-        v-model="search"
-        append-icon="search"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
+      <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
       <v-flex xs12 sm6>
-          <v-select
-            :items="employees"
-            v-model="filter.employee"
-            :menu-props="{ maxHeight: '400' }"
-            label="Select"
-            multiple
-            hint="Pick your favorite states"
-            persistent-hint
-          ></v-select>
-        </v-flex>
+        <v-select :items="employees" v-model="filter.employee" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
+      </v-flex>
       <v-flex xs12 sm6>
-          <v-select
-            :items="categories"
-            v-model="filter.categories"
-            :menu-props="{ maxHeight: '400' }"
-            label="Select"
-            multiple
-            hint="Pick your favorite states"
-            persistent-hint
-          ></v-select>
-        </v-flex>
-      <!--<dialog-tool
-        :editedItem=editedItem
-      ></dialog-tool>-->
+        <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
+      </v-flex>
+      <dialog-tool v-if="Number.isInteger(editItemId)" :itemId=editItemId ref=dialogNewItem></dialog-tool>
+      <!--
       <v-dialog v-model="dialogNewItem">
         <v-btn slot="activator" color="primary" dark class="mb-2">Nový nástroj</v-btn>
         <v-card>
@@ -49,7 +26,7 @@
                   <v-text-field v-model="editedItem.supplier" label="Dodavatel"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.category" label="Kategorie"></v-text-field>
+                  <v-text-field v-model="editedItem.categories" label="Kategorie"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
@@ -70,11 +47,7 @@
                   <v-text-field v-model="editedItem.external" label="Externí"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-combobox
-                    v-model="editedItem.externalMaintenance"
-                    :items="revisionInterval"
-                    label="Časový interval – externí údržba"
-                  ></v-combobox>
+                  <v-combobox v-model="editedItem.externalMaintenance" :items="revisionInterval" label="Časový interval – externí údržba"></v-combobox>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.lastMaintenance" label="Poslední údržba – externí"></v-text-field>
@@ -99,22 +72,18 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      -->
       <v-dialog v-model="dialogAllRevisions">
         <v-card>
           <v-card-title>
             <span class="headline">Všechny revize</span>
           </v-card-title>
-          <v-data-table
-                  :items="itemRevisions.revisions"
-                  class="elevation-1"
-                  hide-actions
-                  hide-headers
-                >
-                  <template slot="items" slot-scope="props">
-                    <td>{{ props.item.date }}</td>
-                    <td>{{ props.item.description }}</td>
-                  </template>
-                </v-data-table>
+          <v-data-table :items="itemRevisions.revisions" class="elevation-1" hide-actions hide-headers>
+            <template slot="items" slot-scope="props">
+              <td>{{ props.item.date }}</td>
+              <td>{{ props.item.description }}</td>
+            </template>
+          </v-data-table>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" flat @click.native="showDialogNewRevisions(itemRevisions.id)">Nová revize</v-btn>
@@ -132,9 +101,7 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-date-picker
-                    v-model="newRevision.date"
-                  ></v-date-picker>
+                  <v-date-picker v-model="newRevision.date"></v-date-picker>
                   <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
@@ -151,27 +118,14 @@
         </v-card>
       </v-dialog>
     </v-toolbar>
-    <v-data-table
-      :headers="headers"
-      :items="tools"
-      :search="search"
-      :pagination.sync="pagination"
-      class="elevation-1"
-      v-model="selected"
-      item-key="id"
-      select-all
-    >
+    <v-data-table :headers="headers" :items="tools" :search="search" :pagination.sync="pagination" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
         <tr v-bind:class="{ 'red lighten-4' : props.item.nextRevision < 6 }">
           <td>
-            <v-checkbox
-              v-model="props.selected"
-              primary
-              hide-details
-            ></v-checkbox>
+            <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.category.name }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.categories.name }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.revizion }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
@@ -179,47 +133,32 @@
           <td v-bind:class="textFontSizeClass">{{ props.item.internal }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.external }}</td>
           <td v-bind:class="textFontSizeClass">
-            {{ props.item.externalMaintenance.text || props.item.externalMaintenance }}
+            <!--{{ props.item.externalMaintenance.text || props.item.externalMaintenance }}-->
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.nextRevision }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.employee.name }}</td>
-          <td v-bind:class="textFontSizeClass" 
-            @click="showDialogAllRevisions(props.item)">
+          <td v-bind:class="textFontSizeClass" @click="showDialogAllRevisions(props.item)">
             <v-chip>{{ oneRevision(props.item.revisions) }}</v-chip>
-            <span
-              v-if="props.item.revisions.length > 1"
-              class="grey--text caption"
-            >(+{{ props.item.revisions.length - 1 }} dalších)</span>
+            <span v-if="props.item.revisions.length > 1" class="grey--text caption">(+{{ props.item.revisions.length - 1 }} dalších)</span>
 
           </td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
-            <v-icon
-              small
-              class="mr-2"
-              @click="editItem(props.item)"
-            >
+            <v-icon small class="mr-2" @click="editItem(props.item.id)">
               edit
             </v-icon>
-            <v-icon
-              small
-              class="mr-2"
-              @click="duplicationItem(props.item)"
-            >
+            <v-icon small class="mr-2" @click="duplicationItem(props.item)">
               filter_none
             </v-icon>
-            <v-icon
-              small
-              @click="deleteItem(props.item)"
-            >
+            <v-icon small @click="deleteItem(props.item)">
               delete
             </v-icon>
           </td>
         </tr>
       </template>
       <v-alert slot="no-results" :value="true" color="error" icon="warning">
-          Your search for "{{ search }}" found no results.
-        </v-alert>
+        Your search for "{{ search }}" found no results.
+      </v-alert>
     </v-data-table>
   </div>
 </template>
@@ -254,6 +193,7 @@ import {
 import moment from "moment";
 export default {
   data: () => ({
+    editItemId: null,
     textFontSizeClass: "test-size-1",
     search: "",
     revisionInterval: [
@@ -285,13 +225,13 @@ export default {
       { value: 3, text: "Pily" }
     ],
     selected: [],
-    dialogNewItem: false,
+    dialogNewItem: true,
     dialogAllRevisions: false,
     dialogAllRevisions: false,
     dialogNewRevision: false,
     headers: [
       { text: "Dodavatel", value: "supplier" },
-      { text: "Kategorie", value: "category" },
+      { text: "Kategorie", value: "categories" },
       { text: "Název stroje", value: "name" },
       { text: "Revizní karta el. nářadí", value: "revizion" },
       { text: "Uvedeno do provozu", value: "startWork" },
@@ -315,7 +255,7 @@ export default {
     newRevision: {},
     editedItem: {
       supplier: "",
-      category: {},
+      categories: {},
       name: "",
       revizion: "",
       startWork: "",
@@ -330,7 +270,7 @@ export default {
     },
     defaultItem: {
       supplier: "",
-      category: {},
+      categories: {},
       name: "",
       revizion: "",
       startWork: "",
@@ -352,9 +292,6 @@ export default {
   },
 
   watch: {
-    dialogNewItem(val) {
-      val || this.closeDialogNewItem();
-    },
     dialogAllRevisions(val) {
       val || this.closeDialogAllRevisions();
     },
@@ -370,7 +307,7 @@ export default {
           }),
           filter(x => {
             return this.basicFilter(
-              indexOf(x.category.id),
+              indexOf(x.categories.id),
               this.filter.categories
             );
           })
@@ -388,6 +325,10 @@ export default {
 
   methods: {
     initialize() {
+      this.axios.get("/tools").then(response => {
+        this.tools = response.data;
+      });
+      /*
       this.tools = [
         {
           id: 1,
@@ -453,6 +394,7 @@ export default {
           revisions: []
         }
       ];
+      */
     },
     basicFilter(filterMethod, filterData) {
       return gte(ifElse(length, filterMethod, always(1))(filterData), 0);
@@ -469,33 +411,18 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialogNewItem = true;
     },
-    editItem(item) {
-      this.editedIndex = this.tools.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogNewItem = true;
+    editItem(itemId) {
+      console.log(this.$store)
+      this.editItemId = parseInt(itemId);
+      if (this.$refs.dialogNewItem) {
+        this.$refs.dialogNewItem.open();
+      }
     },
 
     deleteItem(item) {
       const index = this.tools.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
         this.tools.splice(index, 1);
-    },
-
-    closeDialogNewItem() {
-      this.dialogNewItem = false;
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      }, 300);
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.tools[this.editedIndex], this.editedItem);
-      } else {
-        this.tools.push(this.editedItem);
-      }
-      this.closeDialogNewItem();
     },
     oneRevision(revisions) {
       const dateFormat = x => moment(prop("date", x)).format("MM, YY");

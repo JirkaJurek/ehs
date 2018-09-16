@@ -9,6 +9,7 @@
   "author": "RoSiTech s.r.o.",
   "license": "ISC",
   "dependencies": {
+    "@koa/cors": "2",
     "dotenv": "^6.0.0",
     "joi": "^13.6.0",
     "koa": "^2.5.3",
@@ -19,6 +20,7 @@
     "koa-router": "^7.4.0",
     "koa2-validation": "^0.1.0",
     "mariasql": "^0.2.6",
-    "multy": "^0.1.5"
+    "multy": "^0.1.5",
+    "ramda": "^0.25.0"
   }
 }
