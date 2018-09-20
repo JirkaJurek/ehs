@@ -10,69 +10,8 @@
       <v-flex xs12 sm6>
         <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
-      <dialog-tool v-if="Number.isInteger(editItemId)" :itemId=editItemId ref=dialogNewItem></dialog-tool>
-      <!--
-      <v-dialog v-model="dialogNewItem">
-        <v-btn slot="activator" color="primary" dark class="mb-2">Nový nástroj</v-btn>
-        <v-card>
-          <v-card-title>
-            <span class="headline">{{ formTitle }}</span>
-          </v-card-title>
+      <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
 
-          <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.supplier" label="Dodavatel"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.categories" label="Kategorie"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.revizion" label="Revizní karta el. nářadí"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.startWork" label="Uvedeno do provozu"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.seriesNumber" label="Sériové číslo/rok výroby"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.internal" label="Interní – dle plánu – FB 6_0025"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.external" label="Externí"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-combobox v-model="editedItem.externalMaintenance" :items="revisionInterval" label="Časový interval – externí údržba"></v-combobox>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.lastMaintenance" label="Poslední údržba – externí"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.comment" label="Poznámka"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.employeeId" label="Zaměstnanec"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="closeDialogNewItem">Cancel</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      -->
       <v-dialog v-model="dialogAllRevisions">
         <v-card>
           <v-card-title>
@@ -106,6 +45,7 @@
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
+                  <v-text-field v-model="newRevision.who" label="Kdo"></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -125,7 +65,11 @@
             <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.categories.name }}</td>
+          <td v-bind:class="textFontSizeClass">
+            <v-chip v-for="(category, key) in props.item.categories.slice(0,3)" v-bind:key=key>
+              {{ category.name }}
+            </v-chip>
+          </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.revizion }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
@@ -147,7 +91,7 @@
             <v-icon small class="mr-2" @click="editItem(props.item.id)">
               edit
             </v-icon>
-            <v-icon small class="mr-2" @click="duplicationItem(props.item)">
+            <v-icon small class="mr-2" @click="editItem(props.item.id, true)">
               filter_none
             </v-icon>
             <v-icon small @click="deleteItem(props.item)">
@@ -160,6 +104,7 @@
         Your search for "{{ search }}" found no results.
       </v-alert>
     </v-data-table>
+    <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
   </div>
 </template>
 
@@ -193,7 +138,7 @@ import {
 import moment from "moment";
 export default {
   data: () => ({
-    editItemId: null,
+    dialogNewItem: false,
     textFontSizeClass: "test-size-1",
     search: "",
     revisionInterval: [
@@ -225,7 +170,6 @@ export default {
       { value: 3, text: "Pily" }
     ],
     selected: [],
-    dialogNewItem: true,
     dialogAllRevisions: false,
     dialogAllRevisions: false,
     dialogNewRevision: false,
@@ -252,37 +196,7 @@ export default {
     editedIndex: -1,
     itemRevisions: {},
     itemRevisionsId: 0,
-    newRevision: {},
-    editedItem: {
-      supplier: "",
-      categories: {},
-      name: "",
-      revizion: "",
-      startWork: "",
-      seriesNumber: "",
-      internal: "",
-      external: "",
-      externalMaintenance: "",
-      lastMaintenance: "",
-      comment: "",
-      employee: {},
-      revisions: []
-    },
-    defaultItem: {
-      supplier: "",
-      categories: {},
-      name: "",
-      revizion: "",
-      startWork: "",
-      seriesNumber: "",
-      internal: "",
-      external: "",
-      externalMaintenance: "",
-      lastMaintenance: "",
-      comment: "",
-      employee: {},
-      revisions: []
-    }
+    newRevision: {}
   }),
 
   computed: {
@@ -328,73 +242,6 @@ export default {
       this.axios.get("/tools").then(response => {
         this.tools = response.data;
       });
-      /*
-      this.tools = [
-        {
-          id: 1,
-          supplier: "HOUFEK",
-          category: {
-            id: 1,
-            name: "CNC"
-          },
-          name: "CNC frézka TITAN 623215-G5 HOUFEK",
-          revizion: "",
-          startWork: "2009",
-          seriesNumber: "001/2009",
-          internal: true,
-          external: true,
-          externalMaintenance: { value: "1 y", text: "Roční" },
-          lastMaintenance: "2. 7. 2013 0:00:00",
-          nextRevision: "5",
-          comment: "Frozen Yogurt",
-          employee: { id: 1, name: "Tester" },
-          revisions: [
-            { date: "2018-01-01", description: "popisek" },
-            { date: "2017-01-01", description: "popisek" }
-          ]
-        },
-        {
-          id: 2,
-          supplier: "",
-          category: {
-            id: 2,
-            name: "Ruční nářadí"
-          },
-          name: "Vývěva VTLF 2.250/0-79  BECKER",
-          revizion: "",
-          startWork: "2015",
-          seriesNumber: "2701913/2013",
-          internal: true,
-          external: true,
-          externalMaintenance: { value: "1 m", text: "Měsíční" },
-          lastMaintenance: "2. 7. 2013 0:00:00",
-          nextRevision: "50",
-          comment: "Frozen Yogurt",
-          employee: { id: 2, name: "Uklízečka" },
-          revisions: []
-        },
-        {
-          id: 3,
-          supplier: "",
-          category: {
-            id: 3,
-            name: "Pily"
-          },
-          name: "Pila pásová UH 800 HEMA",
-          revizion: "",
-          startWork: "2008",
-          seriesNumber: "83306/1979",
-          internal: true,
-          external: true,
-          externalMaintenance: { value: "6 m", text: "Půlroční" },
-          lastMaintenance: "28.-29.3.2013",
-          nextRevision: "354",
-          comment: "Frozen Yogurt",
-          employee: { id: 3, name: "Modelář" },
-          revisions: []
-        }
-      ];
-      */
     },
     basicFilter(filterMethod, filterData) {
       return gte(ifElse(length, filterMethod, always(1))(filterData), 0);
@@ -406,16 +253,16 @@ export default {
         this.headers
       );
     },
-    duplicationItem(item) {
-      this.editedIndex = -1;
-      this.editedItem = Object.assign({}, item);
+    editItem(itemId = -1, duplicate = false) {
       this.dialogNewItem = true;
-    },
-    editItem(itemId) {
-      console.log(this.$store)
-      this.editItemId = parseInt(itemId);
+      itemId = parseInt(itemId);
       if (this.$refs.dialogNewItem) {
-        this.$refs.dialogNewItem.open();
+        this.$refs.dialogNewItem.open(itemId, duplicate);
+      } else {
+        const selfRefs = this.$refs;
+        setTimeout(function() {
+          selfRefs.dialogNewItem.open(itemId, duplicate);
+        }, 300);
       }
     },
 
@@ -445,9 +292,14 @@ export default {
       this.dialogNewRevision = true;
     },
     addRevision() {
-      this.tools[
-        findIndex(propEq("id", this.itemRevisionsId), this.tools)
-      ].revisions.push(Object.assign({}, this.newRevision));
+      //this.tools[
+      //  findIndex(propEq("id", this.itemRevisionsId), this.tools)
+      //].revisions.push(Object.assign({}, this.newRevision));
+      this.axios
+        .post("/tools/" + this.itemRevisionsId + "/revision", this.newRevision)
+        .then(response => {
+          console.log(response);
+        });
       this.dialogNewRevision = false;
     },
     notifyMe() {

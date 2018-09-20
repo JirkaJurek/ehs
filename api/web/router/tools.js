@@ -24,4 +24,11 @@ router.post('/', validate(tools.validate.postAddTool) , async (ctx, next) => {
     ctx.body = 'Hello'
 })
 
+router.post('/:id(\\d+)/revision', validate(tools.validate.postAddToolRevision) , async (ctx, next) => {
+    const data = ctx.request.body;
+    data.toolId = ctx.params.id;
+    tools.service.addRevision(data);
+    ctx.body = 'Hello';
+})
+
 module.exports = router

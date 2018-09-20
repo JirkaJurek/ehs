@@ -4,15 +4,21 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './registerServiceWorker'
-import DialogTool from './components/DialogTool.vue'
-import Super from './components/Super.vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+
+import VueUploadComponent from 'vue-upload-component'
+import DialogTool from './components/DialogTool.vue'
+import Super from './components/Super.vue'
+import UploadFile from './components/UploadFile.vue'
+
 Vue.config.productionTip = false
- 
+
+Vue.component('file-upload', VueUploadComponent)
 Vue.component('dialog-tool', DialogTool);
 Vue.component('super', Super);
+Vue.component('upload-file', UploadFile);
 
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
 Vue.use(VueAxios, axios)

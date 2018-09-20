@@ -14,7 +14,7 @@ module.exports.db = db;
 
 module.exports.execQuery = (str, values, config, cb) => new Promise((resolve, reject) => {
     db.query(str, values, config, (error, data) => {
-        db.end();
+        //db.end();
         if (error) {
             reject(error);
         } else {

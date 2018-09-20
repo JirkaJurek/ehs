@@ -8,10 +8,10 @@
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.supplier" label="Dodavatel"></v-text-field>
+              <v-combobox v-model="editedItem.supplier" :items="suppliers" label="Dodavatel"></v-combobox>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.category" label="Kategorie"></v-text-field>
+              <v-select return-object :items="categories" v-model="editedItem.categories" label="Kategorie" multiple></v-select>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
@@ -20,7 +20,14 @@
               <v-text-field v-model="editedItem.revizion" label="Revizní karta el. nářadí"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.startWork" label="Uvedeno do provozu"></v-text-field>
+              <v-menu ref="menu" v-model="startWork" :close-on-content-click="false" :nudge-right="40" :return-value.sync="editedItem.startWork" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                <v-text-field slot="activator" v-model="editedItem.startWork" label="Uvedeno do provozu" prepend-icon="event" readonly></v-text-field>
+                <v-date-picker v-model="editedItem.startWork" no-title scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn flat color="primary" @click="startWork = false">Cancel</v-btn>
+                  <v-btn flat color="primary" @click="$refs.menu.save(editedItem.startWork)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.seriesNumber" label="Sériové číslo/rok výroby"></v-text-field>
@@ -41,10 +48,28 @@
               <v-text-field v-model="editedItem.comment" label="Poznámka"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.employeeId" label="Zaměstnanec"></v-text-field>
+              <v-text-field v-model="editedItem.nextRevision" label="Příšťí revize"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>
+              <v-text-field v-model="editedItem.guaranteeInto" label="guaranteeInto"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-select return-object :items="employees" v-model="editedItem.employee" label="Zaměstnanec"></v-select>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.filter1" label="Filter 1"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.filter2" label="Filter 2"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.filter3" label="Filter 3"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <upload-file></upload-file>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <!--<v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>-->
             </v-flex>
           </v-layout>
         </v-container>
@@ -62,28 +87,13 @@
 <script>
 export default {
   name: "DialogTool",
-  props: {
-    itemId: {
-      type: Number,
-      default: -1
-    },
-  },
   data: () => ({
-    editedItem: {
-      supplier: "",
-      category: {},
-      name: "",
-      revizion: "",
-      startWork: "",
-      seriesNumber: "",
-      internal: "",
-      external: "",
-      externalMaintenance: "",
-      lastMaintenance: "",
-      comment: "",
-      employee: {},
-      revisions: []
-    },
+    itemId: -1,
+    startWork: false,
+    categories: [],
+    employees: [],
+    suppliers: [],
+    editedItem: {},
     revisionInterval: [
       { value: "1 y", text: "Roční" },
       { value: "6 m", text: "Půlroční" },
@@ -102,31 +112,35 @@ export default {
       return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
     }
   },
+  created() {
+    this.categories = this.$store.state.tool.categories;
+    this.suppliers = this.$store.state.tool.suppliers;
+    this.employees = this.$store.getters.getUsersForSelect;
+  },
   methods: {
     setItem(data) {
       this.editedItem = data;
     },
-    async open() {
+    async open(itemId, duplicate = false) {
+      this.itemId = itemId;
+      this.editedItem = {};
       this.dialogNewItem = true;
-      let { data } = await this.axios.get("/tools/" + this.itemId);  
-      this.setItem(data);
+      if (this.itemId > -1) {
+        let { data } = await this.axios.get("/tools/" + this.itemId);
+        this.setItem(data);
+      }
+      if (duplicate) {
+        this.itemId = -1;
+      }
     },
     close() {
       this.dialogNewItem = false;
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      }, 300);
-    },
-    async initialize() {
-      if (this.editedIndex > -1) {
-        this.editedItem = await this.axios.get("/tools/" + this.editedIndex);
-      }
     },
     save() {
+      console.log(this.itemId);
       let url = "/tools";
-      if (this.editedIndex > -1) {
-        url += "/" + this.editedIndex;
+      if (this.itemId > -1) {
+        //url += "/" + this.itemId;
       }
       this.axios.post(url, this.editedItem).then(response => {
         console.log(response);
