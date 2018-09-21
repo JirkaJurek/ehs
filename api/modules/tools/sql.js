@@ -10,14 +10,15 @@ function testConnection() {
 }
 
 function add(data) {
-    data.categoriesJSON = data.categories ? JSON.stringify(data.categories) : null;
+    data.revisions = '[]';
+    data.categoriesJSON = data.categories ? JSON.stringify(data.categories) : '[]';
     data.revisionIntervalJSON = data.revisionInterval ? JSON.stringify(data.revisionInterval) : null;
     if (data.employee) {
         data.employeeJSON = JSON.stringify(data.employee);
         data.employeeId = data.employee.value;
     }
     const tool = execQuery(
-        `INSERT INTO ${tableName} (supplier, categories, name, revizion, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, revisions, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId) VALUES (:supplier, :categoriesJSON , :name, :revizion, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :revisions, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId);`,
+        `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId);`,
         data
     );
     tool.then((rows) => {
@@ -48,12 +49,20 @@ const categoryFunction = {
 }
 
 const revisionFunction = {
-    add: (data) => {
-        //po přidání updatnout tool a přidat mu informaci do json
-        return execQuery(
+    add: async (data) => {
+        await execQuery(
             `INSERT INTO tool_revision (id_tool, date, description, who) VALUES (:toolId, :date, :description, :who);`,
             data
         )
+        const revisions = await revisionFunction.allById(data.toolId);
+        await execQuery(
+            `UPDATE ${tableName} SET revisions=:revision WHERE id = :toolId;`,
+            { revision: JSON.stringify(revisions), toolId: data.toolId }
+        )
+        return true;
+    },
+    allById: (id) => {
+        return execQuery(`SELECT * FROM tool_revision WHERE id_tool = ? ORDER BY \`date\` DESC`, [id]);
     }
 }
 

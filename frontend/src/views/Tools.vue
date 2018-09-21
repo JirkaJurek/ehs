@@ -11,13 +11,14 @@
         <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
+      <v-btn @click.native="showDialogNewRevisions(0)" color="primary" dark class="mb-2">Nová revize</v-btn>
 
       <v-dialog v-model="dialogAllRevisions">
         <v-card>
           <v-card-title>
             <span class="headline">Všechny revize</span>
           </v-card-title>
-          <v-data-table :items="itemRevisions.revisions" class="elevation-1" hide-actions hide-headers>
+          <v-data-table :items="toJson(itemRevisions.revisions)" class="elevation-1" hide-actions hide-headers>
             <template slot="items" slot-scope="props">
               <td>{{ props.item.date }}</td>
               <td>{{ props.item.description }}</td>
@@ -58,7 +59,7 @@
         </v-card>
       </v-dialog>
     </v-toolbar>
-    <v-data-table :headers="headers" :items="tools" :search="search" :pagination.sync="pagination" class="elevation-1" v-model="selected" item-key="id" select-all>
+    <v-data-table hide-actions :headers="headers" :items="tools" :search="search" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
         <tr v-bind:class="{ 'red lighten-4' : props.item.nextRevision < 6 }">
           <td>
@@ -76,16 +77,18 @@
           <td v-bind:class="textFontSizeClass">{{ props.item.seriesNumber }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.internal }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.external }}</td>
+
           <td v-bind:class="textFontSizeClass">
-            <!--{{ props.item.externalMaintenance.text || props.item.externalMaintenance }}-->
+            <!--
+              {{ props.item.externalMaintenance.text || props.item.externalMaintenance }}
+            -->
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.nextRevision }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.employee.name }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.employee ? props.item.employee.name : '' }}</td>
           <td v-bind:class="textFontSizeClass" @click="showDialogAllRevisions(props.item)">
             <v-chip>{{ oneRevision(props.item.revisions) }}</v-chip>
             <span v-if="props.item.revisions.length > 1" class="grey--text caption">(+{{ props.item.revisions.length - 1 }} dalších)</span>
-
           </td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
             <v-icon small class="mr-2" @click="editItem(props.item.id)">
@@ -141,36 +144,13 @@ export default {
     dialogNewItem: false,
     textFontSizeClass: "test-size-1",
     search: "",
-    revisionInterval: [
-      { value: "1 y", text: "Roční" },
-      { value: "6 m", text: "Půlroční" },
-      { value: "1 m", text: "Měsíční" },
-      { value: "7 d", text: "Týdení" },
-      {
-        value: "",
-        text: "Vlastní pište ve tvaru (y,m,d) např. Roční = 1 y, Měsíční = 1 m",
-        disabled: true
-      }
-    ],
     filter: {
       employee: [],
       categories: []
     },
-    pagination: {
-      sortBy: "fat"
-    },
-    employees: [
-      { value: 1, text: "Tester" },
-      { value: 2, text: "Uklízečka" },
-      { value: 3, text: "Modelář" }
-    ],
-    categories: [
-      { value: 1, text: "CNS" },
-      { value: 2, text: "Ruční nářadí" },
-      { value: 3, text: "Pily" }
-    ],
+    employees: [],
+    categories: [],
     selected: [],
-    dialogAllRevisions: false,
     dialogAllRevisions: false,
     dialogNewRevision: false,
     headers: [
@@ -235,6 +215,8 @@ export default {
     this.initialize();
     this.changeFontSize();
     this.notifyMe();
+    this.categories = this.$store.state.tool.categories;
+    this.employees = this.$store.getters.getUsersForSelect;
   },
 
   methods: {
@@ -292,15 +274,13 @@ export default {
       this.dialogNewRevision = true;
     },
     addRevision() {
-      //this.tools[
-      //  findIndex(propEq("id", this.itemRevisionsId), this.tools)
-      //].revisions.push(Object.assign({}, this.newRevision));
-      this.axios
-        .post("/tools/" + this.itemRevisionsId + "/revision", this.newRevision)
-        .then(response => {
-          console.log(response);
-        });
+      const items = this.itemRevisionsId > 0 ? [this.itemRevisionsId] : map(prop('id'),this.selected);
+      this.axios.post("/tools/revisions", {
+        items,
+        revision: this.newRevision
+      });
       this.dialogNewRevision = false;
+      this.itemRevisionsId = 0;
     },
     notifyMe() {
       setTimeout(() => {
@@ -320,6 +300,13 @@ export default {
           });
         }
       }, 2000);
+    },
+    toJson(data) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return data;
+      }
     }
   }
 };

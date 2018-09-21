@@ -45,6 +45,9 @@
               <v-text-field v-model="editedItem.lastMaintenance" label="Poslední údržba – externí"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.price" type="number" label="Cena"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.comment" label="Poznámka"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>

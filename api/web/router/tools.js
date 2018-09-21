@@ -31,4 +31,9 @@ router.post('/:id(\\d+)/revision', validate(tools.validate.postAddToolRevision) 
     ctx.body = 'Hello';
 })
 
+router.post('/revisions', validate(tools.validate.postAddToolRevision) , async (ctx, next) => {
+    tools.service.addRevisions(ctx.request.body);
+    ctx.body = 'Hello';
+})
+
 module.exports = router
