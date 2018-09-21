@@ -12,8 +12,9 @@ const postAddTool = {
         seriesNumber: Joi.string(),
         internal: Joi.string(),
         external: Joi.string(),
-        externalMaintenance: Joi.string(),
-        nextRevision: Joi.string(),
+        revisionInterval: Joi.object(),
+        // měl by se dopočítávat poslední revize + revisionInterval
+        //nextRevision: Joi.string(),
         comment: Joi.string(),
         employee: Joi.object(),
         revisions: Joi.string(),

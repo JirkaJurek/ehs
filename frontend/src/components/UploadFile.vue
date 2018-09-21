@@ -13,6 +13,11 @@
 </template>
 
 <script>
+// tohle bude fungovat tak že vyjede modál, 
+// v něm se bude vybírat z již nahraných obrázku(dokumentu), ale bude se přez něj dát i nahrát obrázek nový
+// !!! celkově v celém projektu se takto budou nahrávat obrázky
+// pozor při mazání obrázku se bude muset vědět kde všude jsou a co všechno se tím postihne
+
 export default {
   name: "UploadFile",
   data: () => ({

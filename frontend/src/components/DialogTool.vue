@@ -39,7 +39,7 @@
               <v-text-field v-model="editedItem.external" label="Externí"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-combobox v-model="editedItem.externalMaintenance" :items="revisionInterval" label="Časový interval – externí údržba"></v-combobox>
+              <v-combobox v-model="editedItem.revisionInterval" :items="revisionInterval" label="Časový interval – externí údržba"></v-combobox>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.lastMaintenance" label="Poslední údržba – externí"></v-text-field>
@@ -48,10 +48,14 @@
               <v-text-field v-model="editedItem.comment" label="Poznámka"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.nextRevision" label="Příšťí revize"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.guaranteeInto" label="guaranteeInto"></v-text-field>
+              <v-menu ref="menu2" v-model="guaranteeInto" :close-on-content-click="false" :nudge-right="40" :return-value.sync="editedItem.guaranteeInto" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                <v-text-field slot="activator" v-model="editedItem.guaranteeInto" label="Uvedeno do provozu" prepend-icon="event" readonly></v-text-field>
+                <v-date-picker v-model="editedItem.guaranteeInto" no-title scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn flat color="primary" @click="guaranteeInto = false">Cancel</v-btn>
+                  <v-btn flat color="primary" @click="$refs.menu2.save(editedItem.guaranteeInto)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-select return-object :items="employees" v-model="editedItem.employee" label="Zaměstnanec"></v-select>
@@ -90,6 +94,7 @@ export default {
   data: () => ({
     itemId: -1,
     startWork: false,
+    guaranteeInto: false,
     categories: [],
     employees: [],
     suppliers: [],

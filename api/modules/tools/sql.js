@@ -11,12 +11,13 @@ function testConnection() {
 
 function add(data) {
     data.categoriesJSON = data.categories ? JSON.stringify(data.categories) : null;
+    data.revisionIntervalJSON = data.revisionInterval ? JSON.stringify(data.revisionInterval) : null;
     if (data.employee) {
         data.employeeJSON = JSON.stringify(data.employee);
         data.employeeId = data.employee.value;
     }
     const tool = execQuery(
-        `INSERT INTO ${tableName} (supplier, categories, name, revizion, startWork, seriesNumber, internal, external, externalMaintenance, nextRevision, comment, employee, revisions, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId) VALUES (:supplier, :categoriesJSON , :name, :revizion, :startWork, :seriesNumber, :internal, :external, :externalMaintenance, :nextRevision, :comment, :employeeJSON, :revisions, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId);`,
+        `INSERT INTO ${tableName} (supplier, categories, name, revizion, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, revisions, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId) VALUES (:supplier, :categoriesJSON , :name, :revizion, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :revisions, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId);`,
         data
     );
     tool.then((rows) => {
