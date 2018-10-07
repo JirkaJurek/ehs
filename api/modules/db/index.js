@@ -1,21 +1,36 @@
-'use strict'
+"use strict";
 
-require('dotenv').config();
+require("dotenv").config();
 
 const Client = require('mariasql');
-const db = new Client({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    db: process.env.DB_DBNAME,
-    charset: 'utf8',
-});
+function newConect() {
+    return new Client({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        db: process.env.DB_DBNAME,
+        charset: 'utf8',
+    })
+}
+let db = newConect();
+let destroyDb = null;
 
 module.exports.db = db;
+module.exports.escape = Client.escape;
 
 module.exports.execQuery = (str, values, config, cb) => new Promise((resolve, reject) => {
+    if (destroyDb) {
+        clearTimeout(destroyDb);
+    }
+    if (!db.connected) {
+        db = newConect();
+    }
     db.query(str, values, config, (error, data) => {
-        //db.end();
+        destroyDb = setTimeout(() => {
+            if (db.connected) {
+                db.end();
+            }
+        }, 60000)
         if (error) {
             reject(error);
         } else {
@@ -23,3 +38,24 @@ module.exports.execQuery = (str, values, config, cb) => new Promise((resolve, re
         }
     });
 });
+
+/*
+const mariadb = require("mariadb");
+const pool = mariadb.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DBNAME,
+  connectionLimit: 5
+});
+
+module.exports.db = pool.getConnection();
+module.exports.execQuery = async (str, values, config, cb) => {
+    return pool.query(str, values, config, cb);
+}
+
+module.exports.escape = async () => {
+    const conn = await pool.getConnection();
+    return conn.escape;
+}
+*/

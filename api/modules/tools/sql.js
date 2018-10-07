@@ -1,6 +1,6 @@
 'use strict'
 
-const { execQuery } = require('../db');
+const { execQuery, escape } = require('../db');
 const { map } = require('ramda');
 const tableName = 'tool';
 
@@ -18,20 +18,47 @@ function add(data) {
         data.employeeId = data.employee.value;
     }
     const tool = execQuery(
-        `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId);`,
+        `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock);`,
         data
     );
     tool.then((rows) => {
-        categoryFunction.removeAllOld(rows.info.insertId).then(() => {
-            if (data.categories) {
+        if (data.categories) {
+            map((categoryData) => {
+                categoryFunction.add({
+                    toolId: rows.info.insertId,
+                    categoryId: categoryData.value
+                })
+            }, data.categories);
+        }
+    });
+    return tool;
+}
+
+function update(id, data) {
+    data.categoriesJSON = data.categories ? JSON.stringify(data.categories) : '[]';
+    data.revisionIntervalJSON = data.revisionInterval ? JSON.stringify(data.revisionInterval) : null;
+    if (data.employee) {
+        data.employeeJSON = JSON.stringify(data.employee);
+        data.employeeId = data.employee.value;
+    }
+    data.id = id;
+    const tool = execQuery(
+        `UPDATE ${tableName} 
+        SET supplier=:supplier, categories=:categoriesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, internal=:internal, external=:external, revisionInterval=:revisionIntervalJSON, nextRevision=:nextRevision, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:files, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock
+        WHERE id=:id;`,
+        data
+    );
+    tool.then((rows) => {
+        if (data.categories) {
+            categoryFunction.removeAllOld(rows.info.insertId).then(() => {
                 map((categoryData) => {
                     categoryFunction.add({
                         toolId: rows.info.insertId,
                         categoryId: categoryData.value
                     })
                 }, data.categories);
-            }
-        });
+            });
+        }
     });
     return tool;
 }
@@ -66,18 +93,36 @@ const revisionFunction = {
     }
 }
 
-function list() {
-    return execQuery(`SELECT * FROM ${tableName} LIMIT 100`);
+function list(query) {
+    let sql = `
+    SELECT * FROM ${tableName}
+    WHERE deletedAt IS NULL
+    `;
+    if (query.sortBy) {
+        sql += ` ORDER BY ${escape(query.sortBy)} ${query.descending == 'true' ? 'DESC' : 'ASC'}`
+    }
+    if (query.filter) {
+        //sql += ` ORDER BY ${escape(query.sortBy)} ${query.descending == 'true' ? 'DESC' : 'ASC'}`
+    }
+    sql += ' LIMIT 100';
+
+    return execQuery(sql);
 }
 
 function showById(id) {
     return execQuery(`SELECT * FROM ${tableName} WHERE id = ?`, [id]);
 }
 
+function deleteById(toolId) {
+    return execQuery(`UPDATE ${tableName} SET deletedAt=NOW() WHERE id = ?;`, [toolId]);
+}
+
 module.exports = {
     testConnection,
     add,
+    update,
     list,
     showById,
-    addRevision: revisionFunction.add
+    addRevision: revisionFunction.add,
+    deleteById,
 }

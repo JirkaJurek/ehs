@@ -3,6 +3,7 @@
 require('dotenv').config();
 
 const Koa = require('koa');
+const koaStatic   = require('koa-static');
 const logger = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 const responseTime = require('koa-response-time');
@@ -26,6 +27,7 @@ app.use(responseTime())
     }))
     .use(cors())
     .use(router())
+    .use(koaStatic(__dirname + '/public'))
     .listen(config.port);
 
 module.exports = app;
