@@ -160,7 +160,7 @@ export default {
         url += "/" + this.itemId;
       }
       this.axios.post(url, this.editedItem).then(response => {
-        console.log(response);
+        this.$store.dispatch("loadAllTool")
       });
       this.close();
     },

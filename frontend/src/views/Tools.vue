@@ -13,52 +13,6 @@
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
-
-      <v-dialog v-model="dialogAllRevisions">
-        <v-card>
-          <v-card-title>
-            <span class="headline">Všechny revize</span>
-          </v-card-title>
-          <v-data-table :items="toJson(itemRevisions.revisions)" class="elevation-1" hide-actions hide-headers>
-            <template slot="items" slot-scope="props">
-              <td>{{ props.item.date }}</td>
-              <td>{{ props.item.description }}</td>
-            </template>
-          </v-data-table>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="showDialogNewRevisions(itemRevisions.id)">Nová revize</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="closeDialogAllRevisions">Cancel</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog v-model="dialogNewRevision">
-        <v-card>
-          <v-card-title>
-            <span class="headline">Nová revize</span>
-          </v-card-title>
-
-          <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-date-picker v-model="newRevision.date"></v-date-picker>
-                  <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
-                  <v-text-field v-model="newRevision.who" label="Kdo"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="closeDialogNewRevision">Cancel</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="addRevision">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-toolbar>
     <v-data-table :custom-sort="customSort" hide-actions :headers="headers" :items="tools" :search="search" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
@@ -87,7 +41,7 @@
           <td v-bind:class="textFontSizeClass">{{ props.item.nextRevision }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
-          <td v-bind:class="textFontSizeClass" @click="showDialogAllRevisions(props.item)">
+          <td v-bind:class="textFontSizeClass" @click="showDialogAllRevisions(props.item.id)">
             <!-- nevím jaký bude mít vliv na výkon toJson -->
             <v-chip>{{ oneRevision(toJson(props.item.revisions)) }}</v-chip>
             <span v-if="toJson(props.item.revisions).length > 1" class="grey--text caption">(+{{ toJson(props.item.revisions).length - 1 }} dalších)</span>
@@ -111,6 +65,7 @@
       </v-alert>
     </v-data-table>
     <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
+    <revision-tool ref=revisionTool />
   </div>
 </template>
 
@@ -155,13 +110,9 @@ export default {
     employees: [],
     categories: [],
     selected: [],
-    dialogAllRevisions: false,
-    dialogNewRevision: false,
     headers: [],
     //tools: [],
     editedIndex: -1,
-    itemRevisions: {},
-    itemRevisionsId: 0,
     newRevision: {},
     bulk: true,
     pagination: {}
@@ -261,33 +212,15 @@ export default {
         head(revisions)
       );
     },
-    showDialogAllRevisions(item) {
-      this.itemRevisions = item;
-      this.dialogAllRevisions = true;
-    },
-    closeDialogAllRevisions() {
-      this.dialogAllRevisions = false;
-    },
-    closeDialogNewRevision() {
-      this.dialogNewRevision = false;
+    showDialogAllRevisions(itemId) {
+      this.$refs.revisionTool.showDialogAllRevisions(itemId);
     },
     showDialogNewRevisions(itemId) {
-      this.itemRevisionsId = itemId;
-      this.dialogNewRevision = true;
-    },
-    addRevision() {
-      const items =
-        this.itemRevisionsId > 0
-          ? [this.itemRevisionsId]
-          : map(prop("id"), this.selected);
-      this.axios.post("/tools/revisions", {
-        items,
-        revision: this.newRevision
-      });
-      this.dialogNewRevision = false;
-      this.itemRevisionsId = 0;
+      this.$refs.revisionTool.selected = this.selected;
+      this.$refs.revisionTool.showDialogNewRevisions(itemId);
     },
     notifyMe() {
+      /*
       setTimeout(() => {
         if (!("Notification" in window)) {
           alert("This browser does not support desktop notification");
@@ -305,6 +238,7 @@ export default {
           });
         }
       }, 2000);
+      */
     },
     toJson(data) {
       try {

@@ -31,10 +31,12 @@ router.post('/:id(\\d+)/revision', validate(tools.validate.postAddToolRevision) 
     const data = ctx.request.body;
     data.toolId = ctx.params.id;
     tools.service.addRevision(data);
+    ctx.status = 201;
 })
 
 router.post('/revisions', validate(tools.validate.postAddToolRevision) , async (ctx, next) => {
-    tools.service.addRevisions(ctx.request.body);
+    await tools.service.addRevisions(ctx.request.body);
+    ctx.status = 200;
 })
 
 router.delete('/:id(\\d+)', async (ctx, next) => {

@@ -38,10 +38,11 @@ module.exports.addRevision = (data) => {
     sql.addRevision(data);
 };
 
-module.exports.addRevisions = ({ items, revision}) => {
-    return map(x => {
-        return sql.addRevision(assoc('toolId', x, revision))
-    }, items);
+module.exports.addRevisions = async ({ items, revision}) => {
+    const z = await Promise.all(map((x) => {
+        return sql.addRevision(assoc('toolId', x, revision));
+    }, items))
+    return z;
 };
 
 
