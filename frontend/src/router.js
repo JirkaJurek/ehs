@@ -15,6 +15,7 @@ export default new Router({
     },
     {
       path: '/tools',
+      alias: '/fe/tools',
       name: 'tools',
       component: () => import('./views/Tools.vue')
     },

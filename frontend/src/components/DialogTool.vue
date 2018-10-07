@@ -17,7 +17,7 @@
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.revizion" label="Revizní karta el. nářadí"></v-text-field>
+              <v-text-field v-model="editedItem.revisionCard" label="Revizní karta el. nářadí"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-menu ref="menu" v-model="startWork" :close-on-content-click="false" :nudge-right="40" :return-value.sync="editedItem.startWork" lazy transition="scale-transition" offset-y full-width min-width="290px">
@@ -63,6 +63,11 @@
             <v-flex xs12 sm6 md4>
               <v-select return-object :items="employees" v-model="editedItem.employee" label="Zaměstnanec"></v-select>
             </v-flex>
+            <v-checkbox
+              v-model="editedItem.inStock"
+              label="Skladem"
+              :value="1"
+            ></v-checkbox>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.filter1" label="Filter 1"></v-text-field>
             </v-flex>
@@ -127,11 +132,16 @@ export default {
   },
   methods: {
     setItem(data) {
+      data.categories = this.toJson(data.categories);
+      data.revisionInterval = this.toJson(data.revisionInterval);
+      data.employee = this.toJson(data.employee);
       this.editedItem = data;
     },
     async open(itemId, duplicate = false) {
       this.itemId = itemId;
-      this.editedItem = {};
+      this.editedItem = {
+        inStock: 1
+      };
       this.dialogNewItem = true;
       if (this.itemId > -1) {
         let { data } = await this.axios.get("/tools/" + this.itemId);
@@ -145,15 +155,21 @@ export default {
       this.dialogNewItem = false;
     },
     save() {
-      console.log(this.itemId);
       let url = "/tools";
       if (this.itemId > -1) {
-        //url += "/" + this.itemId;
+        url += "/" + this.itemId;
       }
       this.axios.post(url, this.editedItem).then(response => {
         console.log(response);
       });
       this.close();
+    },
+    toJson(data) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return data;
+      }
     }
   }
 };

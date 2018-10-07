@@ -7,6 +7,7 @@
       app
     >
       <v-list dense>
+        <router-link to="/fe/tools">Nástroje</router-link>
         <template v-for="item in items">
           <v-layout
             v-if="item.heading"

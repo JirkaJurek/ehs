@@ -11,7 +11,8 @@
         <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
-      <v-btn @click.native="showDialogNewRevisions(0)" color="primary" dark class="mb-2">Nová revize</v-btn>
+      <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
+      <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
 
       <v-dialog v-model="dialogAllRevisions">
         <v-card>
@@ -59,7 +60,7 @@
         </v-card>
       </v-dialog>
     </v-toolbar>
-    <v-data-table hide-actions :headers="headers" :items="tools" :search="search" class="elevation-1" v-model="selected" item-key="id" select-all>
+    <v-data-table :custom-sort="customSort" hide-actions :headers="headers" :items="tools" :search="search" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
         <tr v-bind:class="{ 'red lighten-4' : props.item.nextRevision < 6 }">
           <td>
@@ -67,12 +68,12 @@
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
           <td v-bind:class="textFontSizeClass">
-            <v-chip v-for="(category, key) in props.item.categories.slice(0,3)" v-bind:key=key>
-              {{ category.name }}
+            <v-chip v-for="(category, key) in toJson(props.item.categories).slice(0,3)" v-bind:key=key>
+              {{ category.text }}
             </v-chip>
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.revizion }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.revisionCard }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.seriesNumber }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.internal }}</td>
@@ -85,11 +86,13 @@
           </td>
           <td v-bind:class="textFontSizeClass">{{ props.item.nextRevision }}</td>
           <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.employee ? props.item.employee.name : '' }}</td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
           <td v-bind:class="textFontSizeClass" @click="showDialogAllRevisions(props.item)">
-            <v-chip>{{ oneRevision(props.item.revisions) }}</v-chip>
-            <span v-if="props.item.revisions.length > 1" class="grey--text caption">(+{{ props.item.revisions.length - 1 }} dalších)</span>
+            <!-- nevím jaký bude mít vliv na výkon toJson -->
+            <v-chip>{{ oneRevision(toJson(props.item.revisions)) }}</v-chip>
+            <span v-if="toJson(props.item.revisions).length > 1" class="grey--text caption">(+{{ toJson(props.item.revisions).length - 1 }} dalších)</span>
           </td>
+          <td v-bind:class="textFontSizeClass">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
             <v-icon small class="mr-2" @click="editItem(props.item.id)">
               edit
@@ -97,7 +100,7 @@
             <v-icon small class="mr-2" @click="editItem(props.item.id, true)">
               filter_none
             </v-icon>
-            <v-icon small @click="deleteItem(props.item)">
+            <v-icon small @click="deleteItem(props.item.id)">
               delete
             </v-icon>
           </td>
@@ -141,6 +144,7 @@ import {
 import moment from "moment";
 export default {
   data: () => ({
+    totalItems: 0,
     dialogNewItem: false,
     textFontSizeClass: "test-size-1",
     search: "",
@@ -153,33 +157,20 @@ export default {
     selected: [],
     dialogAllRevisions: false,
     dialogNewRevision: false,
-    headers: [
-      { text: "Dodavatel", value: "supplier" },
-      { text: "Kategorie", value: "categories" },
-      { text: "Název stroje", value: "name" },
-      { text: "Revizní karta el. nářadí", value: "revizion" },
-      { text: "Uvedeno do provozu", value: "startWork" },
-      { text: "Sériové číslo/rok výroby", value: "seriesNumber" },
-      { text: "Interní – dle plánu – FB 6_0025", value: "internal" },
-      { text: "Externí", value: "external" },
-      {
-        text: "Časový interval – externí údržba",
-        value: "externalMaintenance"
-      },
-      { text: "Další údržba", value: "nextRevision" },
-      { text: "Poznámka", value: "comment" },
-      { text: "Zaměstnanec", value: "employeeId" },
-      { text: "Revize", value: "revisions" },
-      { text: "Actions", align: "center", value: "actions", sortable: false }
-    ],
-    tools: [],
+    headers: [],
+    //tools: [],
     editedIndex: -1,
     itemRevisions: {},
     itemRevisionsId: 0,
-    newRevision: {}
+    newRevision: {},
+    bulk: true,
+    pagination: {}
   }),
 
   computed: {
+    tools() {
+      return this.$store.state.tool.tools
+    },
     formTitle() {
       return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
     }
@@ -189,23 +180,12 @@ export default {
     dialogAllRevisions(val) {
       val || this.closeDialogAllRevisions();
     },
+    selected(val) {
+      this.bulk = val.length ? false : true;
+    },
     filter: {
       handler() {
         this.initialize();
-        this.tools = pipe(
-          filter(x => {
-            return this.basicFilter(
-              indexOf(x.employee.id),
-              this.filter.employee
-            );
-          }),
-          filter(x => {
-            return this.basicFilter(
-              indexOf(x.categories.id),
-              this.filter.categories
-            );
-          })
-        )(this.tools);
       },
       deep: true
     }
@@ -217,12 +197,26 @@ export default {
     this.notifyMe();
     this.categories = this.$store.state.tool.categories;
     this.employees = this.$store.getters.getUsersForSelect;
+    this.headersConfig();
   },
 
   methods: {
+    customSort(items, sortBy, descending) {
+      if (
+        this.pagination.sortBy != sortBy ||
+        this.pagination.descending != descending
+      ) {
+        this.pagination.sortBy = sortBy;
+        this.pagination.descending = descending;
+        this.initialize();
+      }
+      return items;
+    },
     initialize() {
-      this.axios.get("/tools").then(response => {
-        this.tools = response.data;
+      this.$store.dispatch("loadAllTool", {
+        filter: this.filter,
+        sortBy: this.pagination.sortBy,
+        descending: this.pagination.descending
       });
     },
     basicFilter(filterMethod, filterData) {
@@ -247,11 +241,19 @@ export default {
         }, 300);
       }
     },
-
-    deleteItem(item) {
-      const index = this.tools.indexOf(item);
-      confirm("Are you sure you want to delete this item?") &&
-        this.tools.splice(index, 1);
+    async deleteItem(itemId) {
+      console.log(this.pagination);
+      if (
+        confirm(
+          `Opravdu chcete smazat ${itemId ? "tuto položku" : "tyto položky"}?`
+        )
+      ) {
+        const items = itemId ? [itemId] : map(prop("id"), this.selected);
+        await this.axios.post("/tools/more-tools", {
+          items
+        });
+        this.initialize();
+      }
     },
     oneRevision(revisions) {
       const dateFormat = x => moment(prop("date", x)).format("MM, YY");
@@ -274,7 +276,10 @@ export default {
       this.dialogNewRevision = true;
     },
     addRevision() {
-      const items = this.itemRevisionsId > 0 ? [this.itemRevisionsId] : map(prop('id'),this.selected);
+      const items =
+        this.itemRevisionsId > 0
+          ? [this.itemRevisionsId]
+          : map(prop("id"), this.selected);
       this.axios.post("/tools/revisions", {
         items,
         revision: this.newRevision
@@ -307,6 +312,9 @@ export default {
       } catch (e) {
         return data;
       }
+    },
+    headersConfig() {
+      this.headers = this.$store.state.tool.columns;
     }
   }
 };
