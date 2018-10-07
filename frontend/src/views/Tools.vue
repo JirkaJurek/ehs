@@ -10,6 +10,14 @@
       <v-flex xs12 sm6>
         <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
+      <v-flex xs12 sm6>
+        <v-select :items="headersFieldForSelect" v-model="headersSelect" :menu-props="{ maxHeight: '400' }" label="Viditelná pole" multiple hint="Viditelná pole" persistent-hint>
+          <template slot="selection" slot-scope="{ item, index }">
+            <span v-if="index === 0">{{ item.text }}</span>
+            <span v-if="index === 1" class="grey--text caption">(a dalších)</span>
+          </template>
+        </v-select>
+      </v-flex>
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
@@ -20,33 +28,33 @@
           <td>
             <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
           </td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.supplier }}</td>
-          <td v-bind:class="textFontSizeClass">
+          <td v-bind:class="textFontSizeClass" v-if="viewSupplier">{{ props.item.supplier }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewCategories">
             <v-chip v-for="(category, key) in toJson(props.item.categories).slice(0,3)" v-bind:key=key>
               {{ category.text }}
             </v-chip>
           </td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.name }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.revisionCard }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.startWork }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.seriesNumber }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.internal }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.external }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewName">{{ props.item.name }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewRevisionCard">{{ props.item.revisionCard }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewStartWork">{{ props.item.startWork }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewSeriesNumber">{{ props.item.seriesNumber }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewInternal">{{ props.item.internal }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewExternal">{{ props.item.external }}</td>
 
-          <td v-bind:class="textFontSizeClass">
-            <!--
+          <!--
+          <td v-bind:class="textFontSizeClass" v-if="viewExternalMaintence">
               {{ props.item.externalMaintenance.text || props.item.externalMaintenance }}
-            -->
           </td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.nextRevision }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.comment }}</td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
-          <td v-bind:class="textFontSizeClass" @click="showDialogAllRevisions(props.item.id)">
+            -->
+          <td v-bind:class="textFontSizeClass" v-if="viewNextRevision">{{ props.item.nextRevision }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewComment">{{ props.item.comment }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewEmployee">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewRevision" @click="showDialogAllRevisions(props.item.id)">
             <!-- nevím jaký bude mít vliv na výkon toJson -->
             <v-chip>{{ oneRevision(toJson(props.item.revisions)) }}</v-chip>
             <span v-if="toJson(props.item.revisions).length > 1" class="grey--text caption">(+{{ toJson(props.item.revisions).length - 1 }} dalších)</span>
           </td>
-          <td v-bind:class="textFontSizeClass">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewStock">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
             <v-icon small class="mr-2" @click="editItem(props.item.id)">
               edit
@@ -111,6 +119,23 @@ export default {
     categories: [],
     selected: [],
     headers: [],
+    headersSelect: [
+      "supplier",
+      "categories",
+      "name",
+      "revisionCard",
+      "startWork",
+      "seriesNumber",
+      "internal",
+      "external",
+      "externalMaintence",
+      "nextRevision",
+      "comment",
+      "employeeId",
+      "revisions",
+      "inStock",
+      "actions"
+    ],
     //tools: [],
     editedIndex: -1,
     newRevision: {},
@@ -120,10 +145,55 @@ export default {
 
   computed: {
     tools() {
-      return this.$store.state.tool.tools
+      return this.$store.state.tool.tools;
     },
     formTitle() {
       return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
+    },
+    viewSupplier() {
+      return this.headersSelect.indexOf("supplier") !== -1;
+    },
+    viewCategories() {
+      return this.headersSelect.indexOf("categories") !== -1;
+    },
+    viewName() {
+      return this.headersSelect.indexOf("name") !== -1;
+    },
+    viewRevisionCard() {
+      return this.headersSelect.indexOf("revisionCard") !== -1;
+    },
+    viewStartWork() {
+      return this.headersSelect.indexOf("startWork") !== -1;
+    },
+    viewSeriesNumber() {
+      return this.headersSelect.indexOf("seriesNumber") !== -1;
+    },
+    viewInternal() {
+      return this.headersSelect.indexOf("internal") !== -1;
+    },
+    viewExternal() {
+      return this.headersSelect.indexOf("external") !== -1;
+    },
+    viewExternalMaintence() {
+      return this.headersSelect.indexOf("externalMaintence") !== -1;
+    },
+    viewNextRevision() {
+      return this.headersSelect.indexOf("nextRevision") !== -1;
+    },
+    viewComment() {
+      return this.headersSelect.indexOf("comment") !== -1;
+    },
+    viewEmployee() {
+      return this.headersSelect.indexOf("employeeId") !== -1;
+    },
+    viewRevision() {
+      return this.headersSelect.indexOf("revisions") !== -1;
+    },
+    viewStock() {
+      return this.headersSelect.indexOf("inStock") !== -1;
+    },
+    headersFieldForSelect() {
+      return this.$store.state.tool.columns;
     }
   },
 
@@ -139,6 +209,9 @@ export default {
         this.initialize();
       },
       deep: true
+    },
+    headersSelect() {
+      this.headersConfig();
     }
   },
 
@@ -169,9 +242,6 @@ export default {
         sortBy: this.pagination.sortBy,
         descending: this.pagination.descending
       });
-    },
-    basicFilter(filterMethod, filterData) {
-      return gte(ifElse(length, filterMethod, always(1))(filterData), 0);
     },
     changeFontSize() {
       this.textFontSizeClass = "test-size-1";
@@ -248,7 +318,9 @@ export default {
       }
     },
     headersConfig() {
-      this.headers = this.$store.state.tool.columns;
+      this.headers = filter(x => {
+        return this.headersSelect.indexOf(x.value) !== -1;
+      }, this.$store.state.tool.columns);
     }
   }
 };
