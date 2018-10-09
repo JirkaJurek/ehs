@@ -3,7 +3,7 @@
     <v-layout display-4 align-center justify-center>Plán údržby 2018</v-layout>
     <v-toolbar flat color="white">
       <v-spacer></v-spacer>
-      <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+      <v-text-field v-model="filter.search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>
       <v-flex xs12 sm6>
         <v-select :items="employees" v-model="filter.employee" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
@@ -22,7 +22,7 @@
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
     </v-toolbar>
-    <v-data-table :custom-sort="customSort" hide-actions :headers="headers" :items="tools" :search="search" class="elevation-1" v-model="selected" item-key="id" select-all>
+    <v-data-table :custom-sort="customSort" hide-actions :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
         <tr v-bind:class="{ 'red lighten-4' : props.item.nextRevision < 6 }">
           <td>
@@ -69,7 +69,7 @@
         </tr>
       </template>
       <v-alert slot="no-results" :value="true" color="error" icon="warning">
-        Your search for "{{ search }}" found no results.
+        Your search for "{{ filter.search }}" found no results.
       </v-alert>
     </v-data-table>
     <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
@@ -110,7 +110,6 @@ export default {
     totalItems: 0,
     dialogNewItem: false,
     textFontSizeClass: "test-size-1",
-    search: "",
     filter: {
       employee: [],
       categories: []

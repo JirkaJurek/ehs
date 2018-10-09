@@ -2,6 +2,8 @@
 
 require("dotenv").config();
 
+var queryBuilder = require('./queryBuilder');
+
 const Client = require('mariasql');
 function newConect() {
     return new Client({
@@ -38,6 +40,8 @@ module.exports.execQuery = (str, values, config, cb) => new Promise((resolve, re
         }
     });
 });
+
+module.exports.queryBuilder = queryBuilder;
 
 /*
 const mariadb = require("mariadb");

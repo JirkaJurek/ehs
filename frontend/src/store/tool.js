@@ -1,14 +1,17 @@
 import { find, propEq } from "ramda";
 import axios from "axios";
+import { clearTimeout, setTimeout } from "timers";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 
-const toJson = (data) => {
+const toJson = data => {
   try {
     return JSON.parse(data);
   } catch (e) {
     return data;
   }
-}
+};
+
+let loadAllToolSetTimeout;
 
 export default {
   state: {
@@ -57,7 +60,7 @@ export default {
       return find(propEq("id", id), state.categories);
     },
     getAllRevisionById: state => id => {
-      const tool = find(propEq("id", id), state.tools)
+      const tool = find(propEq("id", id), state.tools);
       return tool ? toJson(tool.revisions) : [];
     }
   },
@@ -68,13 +71,18 @@ export default {
       if (isGlobalFilter) {
         state.filter = getParams;
       }
-      axios
-        .get("/tools", {
-          params: getParams
-        })
-        .then(response => {
-          state.tools = response.data;
-        });
+      if (loadAllToolSetTimeout) {
+        clearTimeout(loadAllToolSetTimeout);
+      }
+      loadAllToolSetTimeout = setTimeout(() => {
+        axios
+          .get("/tools", {
+            params: getParams
+          })
+          .then(response => {
+            state.tools = response.data;
+          });
+      }, 500);
     }
   }
 };
