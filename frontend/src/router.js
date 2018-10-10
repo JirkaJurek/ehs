@@ -9,12 +9,12 @@ export default new Router({
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
+      path: '/home',
       name: 'home',
       component: Home
     },
     {
-      path: '/tools',
+      path: '/',
       alias: '/fe/tools',
       name: 'tools',
       component: () => import('./views/Tools.vue')

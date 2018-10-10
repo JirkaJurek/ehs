@@ -21,8 +21,10 @@
     "koa-static": "^5.0.0",
     "koa2-validation": "^0.1.0",
     "mariasql": "^0.2.6",
+    "mime-types": "^2.1.20",
     "moment": "^2.22.2",
     "multy": "^0.1.5",
-    "ramda": "^0.25.0"
+    "ramda": "^0.25.0",
+    "save-file": "^1.2.1"
   }
 }

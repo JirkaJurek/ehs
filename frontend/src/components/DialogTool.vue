@@ -78,7 +78,7 @@
               <v-text-field v-model="editedItem.filter3" label="Filter 3"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <upload-file></upload-file>
+              <upload-file v-on:update="updateImages" :selectedFiles="editedItem.files" ref="uploadFile"></upload-file>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <!--<v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>-->
@@ -163,6 +163,9 @@ export default {
         this.$store.dispatch("loadAllTool")
       });
       this.close();
+    },
+    updateImages(data) {
+      this.editedItem.files = data;
     },
     toJson(data) {
       try {

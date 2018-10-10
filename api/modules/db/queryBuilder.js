@@ -77,7 +77,7 @@ module.exports = class QueryBuilder {
         } ON ${data.sql}`;
       });
     }
-    if (this.config.where) {
+    if (this.config.where && this.config.where.length) {
       sql += ` WHERE ${this.config.where.join(" AND ")}`;
     }
     if (this.config.groupBy) {

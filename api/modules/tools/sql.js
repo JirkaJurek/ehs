@@ -18,12 +18,13 @@ function add(data) {
   data.revisionIntervalJSON = data.revisionInterval
     ? JSON.stringify(data.revisionInterval)
     : null;
+  data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
     data.employeeId = data.employee.value;
   }
   const tool = execQuery(
-    `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :files, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock);`,
+    `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock);`,
     data
   );
   tool.then(rows => {
@@ -46,6 +47,7 @@ function update(id, data) {
   data.revisionIntervalJSON = data.revisionInterval
     ? JSON.stringify(data.revisionInterval)
     : null;
+  data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
     data.employeeId = data.employee.value;
@@ -53,10 +55,13 @@ function update(id, data) {
   data.id = id;
   const tool = execQuery(
     `UPDATE ${tableName} 
-        SET supplier=:supplier, categories=:categoriesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, internal=:internal, external=:external, revisionInterval=:revisionIntervalJSON, nextRevision=:nextRevision, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:files, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock
+        SET supplier=:supplier, categories=:categoriesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, internal=:internal, external=:external, revisionInterval=:revisionIntervalJSON, nextRevision=:nextRevision, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock
         WHERE id=:id;`,
     data
   );
+
+  // TODO ukládání files stejně jako u kategorií
+
   tool.then(rows => {
     if (data.categories) {
       categoryFunction.removeAllOld(rows.info.insertId).then(() => {
@@ -91,11 +96,18 @@ const revisionFunction = {
       data
     );
     const revisions = await revisionFunction.allById(data.toolId);
-    const revisionInterval = prop('revisionInterval', head(await showById(data.toolId)));
+    const revisionInterval = prop(
+      "revisionInterval",
+      head(await showById(data.toolId))
+    );
     let nextRevision = null;
     if (revisionInterval) {
-        const revisionIntervalValue = JSON.parse(revisionInterval).value.split('');
-        nextRevision = moment(revisions[0].date).add(revisionIntervalValue[0], revisionIntervalValue[2]).format('Y-M-d');
+      const revisionIntervalValue = JSON.parse(revisionInterval).value.split(
+        ""
+      );
+      nextRevision = moment(revisions[0].date)
+        .add(revisionIntervalValue[0], revisionIntervalValue[2])
+        .format("Y-M-d");
     }
     await execQuery(
       `UPDATE ${tableName} SET revisions=:revision, nextRevision=:nextRevision WHERE id = :toolId;`,
@@ -124,13 +136,25 @@ function list(query) {
   }
   if (filter.categories && filter.categories.length) {
     builder.join("tool_category", `tc.id_tool = ${tableName}.id`, "tc");
-    builder.where(`tc.id_category IN(${filter.categories.filter(x => Number.isInteger(x)).join(',')})`);
+    builder.where(
+      `tc.id_category IN(${filter.categories
+        .filter(x => Number.isInteger(x))
+        .join(",")})`
+    );
   }
   if (filter.employee && filter.employee.length) {
-    builder.where(`${tableName}.employeeId IN(${filter.employee.filter(x => Number.isInteger(x)).join(',')})`);
+    builder.where(
+      `${tableName}.employeeId IN(${filter.employee
+        .filter(x => Number.isInteger(x))
+        .join(",")})`
+    );
   }
   if (filter.search && !isEmpty(filter.search)) {
-      builder.where(`MATCH(supplier, categories, name, revisionCard, seriesNumber, internal, external, comment, employee, filter1, filter2, filter3) AGAINST("${escape(filter.search)}")`)
+    builder.where(
+      `MATCH(supplier, categories, name, revisionCard, seriesNumber, internal, external, comment, employee, filter1, filter2, filter3) AGAINST("${escape(
+        filter.search
+      )}")`
+    );
   }
   console.log(builder.getSql());
   return execQuery(builder.getSql());

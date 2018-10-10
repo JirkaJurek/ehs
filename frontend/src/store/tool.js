@@ -1,6 +1,5 @@
 import { find, propEq } from "ramda";
 import axios from "axios";
-import { clearTimeout, setTimeout } from "timers";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 
 const toJson = data => {
@@ -17,7 +16,7 @@ export default {
   state: {
     suppliers: ["Houfek", "Lenovo"],
     categories: [
-      { value: 1, text: "CNS" },
+      { value: 1, text: "CNC" },
       { value: 2, text: "Ruční nářadí" },
       { value: 3, text: "Pily" }
     ],
