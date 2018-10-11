@@ -1,4 +1,4 @@
-import { find, propEq, props } from "ramda";
+import { find, propEq, props, prepend } from "ramda";
 import axios from "axios";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 
@@ -60,7 +60,12 @@ export default {
       return tool ? toJson(tool.revisions) : [];
     }
   },
-  mutations: {},
+  mutations: {
+    newSupplier(state, name) {
+      state.suppliers.splice(0, 0, name);
+      axios.post("/config/edit-by-name", {name: "tool.supplier", data: state.suppliers})
+    }
+  },
   actions: {
     async loadAllTool({ state }, getParams, isGlobalFilter = true) {
       getParams = getParams || state.filter;

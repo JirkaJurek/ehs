@@ -15,6 +15,16 @@ function list(query) {
     return execQuery(builder.getSql());
 }
 
+function editByName(data) {
+    data.dataJSON = data.data ? JSON.stringify(data.data) : null;
+    return execQuery(
+        `UPDATE ${tableName} 
+            SET data=:dataJSON
+            WHERE name=:name;`,
+        data
+      );
+}
 module.exports = {
-    list
+    list,
+    editByName
 }

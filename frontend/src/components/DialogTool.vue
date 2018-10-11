@@ -105,9 +105,6 @@ export default {
     itemId: -1,
     startWork: false,
     guaranteeInto: false,
-    categories: [],
-    employees: [],
-    suppliers: [],
     editedItem: {},
     revisionInterval: [
       { value: "1 y", text: "Roční" },
@@ -125,13 +122,18 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
-    }
+    },
+    suppliers() {
+      return this.$store.state.tool.suppliers;
+    },
+    employees() {
+      return this.$store.getters.getUsersForSelect;
+    },
+    categories() {
+      return this.$store.state.tool.categories;
+    },
   },
-  created() {
-    this.categories = this.$store.state.tool.categories;
-    this.suppliers = this.$store.state.tool.suppliers;
-    this.employees = this.$store.getters.getUsersForSelect;
-  },
+  created() {},
   methods: {
     setItem(data) {
       data.categories = this.toJson(data.categories);
@@ -160,6 +162,10 @@ export default {
       let url = "/tools";
       if (this.itemId > -1) {
         url += "/" + this.itemId;
+      }
+      if (this.editedItem.supplier && this.suppliers.indexOf(this.editedItem.supplier) === -1) {
+        console.log(this.editedItem.supplier)
+        this.$store.commit('newSupplier', this.editedItem.supplier)
       }
       this.axios.post(url, this.editedItem).then(response => {
         this.$store.dispatch("loadAllTool")
