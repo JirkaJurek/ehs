@@ -24,7 +24,7 @@
     </v-toolbar>
     <v-data-table :custom-sort="customSort" hide-actions :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
-        <tr v-bind:class="{ 'red lighten-4' : props.item.nextRevision < 6 }">
+        <tr>
           <td>
             <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
           </td>
@@ -38,15 +38,14 @@
           <td v-bind:class="textFontSizeClass" v-if="viewRevisionCard">{{ props.item.revisionCard }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewStartWork">{{ props.item.startWork }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewSeriesNumber">{{ props.item.seriesNumber }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewInternal">{{ props.item.internal }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewExternal">{{ props.item.external }}</td>
-
+          <td v-bind:class="textFontSizeClass" v-if="viewInventoryNumber">{{ props.item.inventoryNumber }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewMachineNumber">{{ props.item.machineNumber }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewYearOfManufacture">{{ props.item.yearOfManufacture }}</td>
           <!--
           <td v-bind:class="textFontSizeClass" v-if="viewExternalMaintence">
               {{ props.item.externalMaintenance.text || props.item.externalMaintenance }}
           </td>
             -->
-          <td v-bind:class="textFontSizeClass" v-if="viewNextRevision">{{ props.item.nextRevision }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewComment">{{ props.item.comment }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewEmployee">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewRevision" @click="showDialogAllRevisions(props.item.id)">
@@ -114,8 +113,6 @@ export default {
       employee: [],
       categories: []
     },
-    employees: [],
-    categories: [],
     selected: [],
     headers: [],
     headersSelect: [
@@ -125,19 +122,16 @@ export default {
       "revisionCard",
       "startWork",
       "seriesNumber",
-      "internal",
-      "external",
-      "externalMaintence",
-      "nextRevision",
+      "inventoryNumber",
+      "yearOfManufacture",
+      "machineNumber",  
       "comment",
       "employeeId",
       "revisions",
       "inStock",
       "actions"
     ],
-    //tools: [],
     editedIndex: -1,
-    newRevision: {},
     bulk: true,
     pagination: {}
   }),
@@ -167,17 +161,17 @@ export default {
     viewSeriesNumber() {
       return this.headersSelect.indexOf("seriesNumber") !== -1;
     },
-    viewInternal() {
-      return this.headersSelect.indexOf("internal") !== -1;
+    viewInventoryNumber() {
+      return this.headersSelect.indexOf("inventoryNumber") !== -1;
     },
-    viewExternal() {
-      return this.headersSelect.indexOf("external") !== -1;
+    viewMachineNumber() {
+      return this.headersSelect.indexOf("machineNumber") !== -1;
+    },
+    viewYearOfManufacture() {
+      return this.headersSelect.indexOf("yearOfManufacture") !== -1;
     },
     viewExternalMaintence() {
       return this.headersSelect.indexOf("externalMaintence") !== -1;
-    },
-    viewNextRevision() {
-      return this.headersSelect.indexOf("nextRevision") !== -1;
     },
     viewComment() {
       return this.headersSelect.indexOf("comment") !== -1;
@@ -193,6 +187,12 @@ export default {
     },
     headersFieldForSelect() {
       return this.$store.state.tool.columns;
+    },
+    categories() {
+      return this.$store.state.tool.categories;
+    },
+    employees() {
+      return this.$store.getters.getUsersForSelect;
     }
   },
 
@@ -218,9 +218,8 @@ export default {
     this.initialize();
     this.changeFontSize();
     this.notifyMe();
-    this.categories = this.$store.state.tool.categories;
-    this.employees = this.$store.getters.getUsersForSelect;
     this.headersConfig();
+    this.$store.dispatch("inicialize")
   },
 
   methods: {

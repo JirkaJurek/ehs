@@ -17,7 +17,7 @@
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.revisionCard" label="Revizní karta el. nářadí"></v-text-field>
+              <v-text-field v-model="editedItem.revisionCard" label="Číslo revizní karty"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-menu ref="menu" v-model="startWork" :close-on-content-click="false" :nudge-right="40" :return-value.sync="editedItem.startWork" lazy transition="scale-transition" offset-y full-width min-width="290px">
@@ -30,20 +30,22 @@
               </v-menu>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.seriesNumber" label="Sériové číslo/rok výroby"></v-text-field>
+              <v-text-field v-model="editedItem.seriesNumber" label="Sériové číslo"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.internal" label="Interní – dle plánu – FB 6_0025"></v-text-field>
+              <v-text-field v-model="editedItem.inventoryNumber" label="Inventární číslo"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.external" label="Externí"></v-text-field>
+              <v-text-field v-model="editedItem.machineNumber" label="Označení/číslo stroje"></v-text-field>
             </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.yearOfManufacture" label="Rok výroby"></v-text-field>
+            </v-flex>
+            <!--
             <v-flex xs12 sm6 md4>
               <v-combobox v-model="editedItem.revisionInterval" :items="revisionInterval" label="Časový interval – externí údržba"></v-combobox>
             </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.lastMaintenance" label="Poslední údržba – externí"></v-text-field>
-            </v-flex>
+            -->
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.price" type="number" label="Cena"></v-text-field>
             </v-flex>
@@ -52,7 +54,7 @@
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-menu ref="menu2" v-model="guaranteeInto" :close-on-content-click="false" :nudge-right="40" :return-value.sync="editedItem.guaranteeInto" lazy transition="scale-transition" offset-y full-width min-width="290px">
-                <v-text-field slot="activator" v-model="editedItem.guaranteeInto" label="Uvedeno do provozu" prepend-icon="event" readonly></v-text-field>
+                <v-text-field slot="activator" v-model="editedItem.guaranteeInto" label="Záruka do" prepend-icon="event" readonly></v-text-field>
                 <v-date-picker v-model="editedItem.guaranteeInto" no-title scrollable>
                   <v-spacer></v-spacer>
                   <v-btn flat color="primary" @click="guaranteeInto = false">Cancel</v-btn>
@@ -69,13 +71,13 @@
               :value="1"
             ></v-checkbox>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.filter1" label="Filter 1"></v-text-field>
+              <v-text-field v-model="editedItem.filter1" label="Klíčové slovo 1"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.filter2" label="Filter 2"></v-text-field>
+              <v-text-field v-model="editedItem.filter2" label="Klíčové slovo 2"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.filter3" label="Filter 3"></v-text-field>
+              <v-text-field v-model="editedItem.filter3" label="Klíčové slovo 3"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <upload-file v-on:update="updateImages" :selectedFiles="editedItem.files" ref="uploadFile"></upload-file>

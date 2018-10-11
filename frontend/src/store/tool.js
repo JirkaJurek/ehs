@@ -1,4 +1,4 @@
-import { find, propEq } from "ramda";
+import { find, propEq, props } from "ramda";
 import axios from "axios";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 
@@ -37,14 +37,10 @@ export default {
       { text: "Název stroje", value: "name" },
       { text: "Revizní karta el. nářadí", value: "revisionCard" },
       { text: "Uvedeno do provozu", value: "startWork" },
-      { text: "Sériové číslo/rok výroby", value: "seriesNumber" },
-      { text: "Interní – dle plánu – FB 6_0025", value: "internal" },
-      { text: "Externí", value: "external" },
-      {
-        text: "Časový interval – externí údržba",
-        value: "externalMaintenance"
-      },
-      { text: "Další údržba", value: "nextRevision" },
+      { text: "Sériové číslo", value: "seriesNumber" },
+      { text: "Inventární číslo", value: "inventoryNumber" },
+      { text: "Označení/číslo stroje", value: "machineNumber" },
+      { text: "Rok výroby", value: "yearOfManufacture" },
       { text: "Poznámka", value: "comment" },
       { text: "Zaměstnanec", value: "employeeId" },
       { text: "Revize", value: "revisions" },
@@ -52,7 +48,8 @@ export default {
       { text: "Actions", align: "center", value: "actions", sortable: false }
     ],
     tools: [],
-    filter: { test: "test" }
+    filter: { test: "test" },
+    alreadyInitialized: false
   },
   getters: {
     getCategoryById: state => id => {
@@ -82,6 +79,29 @@ export default {
             state.tools = response.data;
           });
       }, 500);
+    },
+    async inicialize({ state }, only = ["suppliers"]) {
+      if (!state.alreadyInitialized) {
+        const items = {
+          suppliers: () => {
+            axios
+              .get("/config", {
+                params: {
+                  name: "tool.supplier"
+                }
+              })
+              .then(response => {
+                if (response.data[0]) {
+                  state.suppliers = toJson(response.data[0].data);
+                }
+              });
+          }
+        };
+        for (let item of props(only, items)) {
+          item();
+        }
+      }
+      state.alreadyInitialized = true;
     }
   }
 };

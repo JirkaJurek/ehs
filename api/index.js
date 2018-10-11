@@ -5,12 +5,12 @@ const type = process.env.PROCESS_TYPE || 'web'
 
 if (type === 'web') {
   require('./web')
-} else if (type === 'render') {
-  require('./render')
+} else if (type === 'worker') {
+  require('./worker')
 } else {
   throw new Error(`
     ${type} is an unsupported process type. 
-    Use one of: 'web', 'render'!
+    Use one of: 'web', 'worker'!
   `)
 }
 

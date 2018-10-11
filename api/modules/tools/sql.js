@@ -15,16 +15,13 @@ function add(data) {
   data.categoriesJSON = data.categories
     ? JSON.stringify(data.categories)
     : "[]";
-  data.revisionIntervalJSON = data.revisionInterval
-    ? JSON.stringify(data.revisionInterval)
-    : null;
   data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
     data.employeeId = data.employee.value;
   }
   const tool = execQuery(
-    `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, internal, external, revisionInterval, nextRevision, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :internal, :external, :revisionIntervalJSON, :nextRevision, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock);`,
+    `INSERT INTO ${tableName} (supplier, categories, name, revisions, startWork, seriesNumber, machineNumber, inventoryNumber, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock) VALUES (:supplier, :categoriesJSON , :name, :revisions, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock);`,
     data
   );
   tool.then(rows => {
@@ -44,9 +41,6 @@ function update(id, data) {
   data.categoriesJSON = data.categories
     ? JSON.stringify(data.categories)
     : "[]";
-  data.revisionIntervalJSON = data.revisionInterval
-    ? JSON.stringify(data.revisionInterval)
-    : null;
   data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
@@ -55,7 +49,7 @@ function update(id, data) {
   data.id = id;
   const tool = execQuery(
     `UPDATE ${tableName} 
-        SET supplier=:supplier, categories=:categoriesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, internal=:internal, external=:external, revisionInterval=:revisionIntervalJSON, nextRevision=:nextRevision, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock
+        SET supplier=:supplier, categories=:categoriesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock
         WHERE id=:id;`,
     data
   );
@@ -95,23 +89,9 @@ const revisionFunction = {
       `INSERT INTO tool_revision (id_tool, date, description, who) VALUES (:toolId, :date, :description, :who);`,
       data
     );
-    const revisions = await revisionFunction.allById(data.toolId);
-    const revisionInterval = prop(
-      "revisionInterval",
-      head(await showById(data.toolId))
-    );
-    let nextRevision = null;
-    if (revisionInterval) {
-      const revisionIntervalValue = JSON.parse(revisionInterval).value.split(
-        ""
-      );
-      nextRevision = moment(revisions[0].date)
-        .add(revisionIntervalValue[0], revisionIntervalValue[2])
-        .format("Y-M-d");
-    }
     await execQuery(
-      `UPDATE ${tableName} SET revisions=:revision, nextRevision=:nextRevision WHERE id = :toolId;`,
-      { revision: JSON.stringify(revisions), nextRevision, toolId: data.toolId }
+      `UPDATE ${tableName} SET revisions=:revision WHERE id = :toolId;`,
+      { revision: JSON.stringify(revisions), toolId: data.toolId }
     );
     return true;
   },
@@ -151,7 +131,7 @@ function list(query) {
   }
   if (filter.search && !isEmpty(filter.search)) {
     builder.where(
-      `MATCH(supplier, categories, name, revisionCard, seriesNumber, internal, external, comment, employee, filter1, filter2, filter3) AGAINST("${escape(
+      `MATCH(supplier, categories, name, revisionCard, seriesNumber, machineNumber, inventoryNumber, comment, employee, filter1, filter2, filter3) AGAINST("${escape(
         filter.search
       )}")`
     );
