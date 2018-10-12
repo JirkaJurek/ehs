@@ -54,6 +54,12 @@
             <span v-if="toJson(props.item.revisions).length > 1" class="grey--text caption">(+{{ toJson(props.item.revisions).length - 1 }} dalších)</span>
           </td>
           <td v-bind:class="textFontSizeClass" v-if="viewStock">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFiles">
+            <v-btn round color="primary" dark @click="showFiles(props.item.id)">
+              {{ hasFiles(props.item.files) }}
+              <v-icon>image_search</v-icon>
+            </v-btn>
+          </td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
             <v-icon small class="mr-2" @click="editItem(props.item.id)">
               edit
@@ -73,6 +79,7 @@
     </v-data-table>
     <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
     <revision-tool ref=revisionTool />
+    <show-files ref=showFiles />
   </div>
 </template>
 
@@ -124,11 +131,12 @@ export default {
       "seriesNumber",
       "inventoryNumber",
       "yearOfManufacture",
-      "machineNumber",  
+      "machineNumber",
       "comment",
       "employeeId",
       "revisions",
       "inStock",
+      "files",
       "actions"
     ],
     editedIndex: -1,
@@ -185,6 +193,9 @@ export default {
     viewStock() {
       return this.headersSelect.indexOf("inStock") !== -1;
     },
+    viewFiles() {
+      return this.headersSelect.indexOf("files") !== -1;
+    },
     headersFieldForSelect() {
       return this.$store.state.tool.columns;
     },
@@ -219,7 +230,7 @@ export default {
     this.changeFontSize();
     this.notifyMe();
     this.headersConfig();
-    this.$store.dispatch("inicialize")
+    this.$store.dispatch("inicialize");
   },
 
   methods: {
@@ -286,6 +297,15 @@ export default {
     showDialogNewRevisions(itemId) {
       this.$refs.revisionTool.selected = this.selected;
       this.$refs.revisionTool.showDialogNewRevisions(itemId);
+    },
+    hasFiles(files) {
+      const filesArray = this.toJson(files);
+      return filesArray && filesArray.length ? "ano" : "ne";
+    },
+    showFiles(itemId) {
+      this.$refs.showFiles.open(
+        this.$store.getters.getFilesById(itemId)
+      );
     },
     notifyMe() {
       /*

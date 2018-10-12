@@ -45,6 +45,7 @@ export default {
       { text: "Zaměstnanec", value: "employeeId" },
       { text: "Revize", value: "revisions" },
       { text: "Na skladě", value: "inStock" },
+      { text: "Soubory", value: "files" },
       { text: "Actions", align: "center", value: "actions", sortable: false }
     ],
     tools: [],
@@ -58,6 +59,10 @@ export default {
     getAllRevisionById: state => id => {
       const tool = find(propEq("id", id), state.tools);
       return tool ? toJson(tool.revisions) : [];
+    },
+    getFilesById: state => id => {
+      const tool = find(propEq("id", id), state.tools);
+      return tool && tool.files ? toJson(tool.files) : [];
     }
   },
   mutations: {

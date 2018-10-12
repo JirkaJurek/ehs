@@ -65,11 +65,7 @@
             <v-flex xs12 sm6 md4>
               <v-select return-object :items="employees" v-model="editedItem.employee" label="Zaměstnanec"></v-select>
             </v-flex>
-            <v-checkbox
-              v-model="editedItem.inStock"
-              label="Skladem"
-              :value="1"
-            ></v-checkbox>
+            <v-checkbox v-model="editedItem.inStock" label="Skladem" :value="1"></v-checkbox>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.filter1" label="Klíčové slovo 1"></v-text-field>
             </v-flex>
@@ -80,7 +76,7 @@
               <v-text-field v-model="editedItem.filter3" label="Klíčové slovo 3"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <upload-file v-on:update="updateImages" :selectedFiles="editedItem.files" ref="uploadFile"></upload-file>
+              <upload-file v-on:update="updateImages" :selectedFiles="transformFiles(editedItem.files)" ref="uploadFile"></upload-file>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <!--<v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>-->
@@ -99,6 +95,7 @@
 </template>
 
 <script>
+import { map, prop } from "ramda";
 export default {
   name: "DialogTool",
   data: () => ({
@@ -131,7 +128,7 @@ export default {
     },
     categories() {
       return this.$store.state.tool.categories;
-    },
+    }
   },
   created() {},
   methods: {
@@ -163,17 +160,26 @@ export default {
       if (this.itemId > -1) {
         url += "/" + this.itemId;
       }
-      if (this.editedItem.supplier && this.suppliers.indexOf(this.editedItem.supplier) === -1) {
-        console.log(this.editedItem.supplier)
-        this.$store.commit('newSupplier', this.editedItem.supplier)
+      if (
+        this.editedItem.supplier &&
+        this.suppliers.indexOf(this.editedItem.supplier) === -1
+      ) {
+        console.log(this.editedItem.supplier);
+        this.$store.commit("newSupplier", this.editedItem.supplier);
       }
       this.axios.post(url, this.editedItem).then(response => {
-        this.$store.dispatch("loadAllTool")
+        this.$store.dispatch("loadAllTool");
       });
       this.close();
     },
     updateImages(data) {
       this.editedItem.files = data;
+    },
+    transformFiles(files) {
+      if (!files) {
+        return [];
+      }
+      return map(prop("id"), this.toJson(files));
     },
     toJson(data) {
       try {

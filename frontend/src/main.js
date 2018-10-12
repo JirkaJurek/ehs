@@ -13,6 +13,7 @@ import DialogTool from './components/DialogTool.vue'
 import Super from './components/Super.vue'
 import UploadFile from './components/UploadFile.vue'
 import RevisionTool from './components/RevisionTool.vue'
+import ShowFiles from './components/ShowFiles.vue'
 
 Vue.config.productionTip = false
 
@@ -21,6 +22,7 @@ Vue.component('dialog-tool', DialogTool);
 Vue.component('super', Super);
 Vue.component('upload-file', UploadFile);
 Vue.component('revision-tool', RevisionTool);
+Vue.component('show-files', ShowFiles);
 
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
 Vue.use(VueAxios, axios)

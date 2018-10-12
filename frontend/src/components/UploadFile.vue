@@ -1,7 +1,8 @@
 <template>
   <v-dialog v-model="isOpenDialog">
-    <v-btn slot="activator" color="red lighten-2" dark>
+    <v-btn slot="activator" color="blue-grey" dark>
       Nahrát soubory
+      <v-icon right dark>cloud_upload</v-icon>
     </v-btn>
     <v-card>
       <v-card-title>
@@ -14,7 +15,7 @@
           </v-btn>
           <ul>
             <li v-for="(file, key) in files" v-bind:key="key">
-              <v-checkbox multiple v-model="selected" :value="file" />
+              <v-checkbox multiple v-model="selected" :value="file.id" />
               <img :src="baseApiPath + file.path" width="50" height="50" /> {{file.name}}</li>
           </ul>
           <input type="file" multiple @change="onFileChange">
@@ -31,9 +32,10 @@
 // !!! celkově v celém projektu se takto budou nahrávat obrázky
 // pozor při mazání obrázku se bude muset vědět kde všude jsou a co všechno se tím postihne
 
+import { map, find, propEq } from "ramda";
 export default {
   name: "UploadFile",
-  props:['selectedFiles'],
+  props: ["selectedFiles"],
   data: () => ({
     isOpenDialog: false,
     selected: []
@@ -52,10 +54,9 @@ export default {
   watch: {
     isOpenDialog(val) {
       if (val) {
-        this.selected = this.selectedFiles || []
+        this.selected = this.selectedFiles || [];
         this.$store.dispatch("loadFiles");
-      } 
-        
+      }
     }
   },
   methods: {
@@ -78,7 +79,12 @@ export default {
       });
     },
     save() {
-      this.$emit('update', this.selected)
+      this.$emit(
+        "update",
+        map(id => {
+          return find(propEq("id", id), this.files);
+        }, this.selected)
+      );
       this.isOpenDialog = false;
     }
   }
