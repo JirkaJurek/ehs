@@ -91,10 +91,12 @@ export default {
       return getTree(root);
     },
     getCategoriesTransformSelect: state => () => {
-      return map(
-        applySpec({ value: prop("id"), text: prop("name") }),
-        state.categories
-      );
+      return map(category => {
+        return {
+          value: parseInt(prop("id", category)),
+          text: prop("name", category)
+        };
+      }, state.categories);
     },
     getAllRevisionById: state => id => {
       const tool = find(propEq("id", id), state.tools);
