@@ -1,7 +1,7 @@
 'use strict'
 
-var sql = require('./sql');
-var {map, assoc} = require('ramda');
+const sql = require('./sql');
+const {map, assoc} = require('ramda');
 
 module.exports.testConnection = () => {
     sql.testConnection();
@@ -43,6 +43,14 @@ module.exports.addRevisions = async ({ items, revision}) => {
         return sql.addRevision(assoc('toolId', x, revision));
     }, items))
     return z;
+};
+
+module.exports.listCategories = (query) => {
+    return sql.listCategories();
+};
+
+module.exports.addCategories = (data) => {
+    return sql.addCategories(data);
 };
 
 

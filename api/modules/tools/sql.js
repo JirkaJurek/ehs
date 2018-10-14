@@ -83,6 +83,18 @@ const categoryFunction = {
   }
 };
 
+const categoriesFunction = {
+  add: data => {
+    return execQuery(
+      `INSERT INTO tool_categories (name, parentId) VALUES (:name, :parentId);`,
+      data
+    );
+  },
+  list: () => {
+    return execQuery(`SELECT * FROM tool_categories`);
+  }
+};
+
 const revisionFunction = {
   add: async data => {
     await execQuery(
@@ -157,5 +169,7 @@ module.exports = {
   list,
   showById,
   addRevision: revisionFunction.add,
-  deleteById
+  deleteById,
+  listCategories: categoriesFunction.list,
+  addCategories: categoriesFunction.add,
 };

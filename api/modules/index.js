@@ -1,8 +1,8 @@
 'use strict'
 
-var tools = require('./tools');
-var files = require('./files');
-var config = require('./config');
+const tools = require('./tools');
+const files = require('./files');
+const config = require('./config');
 
 module.exports = {
     tools,

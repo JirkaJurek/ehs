@@ -20,6 +20,11 @@ export default new Router({
       component: () => import('./views/Tools.vue')
     },
     {
+      path: '/fe/tools/categories',
+      name: 'categories',
+      component: () => import('./views/ToolCategories.vue')
+    },
+    {
       path: '/pdf',
       name: 'PDF',
       component: () => import('./views/PDF.vue')

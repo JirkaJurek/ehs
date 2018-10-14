@@ -48,4 +48,12 @@ router.post('/more-tools', async (ctx, next) => {
     ctx.body = 'Hello';
 })
 
+router.get('/categories', async (ctx, next) => {
+    ctx.body = await tools.service.listCategories(ctx.request.query);
+})
+
+router.post('/categories', async (ctx, next) => {
+    ctx.body = await tools.service.addCategories(ctx.request.body);
+})
+
 module.exports = router

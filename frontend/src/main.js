@@ -14,6 +14,7 @@ import Super from './components/Super.vue'
 import UploadFile from './components/UploadFile.vue'
 import RevisionTool from './components/RevisionTool.vue'
 import ShowFiles from './components/ShowFiles.vue'
+import SortTreeHack from './sortTreeHack'
 
 Vue.config.productionTip = false
 
@@ -23,6 +24,7 @@ Vue.component('super', Super);
 Vue.component('upload-file', UploadFile);
 Vue.component('revision-tool', RevisionTool);
 Vue.component('show-files', ShowFiles);
+Vue.component('sort-tree', SortTreeHack);
 
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
 Vue.use(VueAxios, axios)

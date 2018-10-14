@@ -200,7 +200,7 @@ export default {
       return this.$store.state.tool.columns;
     },
     categories() {
-      return this.$store.state.tool.categories;
+      return this.$store.getters.getCategoriesTransformSelect();
     },
     employees() {
       return this.$store.getters.getUsersForSelect;

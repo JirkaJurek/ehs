@@ -1,27 +1,39 @@
-/*
-var columns = ["column1", "column2", "column3"];
-require("csv-to-array")({
-   file: "path/to/input/file.csv",
-   columns: columns
-}, function (err, array) {
-  console.log(err || array);
-});
-*/
+const { tools } = require("../index");
+const { map, assoc, filter, isEmpty, not } = require("ramda");
 
 const csvToArray = require("csv-to-array");
 module.exports.migration = () => {
-  const columns = ['test', 'col'];
+  const columns = [
+    "test",
+    "supplier",
+    "name",
+    "test",
+    "machineNumber",
+    "revisionCard",
+    "yearOfManufacture",
+    "seriesNumber"
+  ];
 
   csvToArray(
     {
-      file: "/Users/michal/www/js/intranet/api/modules/migrationFromCSV/test.csv",
+      file:
+        "/Users/michal/Documents/plan_revize/Plán\ budova\,\ auta\,\ EZS-Tabulka\ 1.csv",
       columns,
       csvOptions: {
-        delimiter: ';'
+        delimiter: ";"
       }
     },
     function(err, array) {
+      // každý položce přidat kateorii
       console.log(err || array);
+      map(item => {
+        item.categories = [{ value: 3, text: "Pily" }];
+        tools.service.add(
+          filter(x => {
+            return not(isEmpty(x));
+          }, item)
+        );
+      }, array);
     }
   );
 };
