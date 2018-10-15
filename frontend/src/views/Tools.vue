@@ -1,9 +1,15 @@
 <template>
   <div>
     <v-layout display-4 align-center justify-center>Plán údržby 2018</v-layout>
+    <div xs12 color="white">
+      <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
+      <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
+      <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
+    </div>
     <v-toolbar flat color="white">
       <v-spacer></v-spacer>
-      <v-text-field v-model="filter.search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>
+      <!--<v-text-field v-model="filter.search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>-->
+      <v-text-field v-model="search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>
       <v-flex xs12 sm6>
         <v-select :items="employees" v-model="filter.employee" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
@@ -18,11 +24,8 @@
           </template>
         </v-select>
       </v-flex>
-      <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
-      <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
-      <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
     </v-toolbar>
-    <v-data-table :custom-sort="customSort" hide-actions :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
+    <v-data-table :search=search :custom-sort="customSort" hide-actions :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
         <tr>
           <td>
@@ -113,6 +116,7 @@ import {
 import moment from "moment";
 export default {
   data: () => ({
+    search:"",
     totalItems: 0,
     dialogNewItem: false,
     textFontSizeClass: "test-size-1",
@@ -303,9 +307,7 @@ export default {
       return filesArray && filesArray.length ? "ano" : "ne";
     },
     showFiles(itemId) {
-      this.$refs.showFiles.open(
-        this.$store.getters.getFilesById(itemId)
-      );
+      this.$refs.showFiles.open(this.$store.getters.getFilesById(itemId));
     },
     notifyMe() {
       /*

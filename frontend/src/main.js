@@ -26,6 +26,7 @@ Vue.component('revision-tool', RevisionTool);
 Vue.component('show-files', ShowFiles);
 Vue.component('sort-tree', SortTreeHack);
 
+//axios.defaults.baseURL = location.origin
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
 Vue.use(VueAxios, axios)
 
