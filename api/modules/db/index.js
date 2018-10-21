@@ -24,15 +24,16 @@ module.exports.execQuery = (str, values, config, cb) => new Promise((resolve, re
     if (destroyDb) {
         clearTimeout(destroyDb);
     }
-    if (!db.connected) {
+    if (!db.connecting) {
         db = newConect();
     }
     db.query(str, values, config, (error, data) => {
         destroyDb = setTimeout(() => {
-            if (db.connected) {
+            if (db.connected || db.connecting || !db.closing) {
                 db.end();
             }
         }, 60000)
+        db.end();
         if (error) {
             reject(error);
         } else {

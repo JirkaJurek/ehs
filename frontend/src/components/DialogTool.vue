@@ -127,7 +127,7 @@ export default {
       return this.$store.getters.getUsersForSelect;
     },
     categories() {
-      return this.$store.state.tool.categories;
+      return this.$store.getters.getCategoriesTransformSelect();
     }
   },
   created() {},
