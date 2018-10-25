@@ -15,6 +15,7 @@ import UploadFile from './components/UploadFile.vue'
 import RevisionTool from './components/RevisionTool.vue'
 import ShowFiles from './components/ShowFiles.vue'
 import SortTreeHack from './sortTreeHack'
+import DialogToolRevisionType from './components/DialogToolRevisionType'
 
 Vue.config.productionTip = false
 
@@ -25,9 +26,10 @@ Vue.component('upload-file', UploadFile);
 Vue.component('revision-tool', RevisionTool);
 Vue.component('show-files', ShowFiles);
 Vue.component('sort-tree', SortTreeHack);
+Vue.component('dialog-tool-revision-type', DialogToolRevisionType);
 
-//axios.defaults.baseURL = location.origin
-axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
+axios.defaults.baseURL = location.origin
+//axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
 Vue.use(VueAxios, axios)
 
 new Vue({

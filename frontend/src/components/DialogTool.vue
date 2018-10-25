@@ -11,7 +11,7 @@
               <v-combobox v-model="editedItem.supplier" :items="suppliers" label="Dodavatel"></v-combobox>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-select return-object :items="categories" v-model="editedItem.categories" label="Kategorie" multiple></v-select>
+              <v-select return-object :items="categories" item-text="name" v-model="editedItem.categories" label="Kategorie" multiple></v-select>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
@@ -81,6 +81,9 @@
             <v-flex xs12 sm6 md4>
               <!--<v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>-->
             </v-flex>
+            <v-flex xs12 sm6>
+              <v-select return-object :items="revisionTypes" v-model="editedItem.revisionTypes" item-text="name" label="Typy revizí" multiple chips persistent-hint></v-select>
+            </v-flex>
           </v-layout>
         </v-container>
       </v-card-text>
@@ -127,7 +130,10 @@ export default {
       return this.$store.getters.getUsersForSelect;
     },
     categories() {
-      return this.$store.getters.getCategoriesTransformSelect();
+      return this.$store.state.tool.categories;
+    },
+    revisionTypes() {
+      return this.$store.state.tool.revisionType;
     }
   },
   created() {},
@@ -136,6 +142,7 @@ export default {
       data.categories = this.toJson(data.categories);
       data.revisionInterval = this.toJson(data.revisionInterval);
       data.employee = this.toJson(data.employee);
+      data.revisionTypes = this.toJson(data.revisionTypes);
       this.editedItem = data;
     },
     async open(itemId, duplicate = false) {

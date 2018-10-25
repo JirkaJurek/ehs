@@ -28,40 +28,40 @@ module.exports.migration = () => {
 
   const categories = [
     {
-      value: 1,
-      text: "Velké stroje"
+      id: 1,
+      name: "Velké stroje"
     },
     {
-      value: 9,
-      text: "Budova, auta, EZS"
+      id: 9,
+      name: "Budova, auta, EZS"
     },
     {
-      value: 2,
-      text: "Elektrické nářadí"
+      id: 2,
+      name: "Elektrické nářadí"
     },
     {
-      value: 8,
-      text: "Hasící zařízení"
+      id: 8,
+      name: "Hasící zařízení"
     },
     {
-      value: 4,
-      text: "Jeřáby, zdvihací zařízení, vozíky"
+      id: 4,
+      name: "Jeřáby, zdvihací zařízení, vozíky"
     },
     {
-      value: 7,
-      text: "Kompresory, vývěvy, tlak. nádoby"
+      id: 7,
+      name: "Kompresory, vývěvy, tlak. nádoby"
     },
     {
-      value: 3,
-      text: "Odsávání, vysavače"
+      id: 3,
+      name: "Odsávání, vysavače"
     },
     {
-      value: 5,
-      text: "Prodlužovací kabely"
+      id: 5,
+      name: "Prodlužovací kabely"
     },
     {
-      value: 6,
-      text: "Topení, plyn"
+      id: 6,
+      name: "Topení, plyn"
     }
   ];
 

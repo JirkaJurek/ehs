@@ -12,7 +12,8 @@ import {
   omit
 } from "ramda";
 import axios from "axios";
-axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
+// axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
+axios.defaults.baseURL = location.origin;
 
 const toJson = data => {
   try {
@@ -28,19 +29,14 @@ export default {
   state: {
     suppliers: ["Houfek", "Lenovo"],
     categories: [],
-    categoriesa: [
-      { id: 1, value: 1, text: "CNC", children: [] },
-      { id: 2, value: 2, text: "Ruční nářadí", children: [] },
-      { id: 3, value: 3, text: "Pily", children: [] }
-    ],
     revisionInterval: [
-      { value: "1 y", text: "Roční" },
-      { value: "6 m", text: "Půlroční" },
-      { value: "1 m", text: "Měsíční" },
-      { value: "7 d", text: "Týdení" },
+      { value: "1 year", text: "Roční" },
+      { value: "6 month", text: "Půlroční" },
+      { value: "1 month", text: "Měsíční" },
+      { value: "7 day", text: "Týdení" },
       {
         value: "",
-        text: "Vlastní pište ve tvaru (y,m,d) např. Roční = 1 y, Měsíční = 1 m",
+        text: "Vlastní pište ve tvaru (year,month,day) např. Roční = 1 year, Měsíční = 1 month",
         disabled: true
       }
     ],
@@ -63,7 +59,8 @@ export default {
     ],
     tools: [],
     filter: { test: "test" },
-    alreadyInitialized: false
+    alreadyInitialized: false,
+    revisionType: []
   },
   getters: {
     getCategoryById: state => id => {
@@ -89,14 +86,6 @@ export default {
         });
       };
       return getTree(root);
-    },
-    getCategoriesTransformSelect: state => () => {
-      return map(category => {
-        return {
-          value: parseInt(prop("id", category)),
-          text: prop("name", category)
-        };
-      }, state.categories);
     },
     getAllRevisionById: state => id => {
       const tool = find(propEq("id", id), state.tools);
@@ -140,7 +129,7 @@ export default {
           });
       }, 500);
     },
-    async inicialize({ state }, only = ["suppliers", "categories"]) {
+    async inicialize({ state }, only = ["suppliers", "categories", "loadAllRevisionType"]) {
       if (!state.alreadyInitialized) {
         const items = {
           suppliers: () => {
@@ -159,6 +148,10 @@ export default {
           categories: async () => {
             const result = await axios.get("/tools/categories");
             state.categories = result.data;
+          },
+          loadAllRevisionType: async () => {
+            const result = await axios.get("/tools/revision-type");
+            state.revisionType = result.data;
           }
         };
         for (let item of props(only, items)) {

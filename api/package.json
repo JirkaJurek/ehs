@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "migrationFromCSV": "PROCESS_TYPE=worker node index.js migrationFromCSV",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "RoSiTech s.r.o.",

@@ -25,6 +25,21 @@ export default new Router({
       component: () => import('./views/ToolCategories.vue')
     },
     {
+      path: '/fe/tools/revision-type',
+      name: 'revision-type',
+      component: () => import('./views/ToolRevisionType.vue')
+    },
+    {
+      path: '/fe/tools/revision-type/:id',
+      name: 'revision-type-detail',
+      component: () => import('./views/ToolRevisionTypeDetail.vue')
+    },
+    {
+      path: '/fe/tools/revision-upcoming',
+      name: 'revision-upcoming',
+      component: () => import('./views/ToolRevisionUpcoming.vue')
+    },
+    {
       path: '/pdf',
       name: 'PDF',
       component: () => import('./views/PDF.vue')

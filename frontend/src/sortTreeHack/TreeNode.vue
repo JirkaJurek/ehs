@@ -1,5 +1,9 @@
 <template>
   <div>
+
+    <v-btn dark @click.stop="openModal(null)">
+      Nová kategorie
+    </v-btn>
     <ul>
       <li v-for="(item) in nodeData" :key=item.id :data-id="item.id" v-show="showHide[item.id].nodeVisible">
         <span class="collapse-expand" v-if="showHide[item.id].nodeCL > 0" @click.stop='handleNodeExpand(item.id)'>
@@ -40,7 +44,7 @@ export default {
     openModal(parentId) {
       this.newCategory = {
         parentId: parentId
-      }
+      };
       this.isOpenDialog = true;
     },
     saveCategory() {

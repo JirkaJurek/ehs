@@ -53,4 +53,20 @@ module.exports.addCategories = (data) => {
     return sql.addCategories(data);
 };
 
+module.exports.addRevisionType = async (data) => {
+    return sql.addRevisionType(data);
+};
+
+module.exports.updateRevisionType = async (data) => {
+    return sql.updateRevisionType(data);
+};
+
+module.exports.listUpcomingRevisions = async () => {
+    return sql.listUpcomingRevisions();
+};
+
+module.exports.listRevisionType = () => {
+    return sql.listRevisionType();
+};
+
 

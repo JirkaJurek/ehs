@@ -8,6 +8,7 @@
         <v-data-table :items="revisions" class="elevation-1" hide-actions hide-headers>
           <template slot="items" slot-scope="props">
             <td>{{ props.item.date }}</td>
+            <td>{{ getRevisionTypeName(props.item.revisionType) }}</td>
             <td>{{ props.item.description }}</td>
           </template>
         </v-data-table>
@@ -32,6 +33,7 @@
                 <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
               </v-flex>
               <v-flex xs12 sm6 md4>
+                <v-select return-object :items="revisionTypes" v-model="newRevision.revisionType" item-text="name" label="Typy revize" persistent-hint></v-select>
                 <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
                 <v-text-field v-model="newRevision.who" label="Kdo"></v-text-field>
               </v-flex>
@@ -49,10 +51,7 @@
 </template>
 
 <script>
-import {
-  map,
-  prop
-} from "ramda";
+import { map, prop } from "ramda";
 export default {
   name: "RevisionTool",
   data: () => ({
@@ -63,10 +62,14 @@ export default {
     selected: []
   }),
   created() {
+    this.$store.dispatch("inicialize", ["loadAllRevisionType"]);
   },
   computed: {
     revisions() {
       return this.$store.getters.getAllRevisionById(this.itemRevisionsId);
+    },
+    revisionTypes() {
+      return this.$store.state.tool.revisionType;
     }
   },
   methods: {
@@ -88,14 +91,27 @@ export default {
         this.itemRevisionsId > 0
           ? [this.itemRevisionsId]
           : map(prop("id"), this.selected);
-      this.axios.post("/tools/revisions", {
-        items,
-        revision: this.newRevision
-      }).then(() =>{
-        this.$store.dispatch("loadAllTool");
-      });
+      this.axios
+        .post("/tools/revisions", {
+          items,
+          revision: this.newRevision
+        })
+        .then(() => {
+          this.$store.dispatch("loadAllTool");
+        });
       this.dialogNewRevision = false;
     },
+    getRevisionTypeName(data) {
+      const revisionType = this.toJson(data);
+      return revisionType ? revisionType.name : "";
+    },
+    toJson(data) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return data;
+      }
+    }
   }
 };
 </script>

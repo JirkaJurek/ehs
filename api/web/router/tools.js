@@ -20,11 +20,11 @@ router.get('/:id(\\d+)', async (ctx, next) => {
 router.post('/', validate(tools.validate.postAddTool) , async (ctx, next) => {
     //const { file, name2 } = ctx.request.body;
     tools.service.add(ctx.request.body)
-    ctx.body = 'Hello'
+    ctx.status = 200;
 })
 router.post('/:id(\\d+)', async (ctx, next) => {
     tools.service.update(ctx.params.id, ctx.request.body);
-    ctx.body = 'Hello';
+    ctx.status = 200;
 })
 
 router.post('/:id(\\d+)/revision', validate(tools.validate.postAddToolRevision) , async (ctx, next) => {
@@ -54,6 +54,24 @@ router.get('/categories', async (ctx, next) => {
 
 router.post('/categories', async (ctx, next) => {
     ctx.body = await tools.service.addCategories(ctx.request.body);
+})
+
+router.post('/revision-type', async (ctx, next) => {
+    await tools.service.addRevisionType(ctx.request.body);
+    ctx.status = 200;
+})
+
+router.post('/revision-type/:id(\\d+)', async (ctx, next) => {
+    await tools.service.updateRevisionType(ctx.request.body);
+    ctx.status = 200;
+})
+
+router.get('/revision-type', async (ctx, next) => {
+    ctx.body = await tools.service.listRevisionType();
+})
+
+router.get('/revision-type/upcoming', async (ctx, next) => {
+    ctx.body = await tools.service.listUpcomingRevisions();
 })
 
 module.exports = router

@@ -14,7 +14,7 @@
         <v-select :items="employees" v-model="filter.employee" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
       </v-flex>
       <v-flex xs12 sm6>
-        <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
+        <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" item-text="name" item-value="id" persistent-hint></v-select>
       </v-flex>
       <v-flex xs12 sm6>
         <v-select :items="headersFieldForSelect" v-model="headersSelect" :menu-props="{ maxHeight: '400' }" label="Viditelná pole" multiple hint="Viditelná pole" persistent-hint>
@@ -34,7 +34,7 @@
           <td v-bind:class="textFontSizeClass" v-if="viewSupplier">{{ props.item.supplier }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewCategories">
             <v-chip v-for="(category, key) in toJson(props.item.categories).slice(0,3)" v-bind:key=key>
-              {{ category.text }}
+              {{ category.name }}
             </v-chip>
           </td>
           <td v-bind:class="textFontSizeClass" v-if="viewName">{{ props.item.name }}</td>
@@ -204,7 +204,7 @@ export default {
       return this.$store.state.tool.columns;
     },
     categories() {
-      return this.$store.getters.getCategoriesTransformSelect();
+      return this.$store.state.tool.categories;
     },
     employees() {
       return this.$store.getters.getUsersForSelect;
