@@ -39,10 +39,19 @@ const afterSaveOrUpdate = (data, toolId) => {
       }, data.revisionTypes);
     });
   }
+  if (data.items) {
+    itemFunction.removeAllOld(toolId).then(() => {
+      map(item => {
+        itemFunction.add({
+          toolId: toolId,
+          ...item
+        });
+      }, data.items);
+    });
+  }
 };
 
-function add(data) {
-  data.revisions = "[]";
+const transformData = data => {
   data.categoriesJSON = data.categories
     ? JSON.stringify(data.categories)
     : "[]";
@@ -50,12 +59,19 @@ function add(data) {
     ? JSON.stringify(data.revisionTypes)
     : "[]";
   data.filesJSON = data.files ? JSON.stringify(data.files) : null;
+  data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
     data.employeeId = data.employee.value;
   }
+  return data;
+};
+
+function add(data) {
+  data.revisions = "[]";
+  data = transformData(data);
   const tool = execQuery(
-    `INSERT INTO ${tableName} (supplier, categories, name, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock) VALUES (:supplier, :categoriesJSON , :name, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock);`,
+    `INSERT INTO ${tableName} (supplier, categories, name, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items) VALUES (:supplier, :categoriesJSON , :name, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON);`,
     data
   );
   tool.then(rows => {
@@ -65,21 +81,11 @@ function add(data) {
 }
 
 function update(id, data) {
-  data.categoriesJSON = data.categories
-    ? JSON.stringify(data.categories)
-    : "[]";
-  data.revisionTypesJSON = data.revisionTypes
-    ? JSON.stringify(data.revisionTypes)
-    : "[]";
-  data.filesJSON = data.files ? JSON.stringify(data.files) : null;
-  if (data.employee) {
-    data.employeeJSON = JSON.stringify(data.employee);
-    data.employeeId = data.employee.value;
-  }
+  data = transformData(data);
   data.id = id;
   const tool = execQuery(
     `UPDATE ${tableName} 
-        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock
+        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON
         WHERE id=:id;`,
     data
   );
@@ -144,7 +150,7 @@ const revisionFunction = {
       ? JSON.stringify(data.revisionInterval)
       : "{}";
     await execQuery(
-      `INSERT INTO tool_revision_types (name, revisionInterval) VALUES (:name, :revisionIntervalJSON);`,
+      `INSERT INTO tool_revision_types (name, revisionInterval, description) VALUES (:name, :revisionIntervalJSON, :description);`,
       data
     );
     return true;
@@ -162,7 +168,7 @@ const revisionFunction = {
     return true;
   },
   list: () => {
-    return execQuery(`SELECT * FROM tool_revision_types`);
+    return execQuery(`SELECT * FROM tool_revision_types WHERE deletedAt IS NULL`);
   },
   listUpcomingRevisions: async () => {
     const revisionTypes = await execQuery(`SELECT * FROM tool_revision_types`);
@@ -178,6 +184,12 @@ const revisionFunction = {
     JOIN tool ON tool.id = tool_revision.id_tool
     GROUP BY id_tool, id_tool_revision_types
     HAVING (${u.join(" OR ")})`);
+  },
+  deleteRevisionType: toolId => {
+    return execQuery(
+      `UPDATE tool_revision_types SET deletedAt=NOW() WHERE id = ?;`,
+      [toolId]
+    );
   }
 };
 
@@ -195,14 +207,33 @@ const revisionTypeFunction = {
   }
 };
 
+const itemFunction = {
+  removeAllOld: toolId => {
+    return execQuery(`DELETE FROM tool_item WHERE id_tool = ?;`, [toolId]);
+  },
+  add: data => {
+    if (data.employee) {
+      data.employeeJSON = JSON.stringify(data.employee);
+      data.employeeId = data.employee.id;
+    }
+    return execQuery(
+      `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count);`,
+      data
+    );
+  }
+};
+
 function list(query) {
   const builder = new queryBuilder();
   const filter = query.filter ? JSON.parse(query.filter) : {};
-  builder
-    .from(tableName)
-    .where("deletedAt IS NULL")
-    .groupBy(`${tableName}.id`)
-    .limit(100);
+  builder.from(tableName).groupBy(`${tableName}.id`);
+  //.limit(500);
+
+  if (!filter.deletedAt) {
+    builder.where("deletedAt IS NULL");
+  } else {
+    builder.where("deletedAt IS NOT NULL");
+  }
   if (query.sortBy) {
     builder.orderBy(query.sortBy, query.descending);
   }
@@ -225,9 +256,11 @@ function list(query) {
     );
   }
   if (filter.employee && filter.employee.length) {
+    builder.join("tool_item", `ti.id_tool = ${tableName}.id`, "ti");
     builder.where(
-      `${tableName}.employeeId IN(${filter.employee
-        .filter(x => Number.isInteger(x))
+      `ti.employeeId IN(${filter.employee
+        .map(x => parseInt(x))
+        .filter(x => x > 0)
         .join(",")})`
     );
   }
@@ -264,5 +297,6 @@ module.exports = {
   addRevisionType: revisionFunction.addType,
   updateRevisionType: revisionFunction.updateType,
   listRevisionType: revisionFunction.list,
-  listUpcomingRevisions: revisionFunction.listUpcomingRevisions
+  listUpcomingRevisions: revisionFunction.listUpcomingRevisions,
+  deleteRevisionType: revisionFunction.deleteRevisionType
 };

@@ -7,17 +7,21 @@
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
     </div>
     <v-toolbar flat color="white">
-      <v-spacer></v-spacer>
       <!--<v-text-field v-model="filter.search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>-->
-      <v-text-field v-model="search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>
-      <v-flex xs12 sm6>
-        <v-select :items="employees" v-model="filter.employee" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" persistent-hint></v-select>
+      <v-flex xs12 sm4>
+        <v-text-field v-model="search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>
       </v-flex>
-      <v-flex xs12 sm6>
-        <v-select :items="categories" v-model="filter.categories" :menu-props="{ maxHeight: '400' }" label="Select" multiple hint="Pick your favorite states" item-text="name" item-value="id" persistent-hint></v-select>
+      <v-flex xs12 sm4>
+        <v-select :items="employees" v-model="filter.employee" label="Zaměstnanci" multiple item-text="name" item-value="id" persistent-hint></v-select>
       </v-flex>
-      <v-flex xs12 sm6>
-        <v-select :items="headersFieldForSelect" v-model="headersSelect" :menu-props="{ maxHeight: '400' }" label="Viditelná pole" multiple hint="Viditelná pole" persistent-hint>
+      <v-flex xs12 sm4>
+        <v-select :items="categories" v-model="filter.categories" label="Kategorie" multiple item-text="name" item-value="id" persistent-hint></v-select>
+      </v-flex>
+      <v-flex xs12 sm1>
+        <v-switch label="Smazané" v-model="filter.deletedAt"></v-switch>
+      </v-flex>
+      <v-flex xs12 sm3>
+        <v-select :items="headersFieldForSelect" v-model="headersSelect" :menu-props="{ maxHeight: '400' }" label="Viditelná pole" multiple persistent-hint>
           <template slot="selection" slot-scope="{ item, index }">
             <span v-if="index === 0">{{ item.text }}</span>
             <span v-if="index === 1" class="grey--text caption">(a dalších)</span>
@@ -25,7 +29,7 @@
         </v-select>
       </v-flex>
     </v-toolbar>
-    <v-data-table :search=search :custom-sort="customSort" hide-actions :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
+    <v-data-table :search=search :custom-sort="customSort" :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
       <template slot="items" slot-scope="props">
         <tr>
           <td>
@@ -50,13 +54,19 @@
           </td>
             -->
           <td v-bind:class="textFontSizeClass" v-if="viewComment">{{ props.item.comment }}</td>
+          <!--
           <td v-bind:class="textFontSizeClass" v-if="viewEmployee">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
+          -->
           <td v-bind:class="textFontSizeClass" v-if="viewRevision" @click="showDialogAllRevisions(props.item.id)">
             <!-- nevím jaký bude mít vliv na výkon toJson -->
             <v-chip>{{ oneRevision(toJson(props.item.revisions)) }}</v-chip>
             <span v-if="toJson(props.item.revisions).length > 1" class="grey--text caption">(+{{ toJson(props.item.revisions).length - 1 }} dalších)</span>
           </td>
+          <!--
           <td v-bind:class="textFontSizeClass" v-if="viewStock">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
+          -->
+          <td v-bind:class="textFontSizeClass" v-if="viewPrice">{{ props.item.price}}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewCount">{{ toolItemsCount(props.item.items)}}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewFiles">
             <v-btn round color="primary" dark @click="showFiles(props.item.id)">
               {{ hasFiles(props.item.files) }}
@@ -73,6 +83,9 @@
             <v-icon small @click="deleteItem(props.item.id)">
               delete
             </v-icon>
+            <v-icon small @click="showDialogAllServices(props.item)">
+              build
+            </v-icon>
           </td>
         </tr>
       </template>
@@ -83,6 +96,7 @@
     <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
     <revision-tool ref=revisionTool />
     <show-files ref=showFiles />
+    <dialog-tool-service ref=dialogToolService />
   </div>
 </template>
 
@@ -111,12 +125,14 @@ import {
   findIndex,
   propEq,
   find,
-  defaultTo
+  defaultTo,
+  reduce,
+  add
 } from "ramda";
 import moment from "moment";
 export default {
   data: () => ({
-    search:"",
+    search: "",
     totalItems: 0,
     dialogNewItem: false,
     textFontSizeClass: "test-size-1",
@@ -126,23 +142,7 @@ export default {
     },
     selected: [],
     headers: [],
-    headersSelect: [
-      "supplier",
-      "categories",
-      "name",
-      "revisionCard",
-      "startWork",
-      "seriesNumber",
-      "inventoryNumber",
-      "yearOfManufacture",
-      "machineNumber",
-      "comment",
-      "employeeId",
-      "revisions",
-      "inStock",
-      "files",
-      "actions"
-    ],
+    headersSelect: ["supplier", "categories", "name", "actions"],
     editedIndex: -1,
     bulk: true,
     pagination: {}
@@ -197,6 +197,12 @@ export default {
     viewStock() {
       return this.headersSelect.indexOf("inStock") !== -1;
     },
+    viewPrice() {
+      return this.headersSelect.indexOf("price") !== -1;
+    },
+    viewCount() {
+      return this.headersSelect.indexOf("count") !== -1;
+    },
     viewFiles() {
       return this.headersSelect.indexOf("files") !== -1;
     },
@@ -207,7 +213,7 @@ export default {
       return this.$store.state.tool.categories;
     },
     employees() {
-      return this.$store.getters.getUsersForSelect;
+      return this.$store.state.user.users;
     }
   },
 
@@ -230,6 +236,9 @@ export default {
   },
 
   created() {
+    if (localStorage.headersSelect) {
+      this.headersSelect = JSON.parse(localStorage.headersSelect);
+    }
     this.initialize();
     this.changeFontSize();
     this.notifyMe();
@@ -309,6 +318,28 @@ export default {
     showFiles(itemId) {
       this.$refs.showFiles.open(this.$store.getters.getFilesById(itemId));
     },
+    toolItemsCount(data) {
+      let text = "0 / 0";
+      if (data) {
+        const items = this.toJson(data);
+        const { count, inStock } = reduce(
+          (acc, item) => {
+            return {
+              count: add(acc.count, item.count),
+              inStock: add(acc.inStock, item.inStock)
+            };
+          },
+          { count: 0, inStock: 0 },
+          items
+        );
+        text = `${count} / ${inStock}`;
+      }
+
+      return text;
+    },
+    showDialogAllServices(item) {
+      this.$refs.dialogToolService.open([], this.toJson(item.items));
+    },
     notifyMe() {
       /*
       setTimeout(() => {
@@ -341,190 +372,8 @@ export default {
       this.headers = filter(x => {
         return this.headersSelect.indexOf(x.value) !== -1;
       }, this.$store.state.tool.columns);
+      localStorage.headersSelect = JSON.stringify(this.headersSelect);
     }
   }
 };
 </script>
-
-<!--
-Tohle je načítání dat ze serveru, čeká to a řadí podle serveru
-
-<script>
-  export default {
-    data () {
-      return {
-        totalDesserts: 0,
-        desserts: [],
-        loading: true,
-        pagination: {},
-        headers: [
-          {
-            text: 'Dessert (100g serving)',
-            align: 'left',
-            sortable: false,
-            value: 'name'
-          },
-          { text: 'Calories', value: 'calories' },
-          { text: 'Fat (g)', value: 'fat' },
-          { text: 'Carbs (g)', value: 'carbs' },
-          { text: 'Protein (g)', value: 'protein' },
-          { text: 'Iron (%)', value: 'iron' }
-        ]
-      }
-    },
-    watch: {
-      pagination: {
-        handler () {
-          this.getDataFromApi()
-            .then(data => {
-              this.desserts = data.items
-              this.totalDesserts = data.total
-            })
-        },
-        deep: true
-      }
-    },
-    mounted () {
-      this.getDataFromApi()
-        .then(data => {
-          this.desserts = data.items
-          this.totalDesserts = data.total
-        })
-    },
-    methods: {
-      getDataFromApi () {
-        this.loading = true
-        return new Promise((resolve, reject) => {
-          const { sortBy, descending, page, rowsPerPage } = this.pagination
-
-          let items = this.getDesserts()
-          const total = items.length
-
-          if (this.pagination.sortBy) {
-            items = items.sort((a, b) => {
-              const sortA = a[sortBy]
-              const sortB = b[sortBy]
-
-              if (descending) {
-                if (sortA < sortB) return 1
-                if (sortA > sortB) return -1
-                return 0
-              } else {
-                if (sortA < sortB) return -1
-                if (sortA > sortB) return 1
-                return 0
-              }
-            })
-          }
-
-          if (rowsPerPage > 0) {
-            items = items.slice((page - 1) * rowsPerPage, page * rowsPerPage)
-          }
-
-          setTimeout(() => {
-            this.loading = false
-            resolve({
-              items,
-              total
-            })
-          }, 1000)
-        })
-      },
-      getDesserts () {
-        return [
-          {
-            value: false,
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%'
-          },
-          {
-            value: false,
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%'
-          },
-          {
-            value: false,
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%'
-          },
-          {
-            value: false,
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%'
-          },
-          {
-            value: false,
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%'
-          },
-          {
-            value: false,
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%'
-          },
-          {
-            value: false,
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%'
-          },
-          {
-            value: false,
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%'
-          },
-          {
-            value: false,
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%'
-          },
-          {
-            value: false,
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%'
-          }
-        ]
-      }
-    }
-  }
-</script>
--->

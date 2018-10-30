@@ -13,6 +13,9 @@
             <v-flex xs12 sm6 md4>
               <v-combobox v-model="editedItem.revisionInterval" :items="revisionInterval" label="Časový interval údržby"></v-combobox>
             </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-textarea v-model="editedItem.description" label="Popisek"></v-textarea>
+            </v-flex>
           </v-layout>
         </v-container>
       </v-card-text>
@@ -68,7 +71,7 @@ export default {
         url += "/" + this.itemId;
       }
       this.axios.post(url, this.editedItem).then(response => {
-        this.$store.dispatch("loadAllTool");
+        this.$store.dispatch("inicialize", ["loadAllRevisionType"]);
       });
       this.close();
     },

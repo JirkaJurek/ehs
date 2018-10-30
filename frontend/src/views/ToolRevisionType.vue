@@ -5,14 +5,12 @@
       <template slot="items" slot-scope="props">
         <td>{{ props.item.name }}</td>
         <td>{{ toJson(props.item.revisionInterval).text }}</td>
+        <td>{{ props.item.description }}</td>
         <td class="justify-center layout px-0">
           <v-icon small class="mr-2" @click="editItem(props.item)">
             edit
           </v-icon>
           <v-icon small class="mr-2" @click="detail(props.item.id)">visibility</v-icon>
-          <v-icon small class="mr-2" @click="editItem(props.item.id, true)">
-            filter_none
-          </v-icon>
           <v-icon small @click="deleteItem(props.item.id)">
             delete
           </v-icon>
@@ -33,6 +31,7 @@ export default {
           value: "name"
         },
         { text: "Interval opakování", value: "revisionInterval" },
+        { text: "Popis", value: "description" },
         { text: "Akce", value: "action", align: "center" }
       ]
     };
@@ -52,6 +51,11 @@ export default {
     },
     detail(itemId) {
       this.$router.push(`/fe/tools/revision-type/${itemId}`);
+    },
+    deleteItem(itemId) {
+      this.axios.delete(`/tools/revision-type/${itemId}`).then(response => {
+        this.$store.dispatch("inicialize", ["loadAllRevisionType"]);
+      });
     },
     toJson(data) {
       try {

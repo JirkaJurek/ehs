@@ -69,4 +69,8 @@ module.exports.listRevisionType = () => {
     return sql.listRevisionType();
 };
 
+module.exports.deleteRevisionType = (id) => {
+    return sql.deleteRevisionType(id);
+};
+
 

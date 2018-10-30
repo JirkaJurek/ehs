@@ -12,8 +12,8 @@ import {
   omit
 } from "ramda";
 import axios from "axios";
-// axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
-axios.defaults.baseURL = location.origin;
+axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
+// axios.defaults.baseURL = location.origin;
 
 const toJson = data => {
   try {
@@ -36,7 +36,8 @@ export default {
       { value: "7 day", text: "Týdení" },
       {
         value: "",
-        text: "Vlastní pište ve tvaru (year,month,day) např. Roční = 1 year, Měsíční = 1 month",
+        text:
+          "Vlastní pište ve tvaru (year,month,day) např. Roční = 1 year, Měsíční = 1 month",
         disabled: true
       }
     ],
@@ -51,15 +52,16 @@ export default {
       { text: "Označení/číslo stroje", value: "machineNumber" },
       { text: "Rok výroby", value: "yearOfManufacture" },
       { text: "Poznámka", value: "comment" },
-      { text: "Zaměstnanec", value: "employeeId" },
+      // { text: "Zaměstnanec", value: "employeeId" },
       { text: "Revize", value: "revisions" },
-      { text: "Na skladě", value: "inStock" },
+      //{ text: "Na skladě", value: "inStock" },
+      { text: "Cena", value: "price" },
+      { text: "Celkový počet / skladem", value: "count" },
       { text: "Soubory", value: "files" },
       { text: "Actions", align: "center", value: "actions", sortable: false }
     ],
     tools: [],
     filter: { test: "test" },
-    alreadyInitialized: false,
     revisionType: []
   },
   getters: {
@@ -129,36 +131,36 @@ export default {
           });
       }, 500);
     },
-    async inicialize({ state }, only = ["suppliers", "categories", "loadAllRevisionType"]) {
-      if (!state.alreadyInitialized) {
-        const items = {
-          suppliers: () => {
-            axios
-              .get("/config", {
-                params: {
-                  name: "tool.supplier"
-                }
-              })
-              .then(response => {
-                if (response.data[0]) {
-                  state.suppliers = toJson(response.data[0].data);
-                }
-              });
-          },
-          categories: async () => {
-            const result = await axios.get("/tools/categories");
-            state.categories = result.data;
-          },
-          loadAllRevisionType: async () => {
-            const result = await axios.get("/tools/revision-type");
-            state.revisionType = result.data;
-          }
-        };
-        for (let item of props(only, items)) {
-          item();
+    async inicialize(
+      { state },
+      only = ["suppliers", "categories", "loadAllRevisionType"]
+    ) {
+      const items = {
+        suppliers: () => {
+          axios
+            .get("/config", {
+              params: {
+                name: "tool.supplier"
+              }
+            })
+            .then(response => {
+              if (response.data[0]) {
+                state.suppliers = toJson(response.data[0].data);
+              }
+            });
+        },
+        categories: async () => {
+          const result = await axios.get("/tools/categories");
+          state.categories = result.data;
+        },
+        loadAllRevisionType: async () => {
+          const result = await axios.get("/tools/revision-type");
+          state.revisionType = result.data;
         }
+      };
+      for (let item of props(only, items)) {
+        item();
       }
-      state.alreadyInitialized = true;
     }
   }
 };

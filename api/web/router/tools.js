@@ -66,6 +66,11 @@ router.post('/revision-type/:id(\\d+)', async (ctx, next) => {
     ctx.status = 200;
 })
 
+router.delete('/revision-type/:id(\\d+)', async (ctx, next) => {
+    await tools.service.deleteRevisionType(ctx.params.id);
+    ctx.status = 200;
+})
+
 router.get('/revision-type', async (ctx, next) => {
     ctx.body = await tools.service.listRevisionType();
 })
