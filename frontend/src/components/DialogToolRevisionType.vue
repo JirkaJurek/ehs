@@ -56,6 +56,7 @@ export default {
       this.editedItem = data;
     },
     async open(item) {
+      this.editedItem = {};
       this.itemId = -1;
       if (item) {
         this.setItem(item);

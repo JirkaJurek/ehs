@@ -60,6 +60,7 @@ const transformData = data => {
     : "[]";
   data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
+  data.itemsHistoryJSON = data.itemsHistory ? JSON.stringify(data.itemsHistory) : "[]";
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
     data.employeeId = data.employee.value;
@@ -71,7 +72,7 @@ function add(data) {
   data.revisions = "[]";
   data = transformData(data);
   const tool = execQuery(
-    `INSERT INTO ${tableName} (supplier, categories, name, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items) VALUES (:supplier, :categoriesJSON , :name, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON);`,
+    `INSERT INTO ${tableName} (supplier, categories, name, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items, itemsHistory) VALUES (:supplier, :categoriesJSON , :name, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON, :itemsHistoryJSON);`,
     data
   );
   tool.then(rows => {
@@ -85,7 +86,7 @@ function update(id, data) {
   data.id = id;
   const tool = execQuery(
     `UPDATE ${tableName} 
-        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON
+        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON, itemsHistory=:itemsHistoryJSON
         WHERE id=:id;`,
     data
   );
@@ -123,6 +124,13 @@ const categoriesFunction = {
 };
 
 const revisionFunction = {
+  beforeSaveOrUpdate: async (toolId) => {
+    const revisions = await revisionFunction.allById(toolId);
+    await execQuery(
+      `UPDATE ${tableName} SET revisions=:revisions WHERE id = :toolId;`,
+      { revisions: JSON.stringify(revisions), toolId: toolId }
+    );
+  },
   add: async data => {
     data.revisionTypeJSON = data.revisionType
       ? JSON.stringify(data.revisionType)
@@ -132,11 +140,22 @@ const revisionFunction = {
       `INSERT INTO tool_revision (id_tool, id_tool_revision_types, revisionType, date, description, who) VALUES (:toolId, :revisionTypeId, :revisionTypeJSON, :date, :description, :who);`,
       data
     );
-    const revisions = await revisionFunction.allById(data.toolId);
+    await revisionFunction.beforeSaveOrUpdate(data.toolId);
+    return true;
+  },
+  update: async (id, data) => {
+    data.revisionTypeJSON = data.revisionType
+      ? JSON.stringify(data.revisionType)
+      : null;
+    data.revisionTypeId = data.revisionType ? data.revisionType.id : null;
+    data.id = id;
+    console.log(data)
     await execQuery(
-      `UPDATE ${tableName} SET revisions=:revisions WHERE id = :toolId;`,
-      { revisions: JSON.stringify(revisions), toolId: data.toolId }
+      `UPDATE tool_revision SET id_tool_revision_types=:revisionTypeId, revisionType=:revisionTypeJSON, date=:date, description=:description, who=:who 
+        WHERE id = :id;`,
+      data
     );
+    await revisionFunction.beforeSaveOrUpdate(data.id_tool);
     return true;
   },
   allById: async id => {
@@ -161,7 +180,7 @@ const revisionFunction = {
       : "{}";
     await execQuery(
       `UPDATE tool_revision_types
-        SET name=:name, revisionInterval=:revisionIntervalJSON
+        SET name=:name, revisionInterval=:revisionIntervalJSON, description=:description
         WHERE id=:id;`,
       data
     );
@@ -217,7 +236,7 @@ const itemFunction = {
       data.employeeId = data.employee.id;
     }
     return execQuery(
-      `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count);`,
+      `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count, inService, place) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count, :inService, :place);`,
       data
     );
   }
@@ -284,6 +303,12 @@ function deleteById(toolId) {
   ]);
 }
 
+function revertById(toolId) {
+  return execQuery(`UPDATE ${tableName} SET deletedAt=NULL WHERE id = ?;`, [
+    toolId
+  ]);
+}
+
 module.exports = {
   testConnection,
   add,
@@ -291,7 +316,9 @@ module.exports = {
   list,
   showById,
   addRevision: revisionFunction.add,
+  updateRevisions: revisionFunction.update,
   deleteById,
+  revertById,
   listCategories: categoriesFunction.list,
   addCategories: categoriesFunction.add,
   addRevisionType: revisionFunction.addType,

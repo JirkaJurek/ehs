@@ -83,6 +83,7 @@
             <v-flex xs12>
               <v-select return-object :items="revisionTypes" v-model="editedItem.revisionTypes" item-text="name" label="Typy revizí" multiple chips persistent-hint></v-select>
             </v-flex>
+            <!--
             <v-flex xs12>
               <v-data-table :items="editedItem.items" hide-actions>
                 <template slot="headers" slot-scope="props">
@@ -114,7 +115,7 @@
                 </template>
               </v-data-table>
             </v-flex>
-
+            -->
           </v-layout>
         </v-container>
       </v-card-text>
@@ -125,6 +126,7 @@
         <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
       </v-card-actions>
     </v-card>
+    <!--
     <v-dialog v-model="dialogTollItem" max-width="500px">
       <v-card>
         <v-card-title>
@@ -141,6 +143,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    -->
   </v-dialog>
 </template>
 

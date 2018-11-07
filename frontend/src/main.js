@@ -17,6 +17,7 @@ import ShowFiles from './components/ShowFiles.vue'
 import SortTreeHack from './sortTreeHack'
 import DialogToolRevisionType from './components/DialogToolRevisionType'
 import DialogToolService from './components/DialogToolService'
+import ToolItems from './components/ToolItems'
 
 Vue.config.productionTip = false
 
@@ -29,9 +30,10 @@ Vue.component('show-files', ShowFiles);
 Vue.component('sort-tree', SortTreeHack);
 Vue.component('dialog-tool-revision-type', DialogToolRevisionType);
 Vue.component('dialog-tool-service', DialogToolService);
+Vue.component('tool-items', ToolItems);
 
-// axios.defaults.baseURL = location.origin
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL
+// axios.defaults.baseURL = location.origin
 Vue.use(VueAxios, axios)
 
 new Vue({

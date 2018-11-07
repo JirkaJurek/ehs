@@ -1,9 +1,9 @@
 <template>
   <div>
-    <v-layout display-4 align-center justify-center>Plán údržby 2018</v-layout>
+    <v-layout display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
     <div xs12 color="white">
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
-      <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Nová revize</v-btn>
+      <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Zápis provedené revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
     </div>
     <v-toolbar flat color="white">
@@ -29,7 +29,7 @@
         </v-select>
       </v-flex>
     </v-toolbar>
-    <v-data-table :search=search :custom-sort="customSort" :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all>
+    <v-data-table id="toolTable" :search=search :custom-sort="customSort" :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all :rows-per-page-items="rowsItem">
       <template slot="items" slot-scope="props">
         <tr>
           <td>
@@ -37,9 +37,9 @@
           </td>
           <td v-bind:class="textFontSizeClass" v-if="viewSupplier">{{ props.item.supplier }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewCategories">
-            <v-chip v-for="(category, key) in toJson(props.item.categories).slice(0,3)" v-bind:key=key>
-              {{ category.name }}
-            </v-chip>
+            <span v-for="(category, key) in toJson(props.item.categories)" v-bind:key=key>
+              {{key > 0 ? ", " : ""}}{{ category.name }}
+            </span>
           </td>
           <td v-bind:class="textFontSizeClass" v-if="viewName">{{ props.item.name }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewRevisionCard">{{ props.item.revisionCard }}</td>
@@ -54,6 +54,9 @@
           </td>
             -->
           <td v-bind:class="textFontSizeClass" v-if="viewComment">{{ props.item.comment }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFilter1">{{ props.item.filter1 }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFilter2">{{ props.item.filter2 }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFilter3">{{ props.item.filter3 }}</td>
           <!--
           <td v-bind:class="textFontSizeClass" v-if="viewEmployee">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
           -->
@@ -66,7 +69,9 @@
           <td v-bind:class="textFontSizeClass" v-if="viewStock">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
           -->
           <td v-bind:class="textFontSizeClass" v-if="viewPrice">{{ props.item.price}}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewCount">{{ toolItemsCount(props.item.items)}}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewCount" @click="showToolItems(props.item)">
+            <v-chip>{{ toolItemsCount(props.item.items)}}</v-chip>
+          </td>
           <td v-bind:class="textFontSizeClass" v-if="viewFiles">
             <v-btn round color="primary" dark @click="showFiles(props.item.id)">
               {{ hasFiles(props.item.files) }}
@@ -74,17 +79,22 @@
             </v-btn>
           </td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
-            <v-icon small class="mr-2" @click="editItem(props.item.id)">
+            <v-icon small class="mr-2" @click="editItem(props.item.id)" title="Editace" v-if="!filter.deletedAt">
               edit
             </v-icon>
-            <v-icon small class="mr-2" @click="editItem(props.item.id, true)">
+            <v-icon small class="mr-2" @click="editItem(props.item.id, true)" title="Klonovat" v-if="!filter.deletedAt">
               filter_none
             </v-icon>
-            <v-icon small @click="deleteItem(props.item.id)">
+            <v-icon small @click="deleteItem(props.item.id)" title="Smazat" v-if="!filter.deletedAt">
               delete
             </v-icon>
+            <!--
             <v-icon small @click="showDialogAllServices(props.item)">
               build
+            </v-icon>
+            -->
+            <v-icon small @click="revertItem(props.item.id)" title="Vrátit zpět" v-if="filter.deletedAt">
+              cached
             </v-icon>
           </td>
         </tr>
@@ -97,12 +107,40 @@
     <revision-tool ref=revisionTool />
     <show-files ref=showFiles />
     <dialog-tool-service ref=dialogToolService />
+    <tool-items ref="toolItems" />
   </div>
 </template>
 
-<style scoped>
+<!--
+<style>
+#toolTable table {
+  table-layout: fixed
+}
+#toolTable .v-table__overflow {
+  max-height: 100vh;
+  overflow: auto;
+  width: 90%
+}
+#toolTable th {
+  position: sticky
+}
 .test-size-1 {
   font-size: 13px;
+}
+</style>
+-->
+<style>
+#toolTable .whiteSpace {
+  white-space: inherit;
+}
+#toolTable .wider {
+  min-width: 300px;
+}
+#toolTable table td {
+  padding: 0 12px;
+}
+#toolTable tr:nth-child(even) {
+    background-color: #fafafa
 }
 </style>
 
@@ -145,7 +183,8 @@ export default {
     headersSelect: ["supplier", "categories", "name", "actions"],
     editedIndex: -1,
     bulk: true,
-    pagination: {}
+    pagination: {},
+    rowsItem: [25, 50, 100, { text: "vše", value: -1 }]
   }),
 
   computed: {
@@ -187,6 +226,15 @@ export default {
     },
     viewComment() {
       return this.headersSelect.indexOf("comment") !== -1;
+    },
+    viewFilter1() {
+      return this.headersSelect.indexOf("filter1") !== -1;
+    },
+    viewFilter2() {
+      return this.headersSelect.indexOf("filter2") !== -1;
+    },
+    viewFilter3() {
+      return this.headersSelect.indexOf("filter3") !== -1;
     },
     viewEmployee() {
       return this.headersSelect.indexOf("employeeId") !== -1;
@@ -339,6 +387,15 @@ export default {
     },
     showDialogAllServices(item) {
       this.$refs.dialogToolService.open([], this.toJson(item.items));
+    },
+    showToolItems(item) {
+      this.$refs.toolItems.open(item);
+    },
+    async revertItem(itemId) {
+      if (confirm(`Opravdu chcete smazanou položku vrátit zpět?`)) {
+        await this.axios.post(`/tools/revert/${itemId}`);
+        this.initialize();
+      }
     },
     notifyMe() {
       /*

@@ -1,16 +1,4 @@
-import {
-  find,
-  propEq,
-  props,
-  prop,
-  groupBy,
-  pipe,
-  map,
-  applySpec,
-  lensProp,
-  filter,
-  omit
-} from "ramda";
+import { find, propEq, props, filter } from "ramda";
 import axios from "axios";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 // axios.defaults.baseURL = location.origin;
@@ -30,33 +18,33 @@ export default {
     suppliers: ["Houfek", "Lenovo"],
     categories: [],
     revisionInterval: [
-      { value: "1 year", text: "Roční" },
-      { value: "6 month", text: "Půlroční" },
-      { value: "1 month", text: "Měsíční" },
-      { value: "7 day", text: "Týdení" },
-      {
-        value: "",
-        text:
-          "Vlastní pište ve tvaru (year,month,day) např. Roční = 1 year, Měsíční = 1 month",
-        disabled: true
-      }
+      { value: "3 month", text: "3 měsíce" },
+      { value: "6 month", text: "6 měsíců" },
+      { value: "12 month", text: "12 měsíců" },
+      { value: "24 month", text: "24 měsíců" },
+      { value: "36 month", text: "36 měsíců" },
+      { value: "48 month", text: "48 měsíců" },
+      { value: "60 month", text: "60 měsíců" },
     ],
     columns: [
       { text: "Dodavatel", value: "supplier" },
       { text: "Kategorie", value: "categories" },
-      { text: "Název stroje", value: "name" },
-      { text: "Revizní karta el. nářadí", value: "revisionCard" },
-      { text: "Uvedeno do provozu", value: "startWork" },
+      { text: "Název stroje", value: "name", class: "wider" },
+      { text: "Revizní karta el. nářadí", value: "revisionCard", class: "whiteSpace"},
+      { text: "Uvedeno do provozu", value: "startWork", class: "whiteSpace" },
       { text: "Sériové číslo", value: "seriesNumber" },
       { text: "Inventární číslo", value: "inventoryNumber" },
-      { text: "Označení/číslo stroje", value: "machineNumber" },
+      { text: "Označení/číslo stroje", value: "machineNumber", class: "whiteSpace" },
       { text: "Rok výroby", value: "yearOfManufacture" },
       { text: "Poznámka", value: "comment" },
+      { text: "Klíčové slovo 1", value: "filter1", class: "whiteSpace" },
+      { text: "Klíčové slovo 2", value: "filter2", class: "whiteSpace" },
+      { text: "Klíčové slovo 3", value: "filter3", class: "whiteSpace" },
       // { text: "Zaměstnanec", value: "employeeId" },
       { text: "Revize", value: "revisions" },
       //{ text: "Na skladě", value: "inStock" },
       { text: "Cena", value: "price" },
-      { text: "Celkový počet / skladem", value: "count" },
+      { text: "Celkový počet / skladem", value: "count", class: "whiteSpace" },
       { text: "Soubory", value: "files" },
       { text: "Actions", align: "center", value: "actions", sortable: false }
     ],

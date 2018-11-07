@@ -10,6 +10,12 @@
             <td>{{ props.item.date }}</td>
             <td>{{ getRevisionTypeName(props.item.revisionType) }}</td>
             <td>{{ props.item.description }}</td>
+            <td>{{ props.item.who }}</td>
+            <td>
+              <v-icon small class="mr-2" @click="editRevision(props.item)" title="Editace">
+                edit
+              </v-icon>
+            </td>
           </template>
         </v-data-table>
         <v-card-actions>
@@ -22,7 +28,7 @@
     <v-dialog v-model="dialogNewRevision">
       <v-card>
         <v-card-title>
-          <span class="headline">Nová revize</span>
+          <span class="headline">Zápis provedené revize</span>
         </v-card-title>
 
         <v-card-text>
@@ -59,7 +65,8 @@ export default {
     dialogNewRevision: false,
     newRevision: {},
     itemRevisionsId: 0,
-    selected: []
+    selected: [],
+    editRevisonId: 0
   }),
   created() {
     this.$store.dispatch("inicialize", ["loadAllRevisionType"]);
@@ -77,7 +84,10 @@ export default {
       this.itemRevisionsId = toolId;
       this.dialogAllRevisions = true;
     },
-    showDialogNewRevisions(itemId) {
+    showDialogNewRevisions(toolId) {
+      this.editRevisonId = 0;
+      this.itemRevisionsId = toolId;
+      this.newRevision = {};
       this.dialogNewRevision = true;
     },
     closeDialogAllRevisions() {
@@ -87,23 +97,37 @@ export default {
       this.dialogNewRevision = false;
     },
     addRevision() {
-      const items =
-        this.itemRevisionsId > 0
-          ? [this.itemRevisionsId]
-          : map(prop("id"), this.selected);
-      this.axios
-        .post("/tools/revisions", {
-          items,
-          revision: this.newRevision
-        })
-        .then(() => {
-          this.$store.dispatch("loadAllTool");
-        });
+      if (this.editRevisonId) {
+        this.axios
+          .post(`/tools/revisions/${this.editRevisonId}`, this.newRevision)
+          .then(() => {
+            this.$store.dispatch("loadAllTool");
+          });
+      } else {
+        const items =
+          this.itemRevisionsId > 0
+            ? [this.itemRevisionsId]
+            : map(prop("id"), this.selected);
+        this.axios
+          .post("/tools/revisions", {
+            items,
+            revision: this.newRevision
+          })
+          .then(() => {
+            this.$store.dispatch("loadAllTool");
+          });
+      }
       this.dialogNewRevision = false;
     },
     getRevisionTypeName(data) {
       const revisionType = this.toJson(data);
       return revisionType ? revisionType.name : "";
+    },
+    editRevision(item) {
+      item.revisionType = this.toJson(item.revisionType);
+      this.dialogNewRevision = true;
+      this.editRevisonId = item.id;
+      this.newRevision = item;
     },
     toJson(data) {
       try {

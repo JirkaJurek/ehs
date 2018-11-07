@@ -34,6 +34,11 @@ router.post('/:id(\\d+)/revision', validate(tools.validate.postAddToolRevision) 
     ctx.status = 201;
 })
 
+router.post('/revisions/:id(\\d+)', async (ctx, next) => {
+    await tools.service.updateRevisions(ctx.params.id, ctx.request.body);
+    ctx.status = 200;
+})
+
 router.post('/revisions', validate(tools.validate.postAddToolRevision) , async (ctx, next) => {
     await tools.service.addRevisions(ctx.request.body);
     ctx.status = 200;
@@ -43,9 +48,14 @@ router.delete('/:id(\\d+)', async (ctx, next) => {
     tools.service.delete(ctx.params.id);
 })
 
+router.post('/revert/:id(\\d+)', async (ctx, next) => {
+    await tools.service.revert(ctx.params.id);
+    ctx.status = 200;
+})
+
 router.post('/more-tools', async (ctx, next) => {
     tools.service.deleteMore(ctx.request.body);
-    ctx.body = 'Hello';
+    ctx.status = 200;
 })
 
 router.get('/categories', async (ctx, next) => {
