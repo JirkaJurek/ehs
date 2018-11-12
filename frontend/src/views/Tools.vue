@@ -2,9 +2,12 @@
   <div>
     <v-layout display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
     <div xs12 color="white">
+      <v-btn @click="n()" color="primary" dark class="mb-2">Nový</v-btn>
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Zápis provedené revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
+      <stock-exporter-button />
+      <stock-receiver-button />
     </div>
     <v-toolbar flat color="white">
       <!--<v-text-field v-model="filter.search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>-->
@@ -35,32 +38,39 @@
           <td>
             <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
           </td>
-          <td v-bind:class="textFontSizeClass" v-if="viewSupplier">{{ props.item.supplier }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewCategories">
+          <td v-if="viewStock" @click="n(props.item)">
+            <v-btn>
+              Přidat
+            </v-btn>
+          </td>
+          <td v-bind:class="textFontSizeClass" v-if="viewSupplier" class="text-xs-center">{{ props.item.supplier }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewCategories" class="text-xs-center">
             <span v-for="(category, key) in toJson(props.item.categories)" v-bind:key=key>
               {{key > 0 ? ", " : ""}}{{ category.name }}
             </span>
           </td>
-          <td v-bind:class="textFontSizeClass" v-if="viewName">{{ props.item.name }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewRevisionCard">{{ props.item.revisionCard }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewStartWork">{{ props.item.startWork }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewSeriesNumber">{{ props.item.seriesNumber }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewInventoryNumber">{{ props.item.inventoryNumber }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewMachineNumber">{{ props.item.machineNumber }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewYearOfManufacture">{{ props.item.yearOfManufacture }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewName" class="text-xs-center">{{ props.item.name }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewShortName" class="text-xs-center">{{ props.item.shortName }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewRevisionCard" class="text-xs-center">{{ props.item.revisionCard }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewStartWork" class="text-xs-center">{{ props.item.startWork }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewSeriesNumber" class="text-xs-center">{{ props.item.seriesNumber }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewInventoryNumber" class="text-xs-center">{{ props.item.inventoryNumber }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewCode" class="text-xs-center">{{ props.item.code }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewMachineNumber" class="text-xs-center">{{ props.item.machineNumber }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewYearOfManufacture" class="text-xs-center">{{ props.item.yearOfManufacture }}</td>
           <!--
           <td v-bind:class="textFontSizeClass" v-if="viewExternalMaintence">
               {{ props.item.externalMaintenance.text || props.item.externalMaintenance }}
           </td>
             -->
-          <td v-bind:class="textFontSizeClass" v-if="viewComment">{{ props.item.comment }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewFilter1">{{ props.item.filter1 }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewFilter2">{{ props.item.filter2 }}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewFilter3">{{ props.item.filter3 }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewComment" class="text-xs-center">{{ props.item.comment }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFilter1" class="text-xs-center">{{ props.item.filter1 }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFilter2" class="text-xs-center">{{ props.item.filter2 }}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewFilter3" class="text-xs-center">{{ props.item.filter3 }}</td>
           <!--
           <td v-bind:class="textFontSizeClass" v-if="viewEmployee">{{ props.item.employee ? toJson(props.item.employee).text : '' }}</td>
           -->
-          <td v-bind:class="textFontSizeClass" v-if="viewRevision" @click="showDialogAllRevisions(props.item.id)">
+          <td v-bind:class="textFontSizeClass" v-if="viewRevision" @click="showDialogAllRevisions(props.item.id)" class="text-xs-center">
             <!-- nevím jaký bude mít vliv na výkon toJson -->
             <v-chip>{{ oneRevision(toJson(props.item.revisions)) }}</v-chip>
             <span v-if="toJson(props.item.revisions).length > 1" class="grey--text caption">(+{{ toJson(props.item.revisions).length - 1 }} dalších)</span>
@@ -68,11 +78,11 @@
           <!--
           <td v-bind:class="textFontSizeClass" v-if="viewStock">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
           -->
-          <td v-bind:class="textFontSizeClass" v-if="viewPrice">{{ props.item.price}}</td>
-          <td v-bind:class="textFontSizeClass" v-if="viewCount" @click="showToolItems(props.item)">
+          <td v-bind:class="textFontSizeClass" v-if="viewPrice" class="text-xs-center">{{ props.item.price}}</td>
+          <td v-bind:class="textFontSizeClass" v-if="viewCount" @click="showToolItems(props.item)" class="text-xs-center">
             <v-chip>{{ toolItemsCount(props.item.items)}}</v-chip>
           </td>
-          <td v-bind:class="textFontSizeClass" v-if="viewFiles">
+          <td v-bind:class="textFontSizeClass" v-if="viewFiles" class="text-xs-center">
             <v-btn round color="primary" dark @click="showFiles(props.item.id)">
               {{ hasFiles(props.item.files) }}
               <v-icon>image_search</v-icon>
@@ -139,8 +149,11 @@
 #toolTable table td {
   padding: 0 12px;
 }
+#toolTable table th {
+  padding: 0 12px;
+}
 #toolTable tr:nth-child(even) {
-    background-color: #fafafa
+  background-color: #fafafa;
 }
 </style>
 
@@ -167,9 +180,11 @@ import {
   reduce,
   add
 } from "ramda";
+import { getItemVariant } from "../module/stock";
 import moment from "moment";
 export default {
   data: () => ({
+    currentComponent: null,
     search: "",
     totalItems: 0,
     dialogNewItem: false,
@@ -194,6 +209,9 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
     },
+    viewStock() {
+      return this.headersSelect.indexOf("stock") !== -1;
+    },
     viewSupplier() {
       return this.headersSelect.indexOf("supplier") !== -1;
     },
@@ -202,6 +220,9 @@ export default {
     },
     viewName() {
       return this.headersSelect.indexOf("name") !== -1;
+    },
+    viewShortName() {
+      return this.headersSelect.indexOf("shortName") !== -1;
     },
     viewRevisionCard() {
       return this.headersSelect.indexOf("revisionCard") !== -1;
@@ -214,6 +235,9 @@ export default {
     },
     viewInventoryNumber() {
       return this.headersSelect.indexOf("inventoryNumber") !== -1;
+    },
+    viewCode() {
+      return this.headersSelect.indexOf("code") !== -1;
     },
     viewMachineNumber() {
       return this.headersSelect.indexOf("machineNumber") !== -1;
@@ -242,9 +266,11 @@ export default {
     viewRevision() {
       return this.headersSelect.indexOf("revisions") !== -1;
     },
+    /*
     viewStock() {
       return this.headersSelect.indexOf("inStock") !== -1;
     },
+    */
     viewPrice() {
       return this.headersSelect.indexOf("price") !== -1;
     },
@@ -295,6 +321,9 @@ export default {
   },
 
   methods: {
+    n(item) {
+      console.log(getItemVariant(this.$store, item));
+    },
     customSort(items, sortBy, descending) {
       if (
         this.pagination.sortBy != sortBy ||

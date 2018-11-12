@@ -1,4 +1,4 @@
-import { find, propEq, props, filter } from "ramda";
+import { find, propEq, props, filter, prop } from "ramda";
 import axios from "axios";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 // axios.defaults.baseURL = location.origin;
@@ -24,28 +24,66 @@ export default {
       { value: "24 month", text: "24 měsíců" },
       { value: "36 month", text: "36 měsíců" },
       { value: "48 month", text: "48 měsíců" },
-      { value: "60 month", text: "60 měsíců" },
+      { value: "60 month", text: "60 měsíců" }
     ],
     columns: [
-      { text: "Dodavatel", value: "supplier" },
-      { text: "Kategorie", value: "categories" },
-      { text: "Název stroje", value: "name", class: "wider" },
-      { text: "Revizní karta el. nářadí", value: "revisionCard", class: "whiteSpace"},
-      { text: "Uvedeno do provozu", value: "startWork", class: "whiteSpace" },
-      { text: "Sériové číslo", value: "seriesNumber" },
-      { text: "Inventární číslo", value: "inventoryNumber" },
-      { text: "Označení/číslo stroje", value: "machineNumber", class: "whiteSpace" },
-      { text: "Rok výroby", value: "yearOfManufacture" },
-      { text: "Poznámka", value: "comment" },
-      { text: "Klíčové slovo 1", value: "filter1", class: "whiteSpace" },
-      { text: "Klíčové slovo 2", value: "filter2", class: "whiteSpace" },
-      { text: "Klíčové slovo 3", value: "filter3", class: "whiteSpace" },
+      { text: "Přidat", value: "stock", align: "center", sortable: false },
+      { text: "Dodavatel", value: "supplier", align: "center" },
+      { text: "Kategorie", value: "categories", align: "center" },
+      { text: "Název stroje", value: "name", class: "wider", align: "center" },
+      { text: "Zkrácený název", value: "shortName", align: "center" },
+      {
+        text: "Revizní karta el. nářadí",
+        value: "revisionCard",
+        class: "whiteSpace",
+        align: "center"
+      },
+      {
+        text: "Uvedeno do provozu",
+        value: "startWork",
+        class: "whiteSpace",
+        align: "center"
+      },
+      { text: "Sériové číslo", value: "seriesNumber", align: "center" },
+      { text: "Inventární číslo", value: "inventoryNumber", align: "center" },
+      { text: "Kód", value: "code", align: "center" },
+      {
+        text: "Označení/číslo stroje",
+        value: "machineNumber",
+        class: "whiteSpace",
+        align: "center"
+      },
+      { text: "Rok výroby", value: "yearOfManufacture", align: "center" },
+      { text: "Poznámka", value: "comment", align: "center" },
+      {
+        text: "Klíčové slovo 1",
+        value: "filter1",
+        class: "whiteSpace",
+        align: "center"
+      },
+      {
+        text: "Klíčové slovo 2",
+        value: "filter2",
+        class: "whiteSpace",
+        align: "center"
+      },
+      {
+        text: "Klíčové slovo 3",
+        value: "filter3",
+        class: "whiteSpace",
+        align: "center"
+      },
       // { text: "Zaměstnanec", value: "employeeId" },
-      { text: "Revize", value: "revisions" },
+      { text: "Revize", value: "revisions", align: "center" },
       //{ text: "Na skladě", value: "inStock" },
       { text: "Cena", value: "price" },
-      { text: "Celkový počet / skladem", value: "count", class: "whiteSpace" },
-      { text: "Soubory", value: "files" },
+      {
+        text: "Celkový počet / skladem",
+        value: "count",
+        class: "whiteSpace",
+        align: "center"
+      },
+      { text: "Soubory", value: "files", align: "center" },
       { text: "Actions", align: "center", value: "actions", sortable: false }
     ],
     tools: [],
@@ -84,7 +122,10 @@ export default {
     getFilesById: state => id => {
       const tool = find(propEq("id", id), state.tools);
       return tool && tool.files ? toJson(tool.files) : [];
-    }
+    },
+    getToolNameById: state => id => {
+      return prop('name', find(propEq("id", id), state.tools));
+    },
   },
   mutations: {
     newSupplier(state, name) {

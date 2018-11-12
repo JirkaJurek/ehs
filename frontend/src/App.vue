@@ -53,21 +53,12 @@
       </v-toolbar-title>
       <v-autocomplete @change="changeAutocomplete" :items="autocomplete.items" v-model="autocomplete.select" cache-items flat hide-details label="Search" solo-inverted class="hidden-sm-and-down"></v-autocomplete>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>apps</v-icon>
-      </v-btn>
-      <v-btn icon>
-        <v-icon>notifications</v-icon>
-      </v-btn>
-      <v-btn icon large>
-        <v-avatar size="32px" tile>
-          <img src="https://cdn.vuetifyjs.com/images/logos/logo.svg" alt="Vuetify">
-        </v-avatar>
-      </v-btn>
+      <stock-toolbar-button/>
     </v-toolbar>
     <v-content>
       <router-view/>
     </v-content>
+    <component v-bind:is="mainModal" :myData=mainModalData></component>
   </v-app>
 </template>
 
@@ -113,11 +104,19 @@ export default {
         { text: "Nástroje", path: "/fe/tools" },
         { text: "Kategorie", path: "/fe/tools/categories" },
         { text: "Typy revizí", path: "/fe/tools/revision-type" },
-        { text: "Blížící se revize", path: "/fe/tools/revision-upcoming" },
+        { text: "Blížící se revize", path: "/fe/tools/revision-upcoming" }
       ],
       selected: []
     }
   }),
+  computed: {
+    mainModal() {
+      return this.$store.state.mainModal;
+    },
+    mainModalData() {
+      return this.$store.state.mainModal ? this.$store.state.mainModal.myData : null;
+    }
+  },
   props: {
     source: String
   },

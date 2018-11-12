@@ -2,39 +2,38 @@
   <v-dialog v-model="dialogAllToolItems">
     <v-card>
       <v-card-title>
-        <span class="headline">{{ formTitle }}</span>
+        <span class="headline">Přehled položek</span>
       </v-card-title>
       <v-card-text>
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12>
-              <v-btn color="blue" @click="editToolItem()">
-                <v-icon dark>add</v-icon> Příjemka
-              </v-btn>
-              <v-btn color="blue" @click="exportToolItem()">
-                <v-icon dark>remove</v-icon> Výdejka
-              </v-btn>
               <v-data-table :items="editedItem.items" hide-actions>
                 <template slot="headers" slot-scope="props">
                   <tr>
                     <th>Zaměstnanec</th>
                     <th>Počet kusu</th>
                     <th>Je skladem</th>
+                    <!--
                     <th>V servisu</th>
                     <th>Umístění</th>
+                    -->
                   </tr>
                 </template>
                 <template slot="items" item-key="employeeId" slot-scope="props">
                   <tr>
-                    <td class="text-xs-center">{{ props.item.employee ? props.item.employee.name : '' }}</td>
+                    <td class="text-xs-center">{{ props.item.employee ? toJson(props.item.employee).name : '' }}</td>
                     <td class="text-xs-center">{{ props.item.count }}</td>
                     <td class="text-xs-center">{{ props.item.inStock }}</td>
+                    <!--
                     <td class="text-xs-center">{{ props.item.inService }}</td>
                     <td class="text-xs-center">{{ props.item.place }}</td>
+                    -->
                   </tr>
                 </template>
               </v-data-table>
             </v-flex>
+            <!--
             <v-flex xs12>
               <h3>Historie</h3>
               <v-data-table :items="editedItem.itemsHistory" hide-actions>
@@ -56,7 +55,7 @@
                 </template>
               </v-data-table>
             </v-flex>
-
+            -->
           </v-layout>
         </v-container>
       </v-card-text>
@@ -67,39 +66,6 @@
         <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
       </v-card-actions>
     </v-card>
-    <v-dialog v-model="dialogTollItem" max-width="500px">
-      <v-card>
-        <v-card-title>
-          Příjemka
-        </v-card-title>
-        <v-card-text>
-          <v-select return-object v-model="tollItem.employee" :items="employees" label="Zaměstnanec" item-text="name"></v-select>
-          <v-text-field v-model="tollItem.countItem" type="number" label="Počet kusu"></v-text-field>
-          <v-text-field v-model="tollItem.place" label="Umístění"></v-text-field>
-          <v-text-field v-model="tollItem.description" label="Popis"></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" flat @click="dialogTollItem=false">Zavřít</v-btn>
-          <v-btn color="primary" flat @click="saveToolItem()">Uložit</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="dialogTollItemExport" max-width="500px">
-      <v-card>
-        <v-card-title>
-          Výdejka
-        </v-card-title>
-        <v-card-text>
-          <v-select return-object v-model="tollItem.employee" :items="employees" label="Zaměstnanec" item-text="name"></v-select>
-          <v-text-field v-model="tollItem.countItem" type="number" label="Počet kusu"></v-text-field>
-          <v-text-field v-model="tollItem.description" label="Popis"></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" flat @click="dialogTollItemExport=false">Zavřít</v-btn>
-          <v-btn color="primary" flat @click="saveExportToolItem()">Uložit</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-dialog>
 </template>
 
@@ -132,9 +98,6 @@ export default {
     tollItem: {}
   }),
   computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "Nový nástroj" : "Editace nástroje";
-    },
     suppliers() {
       return this.$store.state.tool.suppliers;
     },

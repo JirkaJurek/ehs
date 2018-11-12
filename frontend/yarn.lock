@@ -5507,6 +5507,10 @@ quote-stream@^1.0.1, quote-stream@~1.0.2:
     minimist "^1.1.3"
     through2 "^2.0.0"
 
+ramda-adjunct@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/ramda-adjunct/-/ramda-adjunct-2.11.0.tgz#45d7cf5da84f39ab3ff9e24b43dc098049a14822"
+
 ramda@^0.25.0:
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.25.0.tgz#8fdf68231cffa90bc2f9460390a0cb74a29b29a9"
@@ -6788,7 +6792,7 @@ vue-cli-plugin-vuetify@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/vue-cli-plugin-vuetify/-/vue-cli-plugin-vuetify-0.1.6.tgz#915a47c5d4f9d4fee44c826f5cf9e9596badb52d"
 
-vue-drag-sort-tree@^1.2.7:
+vue-drag-sort-tree@1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/vue-drag-sort-tree/-/vue-drag-sort-tree-1.2.7.tgz#d50a5fb629ad9d9680f123ea8f848b17f9b21a81"
 

@@ -1,7 +1,18 @@
 "use strict";
 
 const { execQuery, escape, queryBuilder } = require("../db");
-const { map, clone, isEmpty, head, prop } = require("ramda");
+const {
+  map,
+  clone,
+  isEmpty,
+  head,
+  prop,
+  nth,
+  over,
+  lensProp,
+  add: aliasAdd,
+  subtract
+} = require("ramda");
 const moment = require("moment");
 const tableName = "tool";
 
@@ -39,6 +50,7 @@ const afterSaveOrUpdate = (data, toolId) => {
       }, data.revisionTypes);
     });
   }
+  /*
   if (data.items) {
     itemFunction.removeAllOld(toolId).then(() => {
       map(item => {
@@ -49,6 +61,7 @@ const afterSaveOrUpdate = (data, toolId) => {
       }, data.items);
     });
   }
+  */
 };
 
 const transformData = data => {
@@ -60,7 +73,9 @@ const transformData = data => {
     : "[]";
   data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
-  data.itemsHistoryJSON = data.itemsHistory ? JSON.stringify(data.itemsHistory) : "[]";
+  data.itemsHistoryJSON = data.itemsHistory
+    ? JSON.stringify(data.itemsHistory)
+    : "[]";
   if (data.employee) {
     data.employeeJSON = JSON.stringify(data.employee);
     data.employeeId = data.employee.value;
@@ -72,7 +87,7 @@ function add(data) {
   data.revisions = "[]";
   data = transformData(data);
   const tool = execQuery(
-    `INSERT INTO ${tableName} (supplier, categories, name, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items, itemsHistory) VALUES (:supplier, :categoriesJSON , :name, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON, :itemsHistoryJSON);`,
+    `INSERT INTO ${tableName} (supplier, categories, name, shortName, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, code, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items, itemsHistory) VALUES (:supplier, :categoriesJSON , :name, :shortName, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :code, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON, :itemsHistoryJSON);`,
     data
   );
   tool.then(rows => {
@@ -86,7 +101,7 @@ function update(id, data) {
   data.id = id;
   const tool = execQuery(
     `UPDATE ${tableName} 
-        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON, itemsHistory=:itemsHistoryJSON
+        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, shortName=:shortName, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, code=:code, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON, itemsHistory=:itemsHistoryJSON
         WHERE id=:id;`,
     data
   );
@@ -124,7 +139,7 @@ const categoriesFunction = {
 };
 
 const revisionFunction = {
-  beforeSaveOrUpdate: async (toolId) => {
+  beforeSaveOrUpdate: async toolId => {
     const revisions = await revisionFunction.allById(toolId);
     await execQuery(
       `UPDATE ${tableName} SET revisions=:revisions WHERE id = :toolId;`,
@@ -149,7 +164,7 @@ const revisionFunction = {
       : null;
     data.revisionTypeId = data.revisionType ? data.revisionType.id : null;
     data.id = id;
-    console.log(data)
+    console.log(data);
     await execQuery(
       `UPDATE tool_revision SET id_tool_revision_types=:revisionTypeId, revisionType=:revisionTypeJSON, date=:date, description=:description, who=:who 
         WHERE id = :id;`,
@@ -187,7 +202,9 @@ const revisionFunction = {
     return true;
   },
   list: () => {
-    return execQuery(`SELECT * FROM tool_revision_types WHERE deletedAt IS NULL`);
+    return execQuery(
+      `SELECT * FROM tool_revision_types WHERE deletedAt IS NULL`
+    );
   },
   listUpcomingRevisions: async () => {
     const revisionTypes = await execQuery(`SELECT * FROM tool_revision_types`);
@@ -230,15 +247,77 @@ const itemFunction = {
   removeAllOld: toolId => {
     return execQuery(`DELETE FROM tool_item WHERE id_tool = ?;`, [toolId]);
   },
-  add: data => {
+  add: async (data, type = 0) => {
     if (data.employee) {
       data.employeeJSON = JSON.stringify(data.employee);
       data.employeeId = data.employee.id;
     }
+    // tohle by chtělo vyseknout do service a nejůépe na to udělat modul stock
+    const exist = await itemFunction.getItem(data.toolId, data.employeeId);
+    if (exist.length === 0 && type === 0) {
+      data.inStock = data.count;
+      await execQuery(
+        `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count, inService, place) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count, :inService, :place);`,
+        data
+      );
+    } else if (exist.length > 0) {
+      const firstExist = nth(0, exist);
+      if (type === 0) {
+        firstExist.count = aliasAdd(data.count, firstExist.count);
+        firstExist.inStock = aliasAdd(data.count, firstExist.inStock);
+      } else if (type === 1) {
+        firstExist.inStock = aliasAdd(data.count, firstExist.inStock);
+      } else if (type === 2) {
+        firstExist.inStock = subtract(firstExist.inStock, data.count);
+      } else if (type === 3) {
+        firstExist.count = subtract(firstExist.count, data.count);
+        firstExist.inStock = subtract(firstExist.inStock, data.count);
+      }
+      await itemFunction.update(firstExist);
+    }
+    const items = await itemFunction.allById(data.toolId);
+    await execQuery(
+      `UPDATE ${tableName} SET items=:items WHERE id = :toolId;`,
+      { items: JSON.stringify(items), toolId: data.toolId }
+    );
+    return true;
+  },
+  update: data => {
+    data.toolId = data.toolId || data["id_tool"];
     return execQuery(
-      `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count, inService, place) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count, :inService, :place);`,
+      `UPDATE tool_item
+      SET inStock=:inStock, count=:count
+      WHERE id_tool = :toolId AND employeeId = :employeeId;`,
       data
     );
+  },
+  getItem: (toolId, employeeId) => {
+    return execQuery(
+      `SELECT * FROM tool_item WHERE id_tool = ? AND employeeId = ?;`,
+      [toolId, employeeId]
+    );
+  },
+  allById: (toolId) => {
+    return execQuery(
+      `SELECT * FROM tool_item WHERE id_tool = ?;`,
+      [toolId]
+    );
+  }
+};
+
+const stockFunction = {
+  createRecord: async data => {
+    data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
+    data.exporterN = data.exporter ? 1 : 0;
+    console.log(data);
+    // dodělat ukládání jednotlivých items i ukládání k nástrojům, podle toho jestli jde o vyřazení ....
+    await execQuery(
+      `INSERT INTO move_stock (type, exporter, items) VALUES (:type, :exporterN, :itemsJSON);`,
+      data
+    );
+    map(x => {
+      return itemFunction.add(x, data.type);
+    }, data.items);
   }
 };
 
@@ -325,5 +404,6 @@ module.exports = {
   updateRevisionType: revisionFunction.updateType,
   listRevisionType: revisionFunction.list,
   listUpcomingRevisions: revisionFunction.listUpcomingRevisions,
-  deleteRevisionType: revisionFunction.deleteRevisionType
+  deleteRevisionType: revisionFunction.deleteRevisionType,
+  moveRecord: stockFunction.createRecord
 };

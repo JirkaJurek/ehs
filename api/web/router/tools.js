@@ -88,5 +88,9 @@ router.get('/revision-type', async (ctx, next) => {
 router.get('/revision-type/upcoming', async (ctx, next) => {
     ctx.body = await tools.service.listUpcomingRevisions();
 })
+router.post('/move', async (ctx, next) => {
+    await tools.service.createMoveStock(ctx.request.body);
+    ctx.status = 200;
+})
 
 module.exports = router

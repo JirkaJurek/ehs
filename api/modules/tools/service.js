@@ -82,3 +82,7 @@ module.exports.deleteRevisionType = id => {
 module.exports.revert = id => {
   return sql.revertById(id);
 };
+
+module.exports.createMoveStock = data => {
+  return sql.moveRecord(data);
+};

@@ -17,6 +17,9 @@
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.shortName" label="Zkrácený název"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.revisionCard" label="Číslo revizní karty"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
@@ -30,6 +33,9 @@
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.inventoryNumber" label="Inventární číslo"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.code" label="Kód"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.machineNumber" label="Označení/číslo stroje"></v-text-field>
@@ -80,9 +86,11 @@
               <v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>
             </v-flex>
             -->
+            <!--
             <v-flex xs12>
               <v-select return-object :items="revisionTypes" v-model="editedItem.revisionTypes" item-text="name" label="Typy revizí" multiple chips persistent-hint></v-select>
             </v-flex>
+            -->
             <!--
             <v-flex xs12>
               <v-data-table :items="editedItem.items" hide-actions>
@@ -201,15 +209,8 @@ export default {
     async open(itemId, duplicate = false) {
       this.itemId = itemId;
       this.editedItem = {
-        inStock: 1,
-        items: [
-          {
-            inStock: 1,
-            count: 1,
-            employee: { id: 1, name: "Sklad" },
-            edit: true
-          }
-        ]
+        inStock: 0,
+        items: []
       };
       this.dialogNewItem = true;
       if (this.itemId > -1) {
