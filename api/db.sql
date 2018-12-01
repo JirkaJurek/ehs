@@ -27,25 +27,34 @@ CREATE TABLE `file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-SET NAMES utf8mb4;
-
 DROP TABLE IF EXISTS `move_stock`;
 CREATE TABLE `move_stock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` tinyint(4) DEFAULT NULL,
   `exporter` tinyint(4) DEFAULT NULL COMMENT 'Jestli jde o výdejku nebo přijímku',
-  `items` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `items` longtext DEFAULT NULL,
+  `createdAt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `move_stock` (`id`, `type`, `exporter`, `items`) VALUES
-(1,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"4\"}]'),
-(2,	2,	1,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"}]'),
-(3,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"5\"}]'),
-(4,	3,	1,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"}]'),
-(5,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"}]'),
-(6,	0,	0,	'[{\"toolId\":\"512\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"3\"},{\"toolId\":\"256\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"1\"}]'),
-(7,	0,	0,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]');
+INSERT INTO `move_stock` (`id`, `type`, `exporter`, `items`, `createdAt`) VALUES
+(1,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"4\"}]',	'2018-11-13 05:57:37'),
+(2,	2,	1,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"}]',	'2018-11-13 05:57:37'),
+(3,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"5\"}]',	'2018-11-13 05:57:37'),
+(4,	3,	1,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"}]',	'2018-11-13 05:57:37'),
+(5,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"}]',	'2018-11-13 05:57:37'),
+(6,	0,	0,	'[{\"toolId\":\"512\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"3\"},{\"toolId\":\"256\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"1\"}]',	'2018-11-13 05:57:37'),
+(7,	0,	0,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-13 05:57:37'),
+(8,	0,	0,	'[{\"toolId\":\"256\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"2\"},{\"toolId\":\"512\",\"employee\":{\"id\":3,\"name\":\"Modelář\"},\"count\":\"4\"}]',	'2018-11-13 07:17:15'),
+(9,	2,	1,	'[{\"toolId\":\"256\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-13 16:30:35'),
+(10,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returnde\":\"1\",\"returned\":\"1\"}]',	'2018-11-13 17:04:14'),
+(11,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"1\"}]',	'2018-11-13 17:24:20'),
+(12,	0,	0,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-13 17:26:28'),
+(13,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"0\"}]',	'2018-11-13 17:26:42'),
+(14,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-13 17:38:00'),
+(15,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"1\"}]',	'2018-11-13 17:39:24'),
+(16,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"1\"}]',	'2018-11-13 17:40:41'),
+(17,	0,	0,	'[{\"toolId\":\"768\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"2\"}]',	'2018-11-14 05:44:42');
 
 DROP TABLE IF EXISTS `tool`;
 CREATE TABLE `tool` (
@@ -337,7 +346,7 @@ INSERT INTO `tool` (`id`, `supplier`, `categories`, `name`, `shortName`, `revisi
 (253,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Frézka srovnávací  SR – 430 HOUFEK',	NULL,	NULL,	NULL,	'010/2009',	NULL,	NULL,	NULL,	'2009',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (254,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Frézka srovnávací  R630   HOUFEK',	NULL,	NULL,	NULL,	'AR – 022/2015',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (255,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Frézka spodní FVV300P    JEŘÁBEK',	NULL,	NULL,	NULL,	'461513',	NULL,	NULL,	NULL,	'2013',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
-(256,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Frézka spodní WOODSTAR bs 52            3902103000 ',	NULL,	NULL,	NULL,	'8379/2007',	NULL,	NULL,	NULL,	'2009',	NULL,	'{\"value\":1,\"text\":\"Tester\"}',	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	1,	NULL,	NULL,	'[{\"id_tool\":\"256\",\"inStock\":\"7\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"9\",\"inService\":null,\"place\":null},{\"id_tool\":\"256\",\"inStock\":\"1\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null}]',	NULL),
+(256,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Frézka spodní WOODSTAR bs 52            3902103000 ',	NULL,	NULL,	NULL,	'8379/2007',	NULL,	NULL,	NULL,	'2009',	NULL,	'{\"value\":1,\"text\":\"Tester\"}',	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	1,	NULL,	NULL,	'[{\"id_tool\":\"256\",\"inStock\":\"6\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"9\",\"inService\":null,\"place\":null},{\"id_tool\":\"256\",\"inStock\":\"3\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"3\",\"inService\":null,\"place\":null}]',	NULL),
 (257,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Frézka tloušťkovací SP 630   HOUFEK',	NULL,	NULL,	NULL,	'AB – 1198/2014',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (258,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Pila pásová UH 800 HEMA',	NULL,	NULL,	NULL,	'83306/1979',	NULL,	NULL,	NULL,	'2008',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (259,	NULL,	'[{\"id\":1,\"name\":\"Velké stroje\"}]',	'Pila pásová BSA 800 PANHANS',	NULL,	NULL,	NULL,	'505/1979',	NULL,	NULL,	NULL,	'2004',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
@@ -593,7 +602,7 @@ INSERT INTO `tool` (`id`, `supplier`, `categories`, `name`, `shortName`, `revisi
 (509,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska přímá 300 SERIES  DREMEL',	NULL,	'0049',	NULL,	'F013 0300 45/2010',	NULL,	NULL,	NULL,	'2010',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (510,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska přímá EBK 30-8E   NAREX',	NULL,	'0321',	NULL,	'349 344 87/763328',	NULL,	NULL,	NULL,	'2012',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (511,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska přímá EBK 30-8E   NAREX',	NULL,	'0304',	NULL,	'349 344 94/763328/2012',	NULL,	NULL,	NULL,	'2012',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
-(512,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska přímá EBK 30-8E   NAREX',	NULL,	'0305',	NULL,	'349 345 24/763328',	NULL,	NULL,	NULL,	'2012',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"512\",\"inStock\":\"3\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"3\",\"inService\":null,\"place\":null}]',	NULL),
+(512,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska přímá EBK 30-8E   NAREX',	NULL,	'0305',	NULL,	'349 345 24/763328',	NULL,	NULL,	NULL,	'2012',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"512\",\"inStock\":\"3\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"3\",\"inService\":null,\"place\":null},{\"id_tool\":\"512\",\"inStock\":\"4\",\"employeeId\":\"3\",\"employee\":\"{\\\"id\\\":3,\\\"name\\\":\\\"Modelář\\\"}\",\"count\":\"4\",\"inService\":null,\"place\":null}]',	NULL),
 (513,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska řetězová na kov CS03   WOODSTAR',	NULL,	'0310',	NULL,	'1904 3903602942',	NULL,	NULL,	NULL,	'2012',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (514,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska vibrační RS300Q  FESTOOL',	NULL,	'0055',	NULL,	'018443/2003',	NULL,	NULL,	NULL,	'2004',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (515,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Bruska vibrační PSS 250 AE  BOSCH',	NULL,	'0046',	NULL,	'008 000 749/2010',	NULL,	NULL,	NULL,	'2010',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
@@ -849,7 +858,7 @@ INSERT INTO `tool` (`id`, `supplier`, `categories`, `name`, `shortName`, `revisi
 (765,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Pila kotoučová ponorná TS 55 RENQ    FESTOOL',	NULL,	'0318',	NULL,	'41303924/498500/2014',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (766,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní svislá DW621-QS02  DEWALT',	NULL,	'0050',	NULL,	'338758',	NULL,	NULL,	NULL,	'2008',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (767,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní svislá H730S FLEX  9804 01007 259.369',	NULL,	'0012',	NULL,	'12713 (inv.č.)',	NULL,	NULL,	NULL,	'2010',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
-(768,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní svislá H730S FLEX  9804 01007 259.369',	NULL,	'0007',	NULL,	'12720 (inv.č.)',	NULL,	NULL,	NULL,	'2010',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"768\",\"inStock\":\"1\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null}]',	'[]'),
+(768,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní svislá H730S FLEX  9804 01007 259.369',	NULL,	'0007',	NULL,	'12720 (inv.č.)',	NULL,	NULL,	NULL,	'2010',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"768\",\"inStock\":\"2\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"2\",\"inService\":null,\"place\":null},{\"id_tool\":\"768\",\"inStock\":\"2\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"2\",\"inService\":null,\"place\":null}]',	'[]'),
 (769,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní RP2300FC   MAKITA',	NULL,	'0309',	NULL,	'20828/2012',	NULL,	NULL,	NULL,	'2012',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (770,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní RP2300FCXJ   MAKITA',	NULL,	'0320',	NULL,	'62139E/2015',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (771,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Frézka horní ořezávací CMT9',	NULL,	'0310',	NULL,	'32000135',	NULL,	NULL,	NULL,	'2013',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
@@ -4020,10 +4029,12 @@ CREATE TABLE `tool_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `tool_item` (`id_tool`, `inStock`, `employeeId`, `employee`, `count`, `inService`, `place`) VALUES
-(256,	7,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	9,	NULL,	NULL),
-(256,	1,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	1,	NULL,	NULL),
+(256,	6,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	9,	NULL,	NULL),
+(256,	3,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	3,	NULL,	NULL),
 (512,	3,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	3,	NULL,	NULL),
-(768,	1,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	1,	NULL,	NULL);
+(512,	4,	3,	'{\"id\":3,\"name\":\"Modelář\"}',	4,	NULL,	NULL),
+(768,	2,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	2,	NULL,	NULL),
+(768,	2,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	2,	NULL,	NULL);
 
 DROP TABLE IF EXISTS `tool_revision`;
 CREATE TABLE `tool_revision` (
@@ -4079,4 +4090,4 @@ CREATE TABLE `tool_supplier` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
--- 2018-11-12 07:22:45
+-- 2018-11-14 06:03:24

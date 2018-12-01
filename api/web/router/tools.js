@@ -92,5 +92,12 @@ router.post('/move', async (ctx, next) => {
     await tools.service.createMoveStock(ctx.request.body);
     ctx.status = 200;
 })
+router.post('/move/:id(\\d+)/return-all', async (ctx, next) => {
+    await tools.service.returnedAllTools(ctx.params.id);
+    ctx.status = 200;
+})
+router.get('/move', async (ctx, next) => {
+    ctx.body = await tools.service.listMove();
+})
 
 module.exports = router

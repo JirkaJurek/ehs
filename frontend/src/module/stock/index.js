@@ -1,6 +1,7 @@
 import { isArray, isNumber, isBoolean } from "ramda-adjunct";
 import { clone, slice } from "ramda";
 import SetItemModal from "./SetItemModal";
+import DetailModal from "./DetailModal";
 import axios from "axios";
 axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
 // axios.defaults.baseURL = location.origin;
@@ -10,7 +11,7 @@ export const defaultItem = {
   type: 0,
   exporter: false
 };
-const types = [
+export const types = [
   { text: "Nové nástroje", value: 0 },
   { text: "Návrat nástrojů", value: 1 },
   { text: "Výdej nástrojů", value: 2 },
@@ -29,6 +30,11 @@ export const addItem = (store, newItem) => {
   const item = isCorrectOrRepair(store.state.stock.moveItems);
   // pokud už tu je stejný toolId a stejný zaměstnanec, tak se počty pouze sečtou
   item.items.push(newItem);
+  store.commit("setMove", item);
+};
+export const addAllItems = (store, items) => {
+  const item = isCorrectOrRepair(store.state.stock.moveItems);
+  item.items = items;
   store.commit("setMove", item);
 };
 export const setExporter = (store, exporter) => {
@@ -52,8 +58,8 @@ export const getItemVariant = (store, tool) => {
     if (toolItems.length === 1) {
       if (toolItems[0].count == 1) {
         let item = toolItems[0];
-        item.toolId = item['id_tool']
-        item.employee = toJson(item.employee)
+        item.toolId = item["id_tool"];
+        item.employee = toJson(item.employee);
         addItem(store, item);
         return true;
       }
@@ -104,8 +110,8 @@ export const isCorrectOrRepair = item => {
 };
 export const createMove = store => {
   axios.post("/tools/move", store.state.stock.moveItems).then(() => {
-    //inicializovat novou historii skladů
     store.dispatch("loadAllTool");
+    store.dispatch("allMoveStock");
   });
   cleanMove(store);
   store.commit("setMainModal", null);
@@ -114,6 +120,17 @@ export const getPossibleTypes = store => {
   return store.state.stock.moveItems.exporter
     ? slice(2, 4, types)
     : slice(0, 2, types);
+};
+export const getMoveDetail = (store, item) => {
+  DetailModal.myData = { item };
+  store.commit("setMainModal", DetailModal);
+};
+export const returnAllTools = (store, itemId) => {
+  axios.post(`/tools/move/${itemId}/return-all`).then(() => {
+    store.dispatch("loadAllTool");
+    store.dispatch("allMoveStock");
+  });
+  store.commit("setMainModal", null);
 };
 
 const toJson = data => {

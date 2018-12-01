@@ -86,3 +86,9 @@ module.exports.revert = id => {
 module.exports.createMoveStock = data => {
   return sql.moveRecord(data);
 };
+module.exports.listMove = () => {
+  return sql.listMove();
+};
+module.exports.returnedAllTools = id => {
+  return sql.returnedAllTools(id);
+};

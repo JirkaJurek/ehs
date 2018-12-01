@@ -29,10 +29,10 @@
 </template>
 
 <script>
-import { is } from "ramda";
+import { is, nth } from "ramda";
 import { addItem } from "./index";
 export default {
-  props: ['myData'],
+  props: ["myData"],
   data: () => ({
     isOpen: true,
     valid: false,
@@ -45,6 +45,15 @@ export default {
     ],
     employeeRules: [v => !!v || "Počet kusu je povinný"]
   }),
+  created() {
+    try {
+      this.employee = this.$store.getters.getUserById(
+        nth(0, this.$store.state.tool.filter.filter.employee)
+      );
+    } catch (e) {
+      this.employee = null;
+    }
+  },
   computed: {
     title() {
       return this.$store.state.stock.moveItems.exporter

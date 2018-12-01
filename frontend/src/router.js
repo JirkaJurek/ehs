@@ -40,9 +40,24 @@ export default new Router({
       component: () => import('./views/ToolRevisionUpcoming.vue')
     },
     {
+      path: '/fe/move-history',
+      name: 'move-history',
+      component: () => import('./views/MoveHistory.vue')
+    },
+    {
       path: '/pdf',
       name: 'PDF',
       component: () => import('./views/PDF.vue')
+    },
+    {
+      path: '/move-in-stock',
+      name: 'move-in-stock',
+      component: () => import('./views/MoveInStock')
+    },
+    {
+      path: '/a',
+      name: 'a',
+      component: () => import('./module/tool/ToolsTable')
     },
     {
       path: '/about',

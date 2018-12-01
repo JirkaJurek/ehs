@@ -21,6 +21,9 @@ import StockToolbarButton from "./module/stock/ToolbarButton";
 import ExporterButton from "./module/stock/ExporterButton";
 import ReceiverButton from "./module/stock/ReceiverButton";
 
+
+// import "./plugins/tool.js";
+
 Vue.config.productionTip = false;
 
 Vue.component("file-upload", VueUploadComponent);

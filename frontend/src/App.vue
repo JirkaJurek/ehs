@@ -2,7 +2,6 @@
   <v-app id="inspire">
     <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
       <v-list dense>
-        <router-link to="/fe/tools">Nástroje</router-link>
         <template v-for="item in items">
           <v-layout v-if="item.heading" :key="item.heading" row align-center>
             <v-flex xs6>
@@ -22,7 +21,7 @@
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile v-for="(child, i) in item.children" :key="i" @click="">
+            <router-link tag="v-list-tile" v-for="(child, i) in item.children" :to="child.path" :key="i">
               <v-list-tile-action v-if="child.icon">
                 <v-icon>{{ child.icon }}</v-icon>
               </v-list-tile-action>
@@ -31,9 +30,9 @@
                   {{ child.text }}
                 </v-list-tile-title>
               </v-list-tile-content>
-            </v-list-tile>
+            </router-link>
           </v-list-group>
-          <v-list-tile v-else :key="item.text" @click="">
+          <router-link tag="v-list-tile" v-else :key="item.text" :to="item.path">
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
@@ -42,7 +41,7 @@
                 {{ item.text }}
               </v-list-tile-title>
             </v-list-tile-content>
-          </v-list-tile>
+          </router-link>
         </template>
       </v-list>
     </v-navigation-drawer>
@@ -53,7 +52,9 @@
       </v-toolbar-title>
       <v-autocomplete @change="changeAutocomplete" :items="autocomplete.items" v-model="autocomplete.select" cache-items flat hide-details label="Search" solo-inverted class="hidden-sm-and-down"></v-autocomplete>
       <v-spacer></v-spacer>
+      <!--
       <stock-toolbar-button/>
+      -->
     </v-toolbar>
     <v-content>
       <router-view/>
@@ -69,34 +70,26 @@ export default {
     dialog: false,
     drawer: false,
     items: [
-      { icon: "contacts", text: "Contacts" },
-      { icon: "history", text: "Frequently contacted" },
-      { icon: "content_copy", text: "Duplicates" },
+      { icon: "build", text: "Nástroje", path: "/fe/tools" },
+      { icon: "category", text: "Kategorie", path: "/fe/tools/categories" },
       {
-        icon: "keyboard_arrow_up",
-        "icon-alt": "keyboard_arrow_down",
-        text: "Labels",
-        model: true,
-        children: [{ icon: "add", text: "Create label" }]
+        icon: "schedule",
+        text: "Typy revizí",
+        path: "/fe/tools/revision-type"
       },
       {
-        icon: "keyboard_arrow_up",
-        "icon-alt": "keyboard_arrow_down",
-        text: "More",
-        model: false,
-        children: [
-          { text: "Import" },
-          { text: "Export" },
-          { text: "Print" },
-          { text: "Undo changes" },
-          { text: "Other contacts" }
-        ]
+        icon: "update",
+        text: "Blížící se revize",
+        path: "/fe/tools/revision-upcoming"
       },
-      { icon: "settings", text: "Settings" },
-      { icon: "chat_bubble", text: "Send feedback" },
-      { icon: "help", text: "Help" },
-      { icon: "phonelink", text: "App downloads" },
-      { icon: "keyboard", text: "Go to the old version" }
+      { icon: "store", text: "Historie skladu", path: "/fe/move-history" }
+      // {
+      //   icon: "keyboard_arrow_up",
+      //   "icon-alt": "keyboard_arrow_down",
+      //   text: "Labels",
+      //   model: true,
+      //   children: [{ icon: "add", text: "Create label", path: "" }]
+      // }
     ],
     autocomplete: {
       search: null,
@@ -104,7 +97,8 @@ export default {
         { text: "Nástroje", path: "/fe/tools" },
         { text: "Kategorie", path: "/fe/tools/categories" },
         { text: "Typy revizí", path: "/fe/tools/revision-type" },
-        { text: "Blížící se revize", path: "/fe/tools/revision-upcoming" }
+        { text: "Blížící se revize", path: "/fe/tools/revision-upcoming" },
+        { text: "Historie skladu", path: "/fe/move-history" }
       ],
       selected: []
     }
@@ -114,7 +108,9 @@ export default {
       return this.$store.state.mainModal;
     },
     mainModalData() {
-      return this.$store.state.mainModal ? this.$store.state.mainModal.myData : null;
+      return this.$store.state.mainModal
+        ? this.$store.state.mainModal.myData
+        : null;
     }
   },
   props: {

@@ -27,7 +27,6 @@ export default {
       { value: "60 month", text: "60 měsíců" }
     ],
     columns: [
-      { text: "Přidat", value: "stock", align: "center", sortable: false },
       { text: "Dodavatel", value: "supplier", align: "center" },
       { text: "Kategorie", value: "categories", align: "center" },
       { text: "Název stroje", value: "name", class: "wider", align: "center" },

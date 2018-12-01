@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { setType, setExporter } from "./index";
+import { cleanMove, setType, setExporter } from "./index";
 export default {
   name: "ReceiverButton",
   data: () => ({}),
@@ -13,8 +13,10 @@ export default {
   computed: {},
   methods: {
     set() {
+      cleanMove(this.$store);
       setType(this.$store, 0);
       setExporter(this.$store, 0);
+      this.$router.push('/move-in-stock');
     }
   }
 };

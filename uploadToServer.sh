@@ -10,3 +10,4 @@ scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi/web/p
 #najítí běžícího procesu ->  lsof -i :3030
 #připojení mysql -> mysql -u root
 #mysql příklady -> show databases; / DROP DATABASE intranet; / create database intranet;
+#damp databáze -> mysqldump --opt --user=root  intranet > dbzaloha.sql

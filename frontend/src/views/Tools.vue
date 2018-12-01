@@ -1,11 +1,13 @@
 <template>
   <div>
-    <v-layout display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
+    <v-layout my-3 display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
     <div xs12 color="white">
-      <v-btn @click="n()" color="primary" dark class="mb-2">Nový</v-btn>
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Zápis provedené revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
+      <v-btn-toggle v-model="toggleMultiple" multiple>
+        <v-btn color="primary">Smazané položky</v-btn>
+      </v-btn-toggle>
       <stock-exporter-button />
       <stock-receiver-button />
     </div>
@@ -19,9 +21,6 @@
       </v-flex>
       <v-flex xs12 sm4>
         <v-select :items="categories" v-model="filter.categories" label="Kategorie" multiple item-text="name" item-value="id" persistent-hint></v-select>
-      </v-flex>
-      <v-flex xs12 sm1>
-        <v-switch label="Smazané" v-model="filter.deletedAt"></v-switch>
       </v-flex>
       <v-flex xs12 sm3>
         <v-select :items="headersFieldForSelect" v-model="headersSelect" :menu-props="{ maxHeight: '400' }" label="Viditelná pole" multiple persistent-hint>
@@ -110,7 +109,7 @@
         </tr>
       </template>
       <v-alert slot="no-results" :value="true" color="error" icon="warning">
-        Your search for "{{ filter.search }}" found no results.
+        Nebyl nalezen žádný výsledek pro výraz "{{ search }}".
       </v-alert>
     </v-data-table>
     <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
@@ -199,7 +198,8 @@ export default {
     editedIndex: -1,
     bulk: true,
     pagination: {},
-    rowsItem: [25, 50, 100, { text: "vše", value: -1 }]
+    rowsItem: [25, 50, 100, { text: "vše", value: -1 }],
+    toggleMultiple: []
   }),
 
   computed: {
@@ -306,6 +306,11 @@ export default {
     },
     headersSelect() {
       this.headersConfig();
+    },
+    toggleMultiple(val) {
+      this.filter.deletedAt = !!val.length;
+      //nefunguje inicializace u filtru
+      this.initialize();
     }
   },
 
@@ -321,9 +326,6 @@ export default {
   },
 
   methods: {
-    n(item) {
-      console.log(getItemVariant(this.$store, item));
-    },
     customSort(items, sortBy, descending) {
       if (
         this.pagination.sortBy != sortBy ||

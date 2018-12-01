@@ -2,15 +2,16 @@
 
 const { execQuery, escape, queryBuilder } = require("../db");
 const {
-  map,
+  add: aliasAdd,
   clone,
-  isEmpty,
+  flip,
   head,
-  prop,
+  isEmpty,
+  lensProp,
+  map,
   nth,
   over,
-  lensProp,
-  add: aliasAdd,
+  prop,
   subtract
 } = require("ramda");
 const moment = require("moment");
@@ -248,38 +249,43 @@ const itemFunction = {
     return execQuery(`DELETE FROM tool_item WHERE id_tool = ?;`, [toolId]);
   },
   add: async (data, type = 0) => {
-    if (data.employee) {
-      data.employeeJSON = JSON.stringify(data.employee);
-      data.employeeId = data.employee.id;
-    }
-    // tohle by chtělo vyseknout do service a nejůépe na to udělat modul stock
-    const exist = await itemFunction.getItem(data.toolId, data.employeeId);
-    if (exist.length === 0 && type === 0) {
-      data.inStock = data.count;
-      await execQuery(
-        `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count, inService, place) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count, :inService, :place);`,
-        data
-      );
-    } else if (exist.length > 0) {
-      const firstExist = nth(0, exist);
-      if (type === 0) {
-        firstExist.count = aliasAdd(data.count, firstExist.count);
-        firstExist.inStock = aliasAdd(data.count, firstExist.inStock);
-      } else if (type === 1) {
-        firstExist.inStock = aliasAdd(data.count, firstExist.inStock);
-      } else if (type === 2) {
-        firstExist.inStock = subtract(firstExist.inStock, data.count);
-      } else if (type === 3) {
-        firstExist.count = subtract(firstExist.count, data.count);
-        firstExist.inStock = subtract(firstExist.inStock, data.count);
+    const number = data.number || data.count;
+    if (number > 0) {
+      if (data.employee) {
+        data.employeeJSON = JSON.stringify(data.employee);
+        data.employeeId = data.employee.id;
       }
-      await itemFunction.update(firstExist);
+      // tohle by chtělo vyseknout do service a nejůépe na to udělat modul stock
+      const exist = await itemFunction.getItem(data.toolId, data.employeeId);
+      if (exist.length === 0 && type === 0) {
+        data.inStock = number;
+        data.count = number;
+        await execQuery(
+          `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count, inService, place) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count, :inService, :place);`,
+          data
+        );
+      } else if (exist.length > 0) {
+        const firstExist = nth(0, exist);
+        if (type === 0) {
+          firstExist.count = aliasAdd(number, firstExist.count);
+          firstExist.inStock = aliasAdd(number, firstExist.inStock);
+        } else if (type === 1) {
+          firstExist.inStock = aliasAdd(number, firstExist.inStock);
+        } else if (type === 2) {
+          firstExist.inStock = subtract(firstExist.inStock, number);
+        } else if (type === 3) {
+          firstExist.count = subtract(firstExist.count, number);
+          firstExist.inStock = subtract(firstExist.inStock, number);
+        }
+        await itemFunction.update(firstExist);
+      }
+      const items = await itemFunction.allById(data.toolId);
+      
+      await execQuery(
+        `UPDATE ${tableName} SET items=:items WHERE id = :toolId;`,
+        { items: JSON.stringify(items), toolId: data.toolId }
+      );
     }
-    const items = await itemFunction.allById(data.toolId);
-    await execQuery(
-      `UPDATE ${tableName} SET items=:items WHERE id = :toolId;`,
-      { items: JSON.stringify(items), toolId: data.toolId }
-    );
     return true;
   },
   update: data => {
@@ -297,11 +303,8 @@ const itemFunction = {
       [toolId, employeeId]
     );
   },
-  allById: (toolId) => {
-    return execQuery(
-      `SELECT * FROM tool_item WHERE id_tool = ?;`,
-      [toolId]
-    );
+  allById: toolId => {
+    return execQuery(`SELECT * FROM tool_item WHERE id_tool = ?;`, [toolId]);
   }
 };
 
@@ -309,15 +312,38 @@ const stockFunction = {
   createRecord: async data => {
     data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
     data.exporterN = data.exporter ? 1 : 0;
-    console.log(data);
-    // dodělat ukládání jednotlivých items i ukládání k nástrojům, podle toho jestli jde o vyřazení ....
     await execQuery(
-      `INSERT INTO move_stock (type, exporter, items) VALUES (:type, :exporterN, :itemsJSON);`,
+      `INSERT INTO move_stock (type, exporter, items, createdAt) VALUES (:type, :exporterN, :itemsJSON, NOW());`,
       data
     );
     map(x => {
       return itemFunction.add(x, data.type);
     }, data.items);
+  },
+  list: () => execQuery(`SELECT * FROM move_stock ORDER BY createdAt DESC;`),
+  showById: id => execQuery(`SELECT * FROM move_stock WHERE id = ?;`, [id]),
+  returnedAll: async id => {
+    const item = nth(0, await stockFunction.showById(id));
+    const flipSubtract = flip(subtract);
+    map(x => {
+      itemFunction.add(
+        over(lensProp("count"), flipSubtract(x.returned || 0), x),
+        1
+      );
+    }, toJson(item.items));
+    const items = map(
+      x => ({
+        ...x,
+        returned: x.number || x.count
+      }),
+      toJson(item.items)
+    );
+    execQuery(
+      `UPDATE move_stock
+      SET items=:items
+      WHERE id = :id;`,
+      { items: JSON.stringify(items), id }
+    );
   }
 };
 
@@ -405,5 +431,7 @@ module.exports = {
   listRevisionType: revisionFunction.list,
   listUpcomingRevisions: revisionFunction.listUpcomingRevisions,
   deleteRevisionType: revisionFunction.deleteRevisionType,
-  moveRecord: stockFunction.createRecord
+  moveRecord: stockFunction.createRecord,
+  listMove: stockFunction.list,
+  returnedAllTools: stockFunction.returnedAll
 };

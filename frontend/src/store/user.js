@@ -1,3 +1,5 @@
+import { find, propEq } from "ramda";
+
 export default {
   state: {
     users: [
@@ -7,7 +9,11 @@ export default {
       { id: 4, name: "Tester" }
     ]
   },
-  getters: {},
+  getters: {
+    getUserById: state => id => {
+      return find(propEq("id", id), state.users);
+    }
+  },
   mutations: {},
   actions: {}
 };

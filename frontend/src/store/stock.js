@@ -14,7 +14,8 @@ const toJson = data => {
 
 export default {
   state: {
-    moveItems: getDefaultMove()
+    moveItems: getDefaultMove(),
+    moveStock: []
   },
   getters: {
     getNumberItems: state => () => {
@@ -26,5 +27,11 @@ export default {
       state.moveItems = fullNewObject;
     }
   },
-  actions: {}
+  actions: {
+    async allMoveStock({ state }) {
+      axios.get("/tools/move").then(response => {
+        state.moveStock = response.data;
+      });
+    }
+  }
 };

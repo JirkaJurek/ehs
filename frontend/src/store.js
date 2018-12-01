@@ -11,7 +11,6 @@ export default new Vuex.Store({
   },
   mutations: {
     setMainModal(state, modal) {
-      console.log(modal)
       state.mainModal = modal;
     },
   },
