@@ -1,6 +1,6 @@
 <template>
   <v-btn @click.native="set" color="primary" dark class="mb-2">
-    Přijímka
+    Přijemka
   </v-btn>
 </template>
 
@@ -16,7 +16,7 @@ export default {
       cleanMove(this.$store);
       setType(this.$store, 0);
       setExporter(this.$store, 0);
-      this.$router.push('/move-in-stock');
+      this.$router.push('/fe/move-in-stock');
     }
   }
 };

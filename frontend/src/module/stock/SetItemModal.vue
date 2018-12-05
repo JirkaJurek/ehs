@@ -53,12 +53,13 @@ export default {
     } catch (e) {
       this.employee = null;
     }
+    this.$store.dispatch("loadAllUsers");
   },
   computed: {
     title() {
       return this.$store.state.stock.moveItems.exporter
         ? "Výdejka"
-        : "Přijímka";
+        : "Přijemka";
     },
     employees() {
       return this.$store.state.user.users;

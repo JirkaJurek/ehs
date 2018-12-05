@@ -23,6 +23,9 @@ export default {
     },
     change: Function
   },
+  created() {
+    this.$store.dispatch("loadAllUsers");
+  },
   computed: {
     employees() {
       return this.$store.state.user.users;

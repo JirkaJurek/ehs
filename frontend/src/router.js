@@ -50,9 +50,14 @@ export default new Router({
       component: () => import('./views/PDF.vue')
     },
     {
-      path: '/move-in-stock',
+      path: '/fe/move-in-stock',
       name: 'move-in-stock',
       component: () => import('./views/MoveInStock')
+    },
+    {
+      path: '/fe/users',
+      name: 'a',
+      component: () => import('./views/Users')
     },
     {
       path: '/a',

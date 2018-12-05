@@ -9,7 +9,7 @@
       </tr>
     </template>
     <template slot="items" slot-scope="props">
-      <td class="text-xs-center">{{ props.item.exporter == 0 ? 'Přijímka' : 'Výdejka' }}</td>
+      <td class="text-xs-center">{{ props.item.exporter == 0 ? 'Přijemka' : 'Výdejka' }}</td>
       <td class="text-xs-center">{{ getType(props.item.type) }}</td>
       <td class="text-xs-center">{{ dateFormat(props.item.createdAt) }}</td>
       <td class="text-xs-center">

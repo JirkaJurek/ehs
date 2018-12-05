@@ -1,8 +1,6 @@
 import { length } from "ramda";
-import axios from "axios";
+import axios from "../myAxios";
 import { getDefaultMove } from "../module/stock/index";
-axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
-// axios.defaults.baseURL = location.origin;
 
 const toJson = data => {
   try {

@@ -201,7 +201,9 @@ export default {
       return this.$store.state.tool.revisionType;
     }
   },
-  created() {},
+  created() {
+    this.$store.dispatch("loadAllUsers");
+  },
   methods: {
     setItem(data) {
       data.items = data.items ? this.toJson(data.items) : [];

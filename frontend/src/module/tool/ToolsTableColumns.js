@@ -11,7 +11,7 @@ const mapIndexed = addIndex(map);
 
 //tahle funkce by chtěla předělat 
 const toolItemsCount = data => {
-  let text = "0 / 0";
+  let text = "0 / 0 / 0";
   if (data) {
     const items = toJson(data);
     const { count, inStock } = reduce(
@@ -24,7 +24,7 @@ const toolItemsCount = data => {
       { count: 0, inStock: 0 },
       items
     );
-    text = `${count} / ${inStock}`;
+    text = `${count} / ${inStock} / ${count - inStock}`;
   }
 
   return text;

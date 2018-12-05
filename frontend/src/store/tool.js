@@ -1,7 +1,5 @@
 import { find, propEq, props, filter, prop } from "ramda";
-import axios from "axios";
-axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
-// axios.defaults.baseURL = location.origin;
+import axios from "../myAxios";
 
 const toJson = data => {
   try {
@@ -77,7 +75,7 @@ export default {
       //{ text: "Na skladě", value: "inStock" },
       { text: "Cena", value: "price" },
       {
-        text: "Celkový počet / skladem",
+        text: "Celkový počet / skladem / servis",
         value: "count",
         class: "whiteSpace",
         align: "center"

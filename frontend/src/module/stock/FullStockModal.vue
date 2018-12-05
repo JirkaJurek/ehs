@@ -12,7 +12,7 @@
             <v-btn dark flat @click.native="create" :disabled="disableCreate">Uložit</v-btn>
           </v-toolbar-items>
           <v-toolbar-items>
-            <v-btn dark flat @click.native="fullDelete" color="red">Smazat celou přijímku</v-btn>
+            <v-btn dark flat @click.native="fullDelete" color="red">Smazat celou přijemku</v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-flex offset-xs4 xs4>
@@ -70,7 +70,7 @@ export default {
     title() {
       return this.$store.state.stock.moveItems.exporter
         ? "Výdejka"
-        : "Přijímka";
+        : "Přijemka";
     },
     possibleTypes() {
       return getPossibleTypes(this.$store);
@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     fullDelete() {
-      if (confirm(`Opravdu chcete smazat celou přijímku?`)) {
+      if (confirm(`Opravdu chcete smazat celou přijemku?`)) {
         cleanMove(this.$store);
       }
     },
@@ -92,7 +92,7 @@ export default {
       return this.$store.getters.getToolNameById(toolId);
     },
     create() {
-      if (confirm(`Opravdu zpracovat tuto přijímku?`)) {
+      if (confirm(`Opravdu zpracovat tuto přijemku?`)) {
         createMove(this.$store);
       }
     },

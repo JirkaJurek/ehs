@@ -62,7 +62,7 @@ export default {
       );
     },
     numberRules(max) {
-      return [v => v <= max || "Nedostatek kusu skladem"];
+      return [v => Number(v) <= Number(max) || "Nedostatek kusu skladem"];
     },
     getToolName(toolId) {
       return this.$store.getters.getToolNameById(toolId);

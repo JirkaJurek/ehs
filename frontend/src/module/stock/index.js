@@ -2,9 +2,7 @@ import { isArray, isNumber, isBoolean } from "ramda-adjunct";
 import { clone, slice } from "ramda";
 import SetItemModal from "./SetItemModal";
 import DetailModal from "./DetailModal";
-import axios from "axios";
-axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
-// axios.defaults.baseURL = location.origin;
+import axios from "../../myAxios";
 
 export const defaultItem = {
   items: [],
@@ -73,7 +71,7 @@ export const getItemVariant = (store, tool) => {
 
     // vytvořit správný formát pro položku
 
-    // kontrola toho jestli se jedná o přijímku nebo výdejku, podle toho se to taky chová jinak
+    // kontrola toho jestli se jedná o přijemku nebo výdejku, podle toho se to taky chová jinak
   }
   SetItemModal.myData = {
     toolId: tool.id

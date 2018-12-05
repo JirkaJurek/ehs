@@ -4,7 +4,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import "./registerServiceWorker";
-import axios from "axios";
+import axios from "./myAxios";
 import VueAxios from "vue-axios";
 
 import VueUploadComponent from "vue-upload-component";
@@ -39,9 +39,6 @@ Vue.component("tool-items", ToolItems);
 Vue.component("stock-toolbar-button", StockToolbarButton);
 Vue.component("stock-exporter-button", ExporterButton);
 Vue.component("stock-receiver-button", ReceiverButton);
-
-axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL;
-// axios.defaults.baseURL = location.origin
 Vue.use(VueAxios, axios);
 
 new Vue({

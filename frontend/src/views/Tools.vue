@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout my-3 display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
-    <div xs12 color="white">
+    <div xs12 color="white" id="toolTableButtons">
       <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Zápis provedené revize</v-btn>
       <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
@@ -37,11 +37,13 @@
           <td>
             <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
           </td>
+          <!--
           <td v-if="viewStock" @click="n(props.item)">
             <v-btn>
               Přidat
             </v-btn>
           </td>
+          -->
           <td v-bind:class="textFontSizeClass" v-if="viewSupplier" class="text-xs-center">{{ props.item.supplier }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewCategories" class="text-xs-center">
             <span v-for="(category, key) in toJson(props.item.categories)" v-bind:key=key>
@@ -139,6 +141,12 @@
 </style>
 -->
 <style>
+#toolTableButtons {
+  background-color: #ffffff;
+  position: sticky;
+  top: 65px;
+  z-index: 10;
+}
 #toolTable .whiteSpace {
   white-space: inherit;
 }
@@ -323,6 +331,7 @@ export default {
     this.notifyMe();
     this.headersConfig();
     this.$store.dispatch("inicialize");
+    this.$store.dispatch("loadAllUsers");
   },
 
   methods: {
@@ -398,7 +407,7 @@ export default {
       this.$refs.showFiles.open(this.$store.getters.getFilesById(itemId));
     },
     toolItemsCount(data) {
-      let text = "0 / 0";
+      let text = "0 / 0 / 0";
       if (data) {
         const items = this.toJson(data);
         const { count, inStock } = reduce(
@@ -411,7 +420,7 @@ export default {
           { count: 0, inStock: 0 },
           items
         );
-        text = `${count} / ${inStock}`;
+        text = `${count} / ${inStock} / ${count - inStock}`;
       }
 
       return text;

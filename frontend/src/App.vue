@@ -60,18 +60,24 @@
       <router-view/>
     </v-content>
     <component v-bind:is="mainModal" :myData=mainModalData></component>
+    <render-component :component="getComponent"/>
   </v-app>
 </template>
 
 <script>
 import { propEq, find, prop } from "ramda";
+import RenderComponent from "./components/RenderComponent";
 export default {
+  components: {
+    'render-component': RenderComponent
+  },
   data: () => ({
     dialog: false,
     drawer: false,
     items: [
       { icon: "build", text: "Nástroje", path: "/fe/tools" },
       { icon: "category", text: "Kategorie", path: "/fe/tools/categories" },
+      { icon: "people", text: "Zaměstnanci", path: "/fe/users" },
       {
         icon: "schedule",
         text: "Typy revizí",
@@ -106,6 +112,9 @@ export default {
   computed: {
     mainModal() {
       return this.$store.state.mainModal;
+    },
+    getComponent() {
+      return this.$store.state.component;
     },
     mainModalData() {
       return this.$store.state.mainModal

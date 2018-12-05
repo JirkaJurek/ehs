@@ -7,11 +7,15 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules: allStore,
   state: {
-    mainModal: null
+    mainModal: null,
+    component: null,
   },
   mutations: {
     setMainModal(state, modal) {
       state.mainModal = modal;
+    },
+    setComponent(state, component) {
+      state.component = component;
     },
   },
   actions: {

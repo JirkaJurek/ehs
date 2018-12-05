@@ -16,7 +16,7 @@ export default {
       cleanMove(this.$store);
       setType(this.$store, 2);
       setExporter(this.$store, true);
-      this.$router.push('/move-in-stock');
+      this.$router.push('/fe/move-in-stock');
     }
   }
 };

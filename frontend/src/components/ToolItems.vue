@@ -14,17 +14,18 @@
                     <th>Zaměstnanec</th>
                     <th>Počet kusu</th>
                     <th>Je skladem</th>
-                    <!--
                     <th>V servisu</th>
+                    <!--
                     <th>Umístění</th>
                     -->
                   </tr>
                 </template>
-                <template slot="items" item-key="employeeId" slot-scope="props">
+                <template slot="items" item-key="employeeId" slot-scope="{item}">
                   <tr>
-                    <td class="text-xs-center">{{ props.item.employee ? toJson(props.item.employee).name : '' }}</td>
-                    <td class="text-xs-center">{{ props.item.count }}</td>
-                    <td class="text-xs-center">{{ props.item.inStock }}</td>
+                    <td class="text-xs-center">{{ item.employee ? toJson(item.employee).name : '' }}</td>
+                    <td class="text-xs-center">{{ item.count }}</td>
+                    <td class="text-xs-center">{{ item.inStock }}</td>
+                    <td class="text-xs-center">{{ item.count - item.inStock }}</td>
                     <!--
                     <td class="text-xs-center">{{ props.item.inService }}</td>
                     <td class="text-xs-center">{{ props.item.place }}</td>
@@ -62,8 +63,10 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="close">Zavřít</v-btn>
+        <!--
         <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+        -->
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -111,7 +114,9 @@ export default {
       return this.$store.state.tool.revisionType;
     }
   },
-  created() {},
+  created() {
+    this.$store.dispatch("loadAllUsers");
+  },
   methods: {
     setItem(data) {
       data.items = data.items ? this.toJson(data.items) : [];

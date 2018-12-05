@@ -24,7 +24,7 @@ export default {
         <v-card>
           <v-card-title>
             <span class="headline">
-              Detail {props.myData.item.exporter == 0 ? "přijímky" : "výdejky"}
+              Detail {props.myData.item.exporter == 0 ? "přijemky" : "výdejky"}
             </span>
           </v-card-title>
           <v-card-text>

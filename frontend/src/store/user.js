@@ -1,13 +1,10 @@
 import { find, propEq } from "ramda";
+import axios from "../myAxios";
+console.log(axios)
 
 export default {
   state: {
-    users: [
-      { id: 1, name: "Sklad" },
-      { id: 2, name: "Uklízečka" },
-      { id: 3, name: "Modelář" },
-      { id: 4, name: "Tester" }
-    ]
+    users: []
   },
   getters: {
     getUserById: state => id => {
@@ -15,5 +12,13 @@ export default {
     }
   },
   mutations: {},
-  actions: {}
+  actions: {
+    async loadAllUsers({ state }, reload = false) {
+      if (reload || state.users.length === 0) {
+        axios.get("/users").then(response => {
+          state.users = response.data;
+        });
+      }
+    }
+  }
 };
