@@ -78,6 +78,7 @@ export default {
       { icon: "build", text: "Nástroje", path: "/fe/tools" },
       { icon: "category", text: "Kategorie", path: "/fe/tools/categories" },
       { icon: "people", text: "Zaměstnanci", path: "/fe/users" },
+      { icon: "store", text: "Sklady", path: "/fe/warehouse" },
       {
         icon: "schedule",
         text: "Typy revizí",

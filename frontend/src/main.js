@@ -6,6 +6,7 @@ import store from "./store";
 import "./registerServiceWorker";
 import axios from "./myAxios";
 import VueAxios from "vue-axios";
+import { format as dateFormat } from "date-fns";
 
 import VueUploadComponent from "vue-upload-component";
 import DialogTool from "./components/DialogTool.vue";
@@ -20,7 +21,6 @@ import ToolItems from "./components/ToolItems";
 import StockToolbarButton from "./module/stock/ToolbarButton";
 import ExporterButton from "./module/stock/ExporterButton";
 import ReceiverButton from "./module/stock/ReceiverButton";
-
 
 // import "./plugins/tool.js";
 
@@ -39,6 +39,12 @@ Vue.component("tool-items", ToolItems);
 Vue.component("stock-toolbar-button", StockToolbarButton);
 Vue.component("stock-exporter-button", ExporterButton);
 Vue.component("stock-receiver-button", ReceiverButton);
+Vue.filter("dateFormat", (date, format = "DD. MM. YY") => {
+  return dateFormat(date, format);
+});
+Vue.filter("employeeName", (item, defaultValue = '') => {
+  return item ? `${item.degree} ${item.firstName} ${item.lastName}` : defaultValue;
+});
 Vue.use(VueAxios, axios);
 
 new Vue({

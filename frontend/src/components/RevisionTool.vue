@@ -5,9 +5,10 @@
         <v-card-title>
           <span class="headline">Všechny revize</span>
         </v-card-title>
-        <v-data-table :items="revisions" class="elevation-1" hide-actions hide-headers>
+        <v-data-table :items="revisions" class="elevation-1" hide-actions :headers="headers">
           <template slot="items" slot-scope="props">
-            <td>{{ props.item.date }}</td>
+            <td>{{ props.item.date | dateFormat }}</td>
+            <td>{{ props.item.nextRevision | dateFormat }}</td>
             <td>{{ getRevisionTypeName(props.item.revisionType) }}</td>
             <td>{{ props.item.description }}</td>
             <td>{{ props.item.who }}</td>
@@ -66,7 +67,18 @@ export default {
     newRevision: {},
     itemRevisionsId: 0,
     selected: [],
-    editRevisonId: 0
+    editRevisonId: 0,
+    headers: [
+      {
+        text: "Poslední revize",
+        value: "date"
+      },
+      { text: "Příští revize", value: "date2" },
+      { text: "Typ revize", value: "revisionType" },
+      { text: "Poznámka", value: "description" },
+      { text: "Kdo", value: "who" },
+      { text: "Akce", value: "action" }
+    ]
   }),
   created() {
     this.$store.dispatch("inicialize", ["loadAllRevisionType"]);

@@ -22,14 +22,14 @@
           <template slot="headers" slot-scope="props">
             <tr>
               <th>Název nástroje</th>
-              <th>Zaměstnanec</th>
+              <th>Sklad</th>
               <th>Počet kusu</th>
               <th>Akce</th>
             </tr>
           </template>
           <template slot="items" slot-scope="props">
             <td class="text-xs-center">{{ getToolName(props.item.toolId) }}</td>
-            <td class="text-xs-center">{{ props.item.employee.name }}</td>
+            <td class="text-xs-center">{{ props.item.warehouse.name }}</td>
             <td class="text-xs-center">{{ props.item.count }}</td>
             <td class="text-xs-center">
               <v-btn flat icon @click="deleteItem(props.index)">

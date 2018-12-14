@@ -11,7 +11,9 @@ const {
   map,
   nth,
   over,
+  pipe,
   prop,
+  split,
   subtract
 } = require("ramda");
 const moment = require("moment");
@@ -77,9 +79,9 @@ const transformData = data => {
   data.itemsHistoryJSON = data.itemsHistory
     ? JSON.stringify(data.itemsHistory)
     : "[]";
-  if (data.employee) {
-    data.employeeJSON = JSON.stringify(data.employee);
-    data.employeeId = data.employee.value;
+  if (data.warehouse) {
+    data.warehouseJSON = JSON.stringify(data.warehouse);
+    data.warehouseId = data.warehouse.value;
   }
   return data;
 };
@@ -140,38 +142,46 @@ const categoriesFunction = {
 };
 
 const revisionFunction = {
-  beforeSaveOrUpdate: async toolId => {
+  afterSaveOrUpdate: async toolId => {
     const revisions = await revisionFunction.allById(toolId);
     await execQuery(
       `UPDATE ${tableName} SET revisions=:revisions WHERE id = :toolId;`,
       { revisions: JSON.stringify(revisions), toolId: toolId }
     );
   },
-  add: async data => {
+  transformData: data => {
+    const [c, y] = pipe(
+      toJson,
+      prop("revisionInterval"),
+      toJson,
+      prop("value"),
+      split(" ")
+    )(data.revisionType);
     data.revisionTypeJSON = data.revisionType
       ? JSON.stringify(data.revisionType)
       : null;
     data.revisionTypeId = data.revisionType ? data.revisionType.id : null;
+    data.nextRevision = data.date ? moment(data.date).add(c, y).format('YYYY-MM-DD') : null;
+    return data;
+  },
+  add: async data => {
+    data = revisionFunction.transformData(data);
     await execQuery(
-      `INSERT INTO tool_revision (id_tool, id_tool_revision_types, revisionType, date, description, who) VALUES (:toolId, :revisionTypeId, :revisionTypeJSON, :date, :description, :who);`,
+      `INSERT INTO tool_revision (id_tool, id_tool_revision_types, revisionType, date, nextRevision, description, who) VALUES (:toolId, :revisionTypeId, :revisionTypeJSON, :date, :nextRevision, :description, :who);`,
       data
     );
-    await revisionFunction.beforeSaveOrUpdate(data.toolId);
+    await revisionFunction.afterSaveOrUpdate(data.toolId);
     return true;
   },
   update: async (id, data) => {
-    data.revisionTypeJSON = data.revisionType
-      ? JSON.stringify(data.revisionType)
-      : null;
-    data.revisionTypeId = data.revisionType ? data.revisionType.id : null;
+    data = revisionFunction.transformData(data);
     data.id = id;
-    console.log(data);
     await execQuery(
-      `UPDATE tool_revision SET id_tool_revision_types=:revisionTypeId, revisionType=:revisionTypeJSON, date=:date, description=:description, who=:who 
+      `UPDATE tool_revision SET id_tool_revision_types=:revisionTypeId, revisionType=:revisionTypeJSON, date=:date, nextRevision=:nextRevision, description=:description, who=:who 
         WHERE id = :id;`,
       data
     );
-    await revisionFunction.beforeSaveOrUpdate(data.id_tool);
+    await revisionFunction.afterSaveOrUpdate(data.id_tool);
     return true;
   },
   allById: async id => {
@@ -251,17 +261,17 @@ const itemFunction = {
   add: async (data, type = 0) => {
     const number = data.number || data.count;
     if (number > 0) {
-      if (data.employee) {
-        data.employeeJSON = JSON.stringify(data.employee);
-        data.employeeId = data.employee.id;
+      if (data.warehouse) {
+        data.warehouseJSON = JSON.stringify(data.warehouse);
+        data.warehouseId = data.warehouse.id;
       }
       // tohle by chtělo vyseknout do service a nejůépe na to udělat modul stock
-      const exist = await itemFunction.getItem(data.toolId, data.employeeId);
+      const exist = await itemFunction.getItem(data.toolId, data.warehouseId);
       if (exist.length === 0 && type === 0) {
         data.inStock = number;
         data.count = number;
         await execQuery(
-          `INSERT INTO tool_item (id_tool, inStock, employee, employeeId, count, inService, place) VALUES (:toolId, :inStock, :employeeJSON, :employeeId, :count, :inService, :place);`,
+          `INSERT INTO tool_item (id_tool, inStock, warehouse, warehouseId, count, inService, place) VALUES (:toolId, :inStock, :warehouseJSON, :warehouseId, :count, :inService, :place);`,
           data
         );
       } else if (exist.length > 0) {
@@ -280,7 +290,7 @@ const itemFunction = {
         await itemFunction.update(firstExist);
       }
       const items = await itemFunction.allById(data.toolId);
-      
+
       await execQuery(
         `UPDATE ${tableName} SET items=:items WHERE id = :toolId;`,
         { items: JSON.stringify(items), toolId: data.toolId }
@@ -293,14 +303,14 @@ const itemFunction = {
     return execQuery(
       `UPDATE tool_item
       SET inStock=:inStock, count=:count
-      WHERE id_tool = :toolId AND employeeId = :employeeId;`,
+      WHERE id_tool = :toolId AND warehouseId = :warehouseId;`,
       data
     );
   },
-  getItem: (toolId, employeeId) => {
+  getItem: (toolId, warehouseId) => {
     return execQuery(
-      `SELECT * FROM tool_item WHERE id_tool = ? AND employeeId = ?;`,
-      [toolId, employeeId]
+      `SELECT * FROM tool_item WHERE id_tool = ? AND warehouseId = ?;`,
+      [toolId, warehouseId]
     );
   },
   allById: toolId => {
@@ -350,16 +360,17 @@ const stockFunction = {
 function list(query) {
   const builder = new queryBuilder();
   const filter = query.filter ? JSON.parse(query.filter) : {};
+  builder.columns(`${tableName}.*`);
   builder.from(tableName).groupBy(`${tableName}.id`);
   //.limit(500);
 
   if (!filter.deletedAt) {
-    builder.where("deletedAt IS NULL");
+    builder.where(`${tableName}.deletedAt IS NULL`);
   } else {
-    builder.where("deletedAt IS NOT NULL");
+    builder.where(`${tableName}.deletedAt IS NOT NULL`);
   }
   if (query.sortBy) {
-    builder.orderBy(query.sortBy, query.descending);
+    builder.orderBy(`${tableName}.${query.sortBy}`, query.descending);
   }
   if (filter.categories && filter.categories.length) {
     builder.join("tool_category", `tc.id_tool = ${tableName}.id`, "tc");
@@ -379,10 +390,20 @@ function list(query) {
         .join(",")})`
     );
   }
-  if (filter.employee && filter.employee.length) {
+  if (filter.warehouse && filter.warehouse.length) {
     builder.join("tool_item", `ti.id_tool = ${tableName}.id`, "ti");
     builder.where(
-      `ti.employeeId IN(${filter.employee
+      `ti.warehouseId IN(${filter.warehouse
+        .map(x => parseInt(x))
+        .filter(x => x > 0)
+        .join(",")})`
+    );
+  }
+  if (filter.employee && filter.employee.length) {
+    builder.join("tool_item", `ti2.id_tool = ${tableName}.id`, "ti2");
+    builder.join("warehouse", `wh2.id = ti2.warehouseId`, "wh2");
+    builder.where(
+      `wh2.accountableEmployeeId IN(${filter.employee
         .map(x => parseInt(x))
         .filter(x => x > 0)
         .join(",")})`
@@ -395,6 +416,7 @@ function list(query) {
       )}")`
     );
   }
+  
   return execQuery(builder.getSql());
 }
 

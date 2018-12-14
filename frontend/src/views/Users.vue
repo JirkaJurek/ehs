@@ -7,9 +7,11 @@
     <v-data-table :search=search :headers="headers" :items="users" class="elevation-1" item-key="id" hide-actions>
       <template slot="items" slot-scope="{item}">
         <tr>
-          <td class="text-xs-center">{{ item.name }}</td>
+          <td class="text-xs-center">{{ item.degree }}</td>
           <td class="text-xs-center">{{ item.firstName }}</td>
           <td class="text-xs-center">{{ item.lastName }}</td>
+          <td class="text-xs-center">{{ item.personalNumber }}</td>
+          <td class="text-xs-center">{{ item.description }}</td>
           <td class="justify-center layout px-0">
             <edit-user :id="item.id" />
             <delete-user :id="item.id" />
@@ -34,9 +36,11 @@ export default {
   data: () => ({
     search: "",
     headers: [
-      { text: "Přezdívka", value: "name", align: "center" },
+      { text: "Titul", value: "degree", align: "center" },
       { text: "Jméno", value: "firstName", align: "center" },
       { text: "Příjmení", value: "lastName", align: "center" },
+      { text: "Osobní číslo", value: "personalNumber", align: "center" },
+      { text: "Poznámka", value: "description", align: "center" },
       { text: "Akce", value: "action", align: "center" }
     ]
   }),

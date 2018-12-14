@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "analyzer": "npx vue-cli-service serve",
     "start": "vue-cli-service serve --port 3000",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:report": "vue-cli-service build --report-json",
     "lint": "vue-cli-service lint",
     "lint:fix": "yarn lint --fix"
   },

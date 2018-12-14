@@ -11,6 +11,7 @@
               <v-data-table :items="editedItem.items" hide-actions>
                 <template slot="headers" slot-scope="props">
                   <tr>
+                    <th>Sklad</th>
                     <th>Zaměstnanec</th>
                     <th>Počet kusu</th>
                     <th>Je skladem</th>
@@ -20,9 +21,10 @@
                     -->
                   </tr>
                 </template>
-                <template slot="items" item-key="employeeId" slot-scope="{item}">
+                <template slot="items" item-key="warehouseId" slot-scope="{item}">
                   <tr>
-                    <td class="text-xs-center">{{ item.employee ? toJson(item.employee).name : '' }}</td>
+                    <td class="text-xs-center">{{ item.warehouse ? toJson(item.warehouse).name : '' }}</td>
+                    <td class="text-xs-center">{{ item.warehouse ? (toJson(toJson(item.warehouse).accountableEmployee)) : '' | employeeName }}</td>
                     <td class="text-xs-center">{{ item.count }}</td>
                     <td class="text-xs-center">{{ item.inStock }}</td>
                     <td class="text-xs-center">{{ item.count - item.inStock }}</td>
@@ -46,9 +48,9 @@
                     <th>Popis</th>
                   </tr>
                 </template>
-                <template slot="items" item-key="employeeId" slot-scope="props">
+                <template slot="items" item-key="warehouseId" slot-scope="props">
                   <tr>
-                    <td class="text-xs-center">{{ props.item.employee ? props.item.employee.name : '' }}</td>
+                    <td class="text-xs-center">{{ props.item.warehouse ? props.item.warehouse.name : '' }}</td>
                     <td class="text-xs-center">{{ props.item.countItem }}</td>
                     <td class="text-xs-center">{{ props.item.type == 'receipt' ? 'Výdej' : 'Příjem' }}</td>
                     <td class="text-xs-center">{{ props.item.descritpion }}</td>
@@ -104,8 +106,8 @@ export default {
     suppliers() {
       return this.$store.state.tool.suppliers;
     },
-    employees() {
-      return this.$store.state.user.users;
+    warehouse() {
+      return this.$store.state.warehouse.warehouses;
     },
     categories() {
       return this.$store.state.tool.categories;
@@ -122,7 +124,7 @@ export default {
       data.items = data.items ? this.toJson(data.items) : [];
       data.categories = this.toJson(data.categories);
       data.revisionInterval = this.toJson(data.revisionInterval);
-      data.employee = this.toJson(data.employee);
+      data.warehouse = this.toJson(data.warehouse);
       data.revisionTypes = this.toJson(data.revisionTypes);
       data.itemsHistory = data.itemsHistory
         ? this.toJson(data.itemsHistory)
@@ -154,7 +156,7 @@ export default {
     },
     saveToolItem() {
       const itemIndex = findIndex(
-        propEq("employee", this.tollItem.employee),
+        propEq("warehouse", this.tollItem.warehouse),
         this.editedItem.items
       );
       this.editedItem.itemsHistory.push(this.tollItem);
@@ -186,7 +188,7 @@ export default {
     },
     saveExportToolItem() {
       const itemIndex = findIndex(
-        propEq("employee", this.tollItem.employee),
+        propEq("warehouse", this.tollItem.warehouse),
         this.editedItem.items
       );
       if (itemIndex !== -1) {

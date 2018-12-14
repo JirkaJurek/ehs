@@ -1,6 +1,5 @@
 import { find, propEq } from "ramda";
 import axios from "../myAxios";
-console.log(axios)
 
 export default {
   state: {

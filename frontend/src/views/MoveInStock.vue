@@ -18,7 +18,7 @@
             <Filters v-bind="slotProps" />
           </template>
         </ToolsTable>
-        <router-link tag="v-btn" :to="'fe/tools'">Zavřít</router-link>
+        <router-link tag="v-btn" :to="'/fe/tools'">Zavřít</router-link>
         <div v-bind:style="style.pageButtons">
           <v-btn color="primary" @click="nextPage">Další krok</v-btn>
         </div>
@@ -28,7 +28,7 @@
         <ItemsList2 v-else-if="moveType == 1" :tools="selected" />
         <ItemsList v-else :tools="selected" />
 
-        <router-link tag="v-btn" :to="'fe/tools'">Zavřít</router-link>
+        <router-link tag="v-btn" :to="'/fe/tools'">Zavřít</router-link>
         <div v-bind:style="style.pageButtons">
           <v-btn flat @click="previousPage">Zpět</v-btn>
           <v-btn color="primary" @click="nextPage">Další</v-btn>
@@ -37,7 +37,7 @@
       <v-stepper-content step="3">
         <ItemsListPreview />
         
-        <router-link tag="v-btn" :to="'fe/tools'">Zavřít</router-link>
+        <router-link tag="v-btn" :to="'/fe/tools'">Zavřít</router-link>
         <div v-bind:style="style.pageButtons">
           <v-btn flat @click="previousPage">Zpět</v-btn>
           <v-btn color="primary" @click="create">Uložit</v-btn>

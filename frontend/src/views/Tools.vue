@@ -17,7 +17,7 @@
         <v-text-field v-model="search" append-icon="search" label="Vyhledávání" single-line hide-details></v-text-field>
       </v-flex>
       <v-flex xs12 sm4>
-        <v-select :items="employees" v-model="filter.employee" label="Zaměstnanci" multiple item-text="name" item-value="id" persistent-hint></v-select>
+        <v-select :items="employees" v-model="filter.employee" label="Zaměstnanci" multiple :item-text="getName" item-value="id" persistent-hint></v-select>
       </v-flex>
       <v-flex xs12 sm4>
         <v-select :items="categories" v-model="filter.categories" label="Kategorie" multiple item-text="name" item-value="id" persistent-hint></v-select>
@@ -145,7 +145,7 @@
   background-color: #ffffff;
   position: sticky;
   top: 65px;
-  z-index: 10;
+  z-index: 2;
 }
 #toolTable .whiteSpace {
   white-space: inherit;
@@ -436,6 +436,9 @@ export default {
         await this.axios.post(`/tools/revert/${itemId}`);
         this.initialize();
       }
+    },
+    getName(item) {
+      return `${item.degree} ${item.firstName} ${item.lastName}`;
     },
     notifyMe() {
       /*

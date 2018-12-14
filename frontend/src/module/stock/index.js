@@ -57,7 +57,7 @@ export const getItemVariant = (store, tool) => {
       if (toolItems[0].count == 1) {
         let item = toolItems[0];
         item.toolId = item["id_tool"];
-        item.employee = toJson(item.employee);
+        item.warehouse = toJson(item.warehouse);
         addItem(store, item);
         return true;
       }

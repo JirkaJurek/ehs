@@ -7,7 +7,7 @@
         </v-card-title>
         <v-data-table :items="services" class="elevation-1" hide-actions hide-headers>
           <template slot="items" slot-scope="props">
-            <td>{{ props.item.employee ? props.item.employee.name : '' }}</td>
+            <td>{{ props.item.warehouse ? props.item.warehouse.name : '' }}</td>
             <td>{{ props.item.count }}</td>
             <td>{{ props.item.inStock }}</td>
           </template>

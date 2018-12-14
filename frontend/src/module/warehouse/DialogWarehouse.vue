@@ -8,16 +8,13 @@
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.degree" label="Titul"></v-text-field>
+              <v-text-field v-model="editedItem.number" :min="0" :max="100" type="number" label="Číslo skladu" />
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.firstName" label="Jméno"></v-text-field>
+              <v-text-field v-model="editedItem.name" label="Název skladu"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.lastName" label="Přijmení"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.personalNumber" label="Osobní číslo"></v-text-field>
+              <employee-select v-on:change="(value) => {editedItem.accountableEmployee = value}" :value="editedItem.accountableEmployeeId" :multiple="false" />
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-textarea v-model="editedItem.description" label="Poznámka" />
@@ -35,14 +32,18 @@
 </template>
 
 <script>
+import EmployeeSelect from "../tool/EmployeeSelect";
 export default {
-  props: ['defaultItem', 'id'],
+  components: {
+    "employee-select": EmployeeSelect
+  },
+  props: ["defaultItem", "id"],
   data: () => ({
     editedItem: {}
   }),
   computed: {
     formTitle() {
-      return this.editedItem.name ? "Editace zaměstnance" : "Nový zaměstnanec";
+      return this.editedItem.name ? "Editace skladu" : "Nový sklad";
     }
   },
   created() {
@@ -53,12 +54,12 @@ export default {
       this.$store.commit("setComponent", null);
     },
     save() {
-      let url = "/users";
+      let url = "/warehouse";
       if (this.id > 0) {
         url += "/" + this.id;
       }
       this.axios.post(url, this.editedItem).then(response => {
-        this.$store.dispatch("loadAllUsers", true);
+        this.$store.dispatch("loadAllWarehouses", true);
       });
       this.close();
     }

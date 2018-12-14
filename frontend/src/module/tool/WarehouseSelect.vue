@@ -1,5 +1,5 @@
 <template>
-  <v-select v-bind="currentProps" :items="employees" @change="changeInner" :item-text="getName" item-value="id" />
+  <v-select v-bind="currentProps" :items="warehouse" @change="changeInner" item-text="name" item-value="id" />
 </template>
 
 <script>
@@ -7,7 +7,7 @@ export default {
   props: {
     label: {
       type: String,
-      default: "Zaměstnanci"
+      default: "Sklady"
     },
     multiple: {
       type: Boolean,
@@ -27,21 +27,17 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch("loadAllUsers");
+    this.$store.dispatch("loadAllWarehouses");
   },
   computed: {
-    employees() {
-      console.log(this.$store.state.user.users);
-      return this.$store.state.user.users;
+    warehouse() {
+      return this.$store.state.warehouse.warehouses;
     },
     currentProps() {
       return this.$props;
     }
   },
   methods: {
-    getName(item) {
-      return `${item.degree} ${item.firstName} ${item.lastName}`;
-    },
     changeInner(values) {
       return this.change ? this.change(values) : this.$emit("change", values);
     }

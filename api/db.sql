@@ -19,10 +19,11 @@ DROP TABLE IF EXISTS `file`;
 CREATE TABLE `file` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
-  `path` text DEFAULT NULL,
-  `absolutePath` text DEFAULT NULL,
+  `path` text,
+  `absolutePath` text,
   `size` int(11) DEFAULT NULL,
   `mimetype` varchar(255) DEFAULT NULL,
+  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -32,7 +33,7 @@ CREATE TABLE `move_stock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` tinyint(4) DEFAULT NULL,
   `exporter` tinyint(4) DEFAULT NULL COMMENT 'Jestli jde o výdejku nebo přijímku',
-  `items` longtext DEFAULT NULL,
+  `items` longtext,
   `createdAt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -54,13 +55,16 @@ INSERT INTO `move_stock` (`id`, `type`, `exporter`, `items`, `createdAt`) VALUES
 (14,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-13 17:38:00'),
 (15,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"1\"}]',	'2018-11-13 17:39:24'),
 (16,	2,	1,	'[{\"toolId\":\"768\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"1\"}]',	'2018-11-13 17:40:41'),
-(17,	0,	0,	'[{\"toolId\":\"768\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"2\"}]',	'2018-11-14 05:44:42');
+(17,	0,	0,	'[{\"toolId\":\"768\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"2\"}]',	'2018-11-14 05:44:42'),
+(18,	0,	0,	'[{\"toolId\":\"1024\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"2\"},{\"toolId\":\"1024\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"1\"},{\"toolId\":\"1280\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-14 07:13:44'),
+(19,	2,	1,	'[{\"toolId\":\"1024\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"returned\":\"1\"},{\"toolId\":\"1024\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"1\",\"returned\":\"1\"},{\"id_tool\":\"1280\",\"inStock\":\"1\",\"employeeId\":\"1\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\",\"inService\":null,\"place\":null,\"toolId\":\"1280\",\"returned\":\"1\"}]',	'2018-11-14 07:14:48'),
+(20,	0,	0,	'[{\"toolId\":\"1073\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":\"1\"},{\"toolId\":\"1073\",\"employee\":{\"id\":3,\"name\":\"Modelář\"},\"count\":\"1\"},{\"toolId\":\"1073\",\"employee\":{\"id\":2,\"name\":\"Uklízečka\"},\"count\":\"1\"},{\"toolId\":\"1073\",\"employee\":{\"id\":1,\"name\":\"Sklad\"},\"count\":\"1\"}]',	'2018-11-14 14:29:07');
 
 DROP TABLE IF EXISTS `tool`;
 CREATE TABLE `tool` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `supplier` longtext DEFAULT NULL,
-  `categories` longtext DEFAULT NULL,
+  `supplier` longtext,
+  `categories` longtext,
   `name` varchar(255) DEFAULT NULL,
   `shortName` varchar(255) DEFAULT NULL,
   `revisionCard` varchar(255) DEFAULT NULL,
@@ -70,23 +74,23 @@ CREATE TABLE `tool` (
   `inventoryNumber` varchar(255) DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
   `yearOfManufacture` year(4) DEFAULT NULL,
-  `comment` text DEFAULT NULL,
-  `employee` longtext DEFAULT NULL COMMENT 'bude se moct odstranit, používá se items',
-  `revisions` longtext DEFAULT NULL,
-  `revisionTypes` longtext DEFAULT NULL,
-  `repair` longtext DEFAULT NULL,
+  `comment` text,
+  `employee` longtext COMMENT 'bude se moct odstranit, používá se items',
+  `revisions` longtext,
+  `revisionTypes` longtext,
+  `repair` longtext,
   `price` mediumint(9) DEFAULT NULL,
   `filter1` varchar(255) DEFAULT NULL,
   `filter2` varchar(255) DEFAULT NULL,
   `filter3` varchar(255) DEFAULT NULL,
-  `files` longtext DEFAULT NULL,
+  `files` longtext,
   `guaranteeInto` date DEFAULT NULL,
   `supplierId` int(11) DEFAULT NULL,
   `employeeId` int(11) DEFAULT NULL COMMENT 'bude se moct odstranit, používá se items',
   `inStock` tinyint(4) DEFAULT NULL COMMENT 'bude se moct odstranit, používá se items',
   `deletedAt` datetime DEFAULT NULL,
-  `items` longtext DEFAULT NULL COMMENT 'třeba kladivo má 20 lidí, tak je to zahrnuto zde',
-  `itemsHistory` longtext DEFAULT NULL COMMENT 'historie výdaju a příjmu',
+  `items` longtext COMMENT 'třeba kladivo má 20 lidí, tak je to zahrnuto zde',
+  `itemsHistory` longtext COMMENT 'historie výdaju a příjmu',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1114,7 +1118,7 @@ INSERT INTO `tool` (`id`, `supplier`, `categories`, `name`, `shortName`, `revisi
 (1021,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 14-A LIGHT  WŰRTH ',	NULL,	NULL,	NULL,	'988495340924010897',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1022,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219028194',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1023,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219009957',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
-(1024,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219028231',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	'[{\"countItem\":\"4\",\"type\":\"receipt\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":\"4\",\"inStock\":4},{\"countItem\":1,\"type\":\"export\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":\"4\",\"inStock\":3},{\"countItem\":\"2\",\"type\":\"receipt\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":5,\"inStock\":5},{\"countItem\":\"5\",\"type\":\"export\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":5,\"inStock\":0}]'),
+(1024,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219028231',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"1024\",\"inStock\":\"2\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"2\",\"inService\":null,\"place\":null},{\"id_tool\":\"1024\",\"inStock\":\"1\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null}]',	'[{\"countItem\":\"4\",\"type\":\"receipt\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":\"4\",\"inStock\":4},{\"countItem\":1,\"type\":\"export\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":\"4\",\"inStock\":3},{\"countItem\":\"2\",\"type\":\"receipt\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":5,\"inStock\":5},{\"countItem\":\"5\",\"type\":\"export\",\"employee\":{\"id\":4,\"name\":\"Tester\"},\"count\":5,\"inStock\":0}]'),
 (1025,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219028743',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1026,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219028378',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1027,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Šroubovák Aku. BS 18-A Compact   WŰRTH ',	NULL,	NULL,	NULL,	'9884495340219028590',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
@@ -1163,7 +1167,7 @@ INSERT INTO `tool` (`id`, `supplier`, `categories`, `name`, `shortName`, `revisi
 (1070,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Sponkovačka 2m-J/ES-32 COMBI',	NULL,	NULL,	NULL,	'1202254',	'pneu',	NULL,	NULL,	'2004',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1071,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Pinkovačka TU-216-2330-E    BOSTITCH                           pneu',	NULL,	NULL,	NULL,	'16032051QBK',	NULL,	NULL,	NULL,	'2016',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1072,	NULL,	'[{\"id\":2,\"name\":\"Elektrické nářadí\"}]',	'Pinkovačka TU-216-2330-E    BOSTITCH                           pneu',	NULL,	NULL,	NULL,	'16032100QBK',	NULL,	NULL,	NULL,	'2016',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
-(1073,	NULL,	'[{\"id\":8,\"name\":\"Hasící zařízení\"}]',	'Tlaková nádoba – CO2/20kg',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'2016',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
+(1073,	NULL,	'[{\"id\":8,\"name\":\"Hasící zařízení\"}]',	'Tlaková nádoba – CO2/20kg',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'2016',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"1073\",\"inStock\":\"1\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null},{\"id_tool\":\"1073\",\"inStock\":\"1\",\"employeeId\":\"2\",\"employee\":\"{\\\"id\\\":2,\\\"name\\\":\\\"Uklízečka\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null},{\"id_tool\":\"1073\",\"inStock\":\"1\",\"employeeId\":\"3\",\"employee\":\"{\\\"id\\\":3,\\\"name\\\":\\\"Modelář\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null},{\"id_tool\":\"1073\",\"inStock\":\"1\",\"employeeId\":\"4\",\"employee\":\"{\\\"id\\\":4,\\\"name\\\":\\\"Tester\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null}]',	NULL),
 (1074,	'Kučera',	'[{\"id\":8,\"name\":\"Hasící zařízení\"}]',	'Hasicí přístroj - auto 2J6 4409',	NULL,	NULL,	NULL,	'26107/07',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1075,	'Kučera',	'[{\"id\":8,\"name\":\"Hasící zařízení\"}]',	'Hasicí přístroj - sklad odsávání',	NULL,	NULL,	NULL,	'18331/05',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1076,	'Kučera',	'[{\"id\":8,\"name\":\"Hasící zařízení\"}]',	'Hasicí přístroj - sklad hořlavin kapal',	NULL,	NULL,	NULL,	'929163/04',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
@@ -1370,7 +1374,7 @@ INSERT INTO `tool` (`id`, `supplier`, `categories`, `name`, `shortName`, `revisi
 (1277,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Vývěva VTLF 2.250/0-79  BECKER',	NULL,	NULL,	NULL,	'2701913/2013',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1278,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Vývěva VTLF 2.250/0-79  BECKER',	NULL,	NULL,	NULL,	'A 2894741/2015',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1279,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Vývěva – rozvaděč RVM  UNISERVIS HAŠEK',	NULL,	NULL,	NULL,	'439/15/2015',	NULL,	NULL,	NULL,	'2015',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
-(1280,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Kompresor CLASSIC AIR 255 METABO - revize el.',	NULL,	'0028',	NULL,	'0230025500/2011',	NULL,	NULL,	NULL,	'2011',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
+(1280,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Kompresor CLASSIC AIR 255 METABO - revize el.',	NULL,	'0028',	NULL,	'0230025500/2011',	NULL,	NULL,	NULL,	'2011',	NULL,	NULL,	'[]',	'[]',	NULL,	100,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[{\"id_tool\":\"1280\",\"inStock\":\"1\",\"employeeId\":\"1\",\"employee\":\"{\\\"id\\\":1,\\\"name\\\":\\\"Sklad\\\"}\",\"count\":\"1\",\"inService\":null,\"place\":null}]',	NULL),
 (1281,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Kompresor ATLAS COPCO GA11FF',	NULL,	NULL,	NULL,	'CAI 715298',	NULL,	NULL,	NULL,	'2013',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1282,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Kompresor ATLAS COPCO GA11FF - revize el.',	NULL,	NULL,	NULL,	'CAI 715298',	NULL,	NULL,	NULL,	'2013',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
 (1283,	NULL,	'[{\"id\":7,\"name\":\"Kompresory, vývěvy, tlak. nádoby\"}]',	'Tlakové nádoby – demontováno z  ALBERT E.50 ATMOS – SERBATOI',	NULL,	NULL,	NULL,	'1378237/2008',	NULL,	NULL,	NULL,	'2014',	NULL,	NULL,	'[]',	'[]',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'[]',	NULL),
@@ -4019,7 +4023,7 @@ CREATE TABLE `tool_item` (
   `id_tool` int(11) NOT NULL,
   `inStock` mediumint(9) DEFAULT NULL COMMENT 'počet kusu skladem',
   `employeeId` int(11) NOT NULL,
-  `employee` longtext DEFAULT NULL,
+  `employee` longtext,
   `count` mediumint(9) DEFAULT NULL COMMENT 'celkový počet',
   `inService` mediumint(9) DEFAULT NULL COMMENT 'počet kusu v servisu, asi smazat',
   `place` varchar(255) DEFAULT NULL COMMENT 'také asi smazat',
@@ -4034,16 +4038,23 @@ INSERT INTO `tool_item` (`id_tool`, `inStock`, `employeeId`, `employee`, `count`
 (512,	3,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	3,	NULL,	NULL),
 (512,	4,	3,	'{\"id\":3,\"name\":\"Modelář\"}',	4,	NULL,	NULL),
 (768,	2,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	2,	NULL,	NULL),
-(768,	2,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	2,	NULL,	NULL);
+(768,	2,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	2,	NULL,	NULL),
+(1024,	2,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	2,	NULL,	NULL),
+(1024,	1,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	1,	NULL,	NULL),
+(1073,	1,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	1,	NULL,	NULL),
+(1073,	1,	2,	'{\"id\":2,\"name\":\"Uklízečka\"}',	1,	NULL,	NULL),
+(1073,	1,	3,	'{\"id\":3,\"name\":\"Modelář\"}',	1,	NULL,	NULL),
+(1073,	1,	4,	'{\"id\":4,\"name\":\"Tester\"}',	1,	NULL,	NULL),
+(1280,	1,	1,	'{\"id\":1,\"name\":\"Sklad\"}',	1,	NULL,	NULL);
 
 DROP TABLE IF EXISTS `tool_revision`;
 CREATE TABLE `tool_revision` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_tool` int(11) NOT NULL,
   `id_tool_revision_types` int(11) DEFAULT NULL,
-  `revisionType` longtext DEFAULT NULL,
+  `revisionType` longtext,
   `date` date DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `who` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_tool` (`id_tool`),
@@ -4069,18 +4080,26 @@ CREATE TABLE `tool_revision_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `revisionInterval` varchar(100) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `deletedAt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `tool_revision_types` (`id`, `name`, `revisionInterval`, `description`, `deletedAt`) VALUES
-(1,	'test',	'{\"value\":\"1 month\",\"text\":\"Měsíční\"}',	'test2',	NULL),
-(2,	'tester',	'{\"value\":\"7 day\",\"text\":\"Týdení\"}',	NULL,	NULL),
+(1,	'Revize Elektro - dvouletá',	'{\"value\":\"24 month\",\"text\":\"24 měsíců\"}',	'Velké stroje, Budova, Jeřáby, Vacuum frezer,',	NULL),
+(2,	'Běžná inspekce jeřáby - čtvrtletní',	'{\"value\":\"3 month\",\"text\":\"3 měsíce\"}',	'GIGA jeřáby, Fobus kladkostroj',	NULL),
 (3,	'test2',	'{\"value\":\"1 month\",\"text\":\"Měsíční\"}',	'ahoj',	'2018-10-30 06:24:00'),
-(4,	'ahoj',	'{\"value\":\"1 month\",\"text\":\"Měsíční\"}',	'ahoj',	NULL),
+(4,	'Revize Elektro - roční ',	'{\"value\":\"12 month\",\"text\":\"12 měsíců\"}',	'Ruční elektrické nářadí, počítače + servery + HW, Elektrický paletový vozík, EZS + EPS',	NULL),
 (5,	'test',	'{\"value\":\"1 month\",\"text\":\"Měsíční\"}',	NULL,	'2018-10-30 06:24:01'),
-(6,	'tester',	'{\"value\":\"6 month\",\"text\":\"Půlroční\"}',	'ahoj',	'2018-10-30 00:00:00');
+(6,	'tester',	'{\"value\":\"6 month\",\"text\":\"Půlroční\"}',	'ahoj',	'2018-10-30 00:00:00'),
+(7,	'Periodická revize jeřáby - roční',	'{\"value\":\"12 month\",\"text\":\"12 měsíců\"}',	'GIGA jeřáby',	NULL),
+(8,	'Revize stavu jeřáby - tříletá',	'{\"value\":\"36 month\",\"text\":\"36 měsíců\"}',	'GIGA jeřáby',	NULL),
+(9,	'Revizní zkouška stavu jeřáby - pětiletá',	'{\"value\":\"60 month\",\"text\":\"60 měsíců\"}',	'GIGA jeřáby',	NULL),
+(10,	'Revizní zkouška tlakové nádoby - roční',	'{\"value\":\"12 month\",\"text\":\"12 měsíců\"}',	'Samostatné Tlakové nádoby,  Tlaková nádoba kompresoru',	NULL),
+(11,	'Revize zásobování požární vodou - roční',	'{\"value\":\"12 month\",\"text\":\"12 měsíců\"}',	'Požární hydranty',	NULL),
+(12,	'Revizní zkouška tlaková hasící přístroje - roční',	'{\"value\":\"12 month\",\"text\":\"12 měsíců\"}',	'Hasící přístroje',	NULL),
+(13,	'Technická kontrola vozidla - dvouletá',	'{\"value\":\"24 month\",\"text\":\"24 měsíců\"}',	'Auta po 4 letech od koupě',	NULL),
+(14,	'Technická kontrola vozidla - čtyřletá',	'{\"value\":\"48 month\",\"text\":\"48 měsíců\"}',	'Nově koupená vozidla do 4 let stáří',	NULL);
 
 DROP TABLE IF EXISTS `tool_supplier`;
 CREATE TABLE `tool_supplier` (
@@ -4090,4 +4109,15 @@ CREATE TABLE `tool_supplier` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
--- 2018-11-14 06:03:24
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `firstName` varchar(255) DEFAULT NULL,
+  `lastName` varchar(255) DEFAULT NULL,
+  `deletedAt` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- 2018-12-09 17:54:05

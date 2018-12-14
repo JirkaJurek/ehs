@@ -3,7 +3,7 @@
     <template slot="headers" slot-scope="props">
       <tr>
         <th>Název nástroje</th>
-        <th>Zaměstnanec</th>
+        <th>Sklad</th>
         <th>Počet nových kusu</th>
       </tr>
     </template>
@@ -11,9 +11,9 @@
       <td class="text-xs-center">{{ getToolName(props.item.toolId) }}</td>
       <td class="text-xs-center">
         <span v-if="props.item.count > 0">
-          {{ props.item.employee.name }}
+          {{ props.item.warehouse.name }}
         </span>
-        <employee-select v-else v-on:change="(value) => {props.item.employee = value}" :multiple="false" />
+        <warehouse-select v-else v-on:change="(value) => {props.item.warehouse = value}" :multiple="false" />
       </td>
       <td class="text-xs-center">
         <v-text-field v-model="props.item.number" :min="0" @change="changeCount(props.item)" type="number"></v-text-field>
@@ -45,10 +45,10 @@ import {
   sortBy
 } from "ramda";
 import { addAllItems } from "../stock";
-import EmployeeSelect from "./EmployeeSelect";
+import WarehouseSelect from "./WarehouseSelect";
 export default {
   components: {
-    "employee-select": EmployeeSelect
+    "warehouse-select": WarehouseSelect
   },
   props: {
     tools: {
@@ -105,7 +105,7 @@ export default {
         this.$store,
         pipe(
           reject(
-            x => x.toolId == item.toolId && x.employee.id == item.employee.id
+            x => x.toolId == item.toolId && x.warehouse.id == item.warehouse.id
           ),
           append(item),
           sortBy(prop("toolId"))
@@ -126,7 +126,7 @@ export default {
       return {
         ...item,
         toolId: item.id_tool,
-        employee: this.toJson(item.employee)
+        warehouse: this.toJson(item.warehouse)
       };
     },
     toJson(data) {

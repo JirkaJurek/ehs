@@ -8,23 +8,74 @@
       <v-card-title>
         <span class="headline">Nahrávání obrázku</span>
       </v-card-title>
-      <v-card-text>
-        <v-container grid-list-md>
-          <v-btn @click="save">
-            Uložit vybrané soubory
-          </v-btn>
-          <ul>
-            <li v-for="(file, key) in files" v-bind:key="key">
-              <v-checkbox multiple v-model="selected" :value="file.id" />
-              <img :src="baseApiPath + file.path" width="50" height="50" /> {{file.name}}</li>
-          </ul>
-          <input type="file" multiple @change="onFileChange">
-        </v-container>
-      </v-card-text>
+      <v-btn @click="save">
+        Uložit vybrané soubory
+      </v-btn>
+      <v-btn @click="close">
+        Zrušit
+      </v-btn>
+      <input type="file" multiple @change="onFileChange" id="inputFile">
+      <label for="inputFile" class="v-btn theme--dark blue-grey">
+        Nahrát nové soubory
+        <v-icon right dark>cloud_upload</v-icon>
+      </label>
+      <v-container grid-list-sm fluid id="listImages">
+        <v-layout row wrap>
+          <v-flex v-for="(file, key) in files" :key="key" xs6 md3 d-flex>
+            <v-card flat tile class="d-flex">
+              <v-img :src="baseApiPath + file.path" style="width: 100%; height: 100%;background-color: grey;">
+                <v-expand-transition>
+                  <div style="height: 100%; color: white">
+                    <v-checkbox multiple v-model="selected" :value="file.id" />
+                    <div class="hoverEfect">
+                      <div>
+                        {{file.name}}
+                      </div>
+                    </div>
+                  </div>
+                </v-expand-transition>
+              </v-img>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-container>
+      <v-btn @click="save">
+        Uložit vybrané soubory
+      </v-btn>
+      <v-btn @click="close">
+        Zrušit
+      </v-btn>
     </v-card>
   </v-dialog>
 
 </template>
+
+<style>
+#inputFile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+#inputFile + label {
+  cursor: pointer;
+}
+#listImages .hoverEfect div {
+  position: absolute;
+  bottom: 0px;
+}
+#listImages .v-input--selection-controls__input i {
+  font-size: 65px;
+  color: lightblue;
+}
+#listImages .v-input--selection-controls__input input {
+  height: 60px;
+  width: 60px;
+}
+</style>
+
 
 <script>
 // tohle bude fungovat tak že vyjede modál,
@@ -42,8 +93,8 @@ export default {
   }),
   computed: {
     baseApiPath() {
-      return process.env.VUE_APP_SERVER_URL;
-      // return location.origin;
+      // return process.env.VUE_APP_SERVER_URL;
+      return location.origin;
     },
     files() {
       return this.$store.state.file.files;
@@ -63,6 +114,9 @@ export default {
   methods: {
     open() {
       this.isOpenDialog = true;
+    },
+    close() {
+      this.isOpenDialog = false;
     },
     onFileChange(e) {
       var files = e.target.files || e.dataTransfer.files;
@@ -86,7 +140,7 @@ export default {
           return find(propEq("id", id), this.files);
         }, this.selected)
       );
-      this.isOpenDialog = false;
+      this.close();
     }
   }
 };

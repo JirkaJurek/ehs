@@ -2,7 +2,7 @@
 
 const { execQuery, escape, queryBuilder } = require("../db");
 const {} = require("ramda");
-const tableName = "user";
+const tableName = "warehouse";
 
 const toJson = data => {
   try {
@@ -12,18 +12,28 @@ const toJson = data => {
   }
 };
 
+const transformData = data => {
+  if (data.accountableEmployee) {
+    data.accountableEmployeeJSON = JSON.stringify(data.accountableEmployee);
+    data.accountableEmployeeId = data.accountableEmployee.id;
+  }
+  return data;
+};
+
 function add(data) {
+  data = transformData(data);
   const user = execQuery(
-    `INSERT INTO ${tableName} (degree, firstName, lastName, personalNumber, description) VALUES (:degree, :firstName, :lastName, :personalNumber, :description);`,
+    `INSERT INTO ${tableName} (number, name, accountableEmployee	, accountableEmployeeId, description) VALUES (:number, :name, :accountableEmployeeJSON, :accountableEmployeeId, :description);`,
     data
   );
   return user;
 }
 
 function update(id, data) {
+  data = transformData(data);
   const user = execQuery(
     `UPDATE ${tableName} 
-        SET degree=:degree, firstName=:firstName, lastName=:lastName, personalNumber=:personalNumber, description=:description
+        SET number=:number, name=:name, accountableEmployee=:accountableEmployeeJSON, accountableEmployeeId=:accountableEmployeeId, description=:description
         WHERE id=:id;`,
     data
   );

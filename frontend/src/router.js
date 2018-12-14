@@ -56,8 +56,13 @@ export default new Router({
     },
     {
       path: '/fe/users',
-      name: 'a',
+      name: 'users',
       component: () => import('./views/Users')
+    },
+    {
+      path: '/fe/warehouse',
+      name: 'warehouse',
+      component: () => import('./views/Warehouse')
     },
     {
       path: '/a',
