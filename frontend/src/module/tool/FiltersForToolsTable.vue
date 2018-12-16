@@ -4,10 +4,13 @@
       <v-text-field @keyup="searchChangeInner" append-icon="search" label="Vyhledávání" single-line hide-details />
     </v-flex>
     <v-flex xs12 sm4 mx-2>
-      <Employee v-on:change="employeeChangeInner" />
+      <employee-select v-on:change="employeeChangeInner" />
+    </v-flex>
+    <v-flex xs12 sm4 mx-2>
+      <warehouse-select v-on:change="warehouseChangeInner" />
     </v-flex>
     <v-flex xs12 sm4 mx-1>
-      <Category v-on:change="categoryChangeInner" />
+      <category-select v-on:change="categoryChangeInner" />
     </v-flex>
   </v-toolbar>
 </template>
@@ -21,15 +24,18 @@
 <script>
 import Employee from "./EmployeeSelect";
 import Category from "./CategorySelect";
+import WarehouseSelect from "./WarehouseSelect";
 export default {
   components: {
-    Employee: Employee,
-    Category: Category,
+    'employee-select': Employee,
+    'category-select': Category,
+    'warehouse-select': WarehouseSelect,
   },
   props: {
     searchChange: Function,
     employeeChange: Function,
     categoryChange: Function,
+    warehouseChange: Function,
   },
   data: () => ({}),
   computed: {},
@@ -43,6 +49,9 @@ export default {
     },
     employeeChangeInner(values) {
       return this.employeeChange ? this.employeeChange(values) : this.$emit("employeeChange", values);
+    },
+    warehouseChangeInner(values) {
+      return this.warehouseChange ? this.warehouseChange(values) : this.$emit("warehouseChange", values);
     },
     categoryChangeInner(values) {
       return this.categoryChange ? this.categoryChange(values) : this.$emit("categoryChange", values);

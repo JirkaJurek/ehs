@@ -20,6 +20,9 @@
         <v-select :items="employees" v-model="filter.employee" label="Zaměstnanci" multiple :item-text="getName" item-value="id" persistent-hint></v-select>
       </v-flex>
       <v-flex xs12 sm4>
+        <warehouse-select :return-object="false" @change="data => { filter.warehouse = data }" />
+      </v-flex>
+      <v-flex xs12 sm4>
         <v-select :items="categories" v-model="filter.categories" label="Kategorie" multiple item-text="name" item-value="id" persistent-hint></v-select>
       </v-flex>
       <v-flex xs12 sm3>
@@ -188,8 +191,12 @@ import {
   add
 } from "ramda";
 import { getItemVariant } from "../module/stock";
+import WarehouseSelect from "../module/tool/WarehouseSelect";
 import moment from "moment";
 export default {
+  components: {
+    "warehouse-select": WarehouseSelect
+  },
   data: () => ({
     currentComponent: null,
     search: "",
@@ -198,7 +205,8 @@ export default {
     textFontSizeClass: "test-size-1",
     filter: {
       employee: [],
-      categories: []
+      categories: [],
+      warehouse: []
     },
     selected: [],
     headers: [],
@@ -296,6 +304,9 @@ export default {
     },
     employees() {
       return this.$store.state.user.users;
+    },
+    warehouses() {
+      return this.$store.state.warehouse.warehouses;
     }
   },
 

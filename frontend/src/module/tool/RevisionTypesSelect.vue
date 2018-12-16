@@ -1,5 +1,5 @@
 <template>
-  <v-select v-bind="currentProps" :items="warehouse" @change="changeInner" :item-text="getName" item-value="id" />
+  <v-select v-bind="currentProps" :items="revisionTypes" @change="changeInner" item-text="name" item-value="id" />
 </template>
 
 <script>
@@ -7,7 +7,7 @@ export default {
   props: {
     label: {
       type: String,
-      default: "Sklady"
+      default: "Typy revizí"
     },
     multiple: {
       type: Boolean,
@@ -27,20 +27,17 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch("loadAllWarehouses");
+    this.$store.dispatch("inicialize", ["loadAllRevisionType"]);
   },
   computed: {
-    warehouse() {
-      return this.$store.state.warehouse.warehouses;
+    revisionTypes() {
+      return this.$store.state.tool.revisionType;
     },
     currentProps() {
       return this.$props;
     }
   },
   methods: {
-    getName(item) {
-      return `${item.number} - ${item.name}`;
-    },
     changeInner(values) {
       return this.change ? this.change(values) : this.$emit("change", values);
     }

@@ -161,7 +161,11 @@ const revisionFunction = {
       ? JSON.stringify(data.revisionType)
       : null;
     data.revisionTypeId = data.revisionType ? data.revisionType.id : null;
-    data.nextRevision = data.date ? moment(data.date).add(c, y).format('YYYY-MM-DD') : null;
+    data.nextRevision = data.date
+      ? moment(data.date)
+          .add(c, y)
+          .format("YYYY-MM-DD")
+      : null;
     return data;
   },
   add: async data => {
@@ -217,20 +221,27 @@ const revisionFunction = {
       `SELECT * FROM tool_revision_types WHERE deletedAt IS NULL`
     );
   },
-  listUpcomingRevisions: async () => {
-    const revisionTypes = await execQuery(`SELECT * FROM tool_revision_types`);
-    const u = map(x => {
-      return `(id_tool_revision_types = ${
-        x.id
-      } AND dd < DATE_ADD(NOW(), INTERVAL -${
-        toJson(x.revisionInterval).value
-      }))`;
-    }, revisionTypes);
-    return execQuery(`SELECT *, max(date) as dd
-    FROM tool_revision
-    JOIN tool ON tool.id = tool_revision.id_tool
-    GROUP BY id_tool, id_tool_revision_types
-    HAVING (${u.join(" OR ")})`);
+  listUpcomingRevisions: async query => {
+    const builder = new queryBuilder();
+    const filter = query.filter ? JSON.parse(query.filter) : {};
+    builder
+      .columns(`tool_revision.*, MAX(nextRevision) as nextRevision`)
+      .from("tool_revision")
+      .join(tableName, `tool_revision.id_tool = tool.id`, "tool")
+      .where(`tool.deletedAt IS NULL`)
+      .groupBy("id_tool, id_tool_revision_types")
+      .having(
+        `nextRevision < DATE_SUB(NOW(), INTERVAL -${filter.daysBack || 30} DAY)`
+      );
+    if (filter.revisionTypes && filter.revisionTypes.length) {
+      builder.where(
+        `id_tool_revision_types IN(${filter.revisionTypes
+          .map(x => parseInt(x))
+          .filter(x => x > 0)
+          .join(",")})`
+      );
+    }
+    return execQuery(builder.getSql());
   },
   deleteRevisionType: toolId => {
     return execQuery(
@@ -416,7 +427,7 @@ function list(query) {
       )}")`
     );
   }
-  
+
   return execQuery(builder.getSql());
 }
 

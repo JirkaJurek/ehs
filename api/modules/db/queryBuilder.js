@@ -7,7 +7,8 @@ module.exports = class QueryBuilder {
       from: {},
       innerJoin: [],
       leftJoin: [],
-      where: []
+      where: [],
+      having: []
     };
   }
 
@@ -43,6 +44,11 @@ module.exports = class QueryBuilder {
 
   where(val) {
     this.config.where.push(val);
+    return this;
+  }
+
+  having(val) {
+    this.config.having.push(val);
     return this;
   }
 
@@ -82,6 +88,9 @@ module.exports = class QueryBuilder {
     }
     if (this.config.groupBy) {
       sql += ` GROUP BY ${Client.escape(this.config.groupBy)}`;
+    }
+    if (this.config.having && this.config.having.length) {
+      sql += ` HAVING ${this.config.having.join(" AND ")}`;
     }
     if (this.config.orderBy && this.config.orderBy.sortBy) {
       sql += ` ORDER BY ${Client.escape(this.config.orderBy.sortBy)} ${

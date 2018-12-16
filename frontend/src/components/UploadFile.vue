@@ -23,13 +23,13 @@
         <v-layout row wrap>
           <v-flex v-for="(file, key) in files" :key="key" xs6 md3 d-flex>
             <v-card flat tile class="d-flex">
-              <v-img :src="baseApiPath + file.path" style="width: 100%; height: 100%;background-color: grey;">
+              <v-img :src="getPath(file)" style="width: 100%; height: 100%;background-color: grey;">
                 <v-expand-transition>
                   <div style="height: 100%; color: white">
                     <v-checkbox multiple v-model="selected" :value="file.id" />
                     <div class="hoverEfect">
                       <div>
-                        {{file.name}}
+                        <v-layout mb-1 mx-2>{{file.name}}</v-layout>
                       </div>
                     </div>
                   </div>
@@ -62,7 +62,7 @@
 #inputFile + label {
   cursor: pointer;
 }
-#listImages .hoverEfect div {
+#listImages .hoverEfect {
   position: absolute;
   bottom: 0px;
 }
@@ -93,8 +93,8 @@ export default {
   }),
   computed: {
     baseApiPath() {
-      // return process.env.VUE_APP_SERVER_URL;
-      return location.origin;
+      return process.env.VUE_APP_SERVER_URL;
+      // return location.origin;
     },
     files() {
       return this.$store.state.file.files;
@@ -141,6 +141,12 @@ export default {
         }, this.selected)
       );
       this.close();
+    },
+    getPath(file, size = "900x300/969696/ffffff") {
+      if (["peg"].indexOf(file.path.substr(-3)) !== -1) {
+        return this.baseApiPath + file.path;
+      }
+      return `https://via.placeholder.com/${size}.png?text=${file.name}`;
     }
   }
 };

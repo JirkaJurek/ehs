@@ -8,7 +8,7 @@
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12 sm6 md4>
-              <v-text-field v-model="editedItem.number" :min="0" :max="100" type="number" label="Číslo skladu" />
+              <v-text-field v-model="editedItem.number" :min="0" :max="999" @change="numberAfterChange" type="number" label="Číslo skladu" />
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.name" label="Název skladu"></v-text-field>
@@ -50,6 +50,9 @@ export default {
     this.editedItem = this.defaultItem;
   },
   methods: {
+    numberAfterChange() {
+      this.editedItem.number = ("00" + this.editedItem.number).substr(-3);
+    },
     close() {
       this.$store.commit("setComponent", null);
     },

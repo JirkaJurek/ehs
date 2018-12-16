@@ -67,8 +67,8 @@ module.exports.updateRevisionType = async data => {
   return sql.updateRevisionType(data);
 };
 
-module.exports.listUpcomingRevisions = async () => {
-  return sql.listUpcomingRevisions();
+module.exports.listUpcomingRevisions = async query => {
+  return sql.listUpcomingRevisions(query);
 };
 
 module.exports.listRevisionType = () => {

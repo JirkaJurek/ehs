@@ -5,24 +5,29 @@
         <v-container grid-list-sm fluid>
           <v-layout row wrap>
             <v-carousel v-if="detail" :value="detailValue" hide-delimiters>
-              <v-carousel-item v-for="(file,i) in files" :key="i" :src="getPath(file.path)"></v-carousel-item>
+              <v-carousel-item v-for="(file,i) in files" :key="i" :src="getPath(file, '1500x500')">
+                <v-btn icon @click="detail = false;">
+                  <v-icon large>close</v-icon>
+                </v-btn>
+                <v-btn icon @click.stop="download(file)">
+                  <v-icon large color="white">get_app</v-icon>
+                </v-btn>
+              </v-carousel-item>
             </v-carousel>
             <template v-else>
               <v-flex v-for="(file, key) in files" :key="key" xs3 d-flex>
                 <v-card flat tile class="d-flex">
-                  <v-img @click="showDetail(key)" :src="`${baseApiPath + file.path}`" :lazy-src="`${baseApiPath + file.path}`" aspect-ratio="1" class="grey lighten-2">
-                    <v-toolbar dense floating>
-                      <v-text-field hide-details prepend-icon="search" single-line></v-text-field>
-                      <v-btn icon>
-                        <v-icon>my_location</v-icon>
-                      </v-btn>
-                      <v-btn icon>
-                        <v-icon>more_vert</v-icon>
-                      </v-btn>
-                    </v-toolbar>
+                  <v-img @click="showDetail(key)" :src="getPath(file)" :lazy-src="getPath(file)" aspect-ratio="1" class="grey lighten-2">
+                    <v-btn icon>
+                      <v-icon large color="white">search</v-icon>
+                    </v-btn>
+                    <v-btn icon @click.stop="download(file)">
+                      <v-icon large color="white">get_app</v-icon>
+                    </v-btn>
                     <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
                       <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
                     </v-layout>
+                    <v-layout subheading ma-3 style="position:absolute; bottom: 0;">{{file.name}}</v-layout>
                   </v-img>
                 </v-card>
               </v-flex>
@@ -36,6 +41,7 @@
 
 <script>
 import { slice } from "ramda";
+import saveAs from "file-saver";
 export default {
   name: "ShowFiles",
   props: [],
@@ -47,8 +53,8 @@ export default {
   }),
   computed: {
     baseApiPath() {
-      // return process.env.VUE_APP_SERVER_URL;
-      return location.origin;
+      return process.env.VUE_APP_SERVER_URL;
+      // return location.origin;
     }
   },
   created() {},
@@ -60,6 +66,9 @@ export default {
     }
   },
   methods: {
+    download(file) {
+      saveAs(this.baseApiPath + file.path, file.name);
+    },
     open(filesArray) {
       this.files = filesArray;
       this.isOpenDialog = true;
@@ -68,11 +77,11 @@ export default {
       this.detail = true;
       this.detailValue = val;
     },
-    getPath(path) {
-      console.log(path);
-      console.log(slice(-3,3, path));
-      return "https://via.placeholder.com/300x100.png?text=placeholder";
-      return this.baseApiPath + path;
+    getPath(file, size = "300x300") {
+      if (["peg"].indexOf(file.path.substr(-3)) !== -1) {
+        return this.baseApiPath + file.path;
+      }
+      return `https://via.placeholder.com/${size}.png?text=${file.name}`;
     }
   }
 };

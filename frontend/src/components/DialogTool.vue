@@ -221,6 +221,7 @@ export default {
       }
       if (duplicate) {
         this.itemId = -1;
+        this.editedItem.files = [];
       }
     },
     close() {

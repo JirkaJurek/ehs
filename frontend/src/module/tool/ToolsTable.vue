@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-toolbar flat color="white" class="filter">
-      <slot name="filters" :categoryChange="categoryChange" :searchChange="searchChange" :employeeChange="employeeChange"></slot>
+      <slot name="filters" :categoryChange="categoryChange" :searchChange="searchChange" :employeeChange="employeeChange" :warehouseChange="warehouseChange"></slot>
     </v-toolbar>
     <v-data-table id="toolTable" :search=search :custom-sort="customSort" :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all :rows-per-page-items="rowsItem">
       <template slot="items" slot-scope="props">
@@ -21,7 +21,7 @@
 
 <style>
 #toolTable {
-  border-top: #c1c1c1 2px solid
+  border-top: #c1c1c1 2px solid;
 }
 #toolTable .whiteSpace {
   white-space: inherit;
@@ -58,7 +58,8 @@ export default {
     textFontSizeClass: "test-size-1",
     filter: {
       employee: [],
-      categories: []
+      categories: [],
+      warehouse: []
     },
     // měl by jít i k rodiči a potomkum, možnost i při každe změně
     selected: [],
@@ -90,11 +91,15 @@ export default {
 
   methods: {
     categoryChange(values) {
-      this.filter.categories = map(prop('id'), values);
+      this.filter.categories = map(prop("id"), values);
       this.initialize();
     },
     employeeChange(values) {
-      this.filter.employee = map(prop('id'), values);
+      this.filter.employee = map(prop("id"), values);
+      this.initialize();
+    },
+    warehouseChange(values) {
+      this.filter.warehouse = map(prop("id"), values);
       this.initialize();
     },
     searchChange(values) {
