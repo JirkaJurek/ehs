@@ -1,7 +1,6 @@
 "use strict";
 
 const { execQuery, escape, queryBuilder } = require("../db");
-const {} = require("ramda");
 const tableName = "warehouse";
 
 const toJson = data => {

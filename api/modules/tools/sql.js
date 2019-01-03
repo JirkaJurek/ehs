@@ -83,6 +83,7 @@ const transformData = data => {
     data.warehouseJSON = JSON.stringify(data.warehouse);
     data.warehouseId = data.warehouse.value;
   }
+  data.check = data.check ? 1 : 0;
   return data;
 };
 
@@ -90,7 +91,7 @@ function add(data) {
   data.revisions = "[]";
   data = transformData(data);
   const tool = execQuery(
-    `INSERT INTO ${tableName} (supplier, categories, name, shortName, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, code, yearOfManufacture, comment, employee, repair, price, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items, itemsHistory) VALUES (:supplier, :categoriesJSON , :name, :shortName, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :code, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON, :itemsHistoryJSON);`,
+    `INSERT INTO ${tableName} (supplier, categories, name, shortName, revisions, revisionTypes, startWork, seriesNumber, machineNumber, inventoryNumber, code, yearOfManufacture, comment, employee, repair, price, \`check\`, filter1, filter2, filter3, files, guaranteeInto, supplierId, employeeId, revisionCard, inStock, items, itemsHistory) VALUES (:supplier, :categoriesJSON , :name, :shortName, :revisions, :revisionTypesJSON, :startWork, :seriesNumber, :machineNumber, :inventoryNumber, :code, :yearOfManufacture, :comment, :employeeJSON, :repair, :price, :check, :filter1, :filter2, :filter3, :filesJSON, :guaranteeInto, :supplierId, :employeeId, :revisionCard, :inStock, :itemsJSON, :itemsHistoryJSON);`,
     data
   );
   tool.then(rows => {
@@ -104,7 +105,7 @@ function update(id, data) {
   data.id = id;
   const tool = execQuery(
     `UPDATE ${tableName} 
-        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, shortName=:shortName, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, code=:code, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON, itemsHistory=:itemsHistoryJSON
+        SET supplier=:supplier, categories=:categoriesJSON, revisionTypes=:revisionTypesJSON, name=:name, shortName=:shortName, startWork=:startWork, seriesNumber=:seriesNumber, machineNumber=:machineNumber, inventoryNumber=:inventoryNumber, code=:code, yearOfManufacture=:yearOfManufacture, comment=:comment, employee=:employeeJSON, repair=:repair, price=:price, \`check\`=:check, filter1=:filter1, filter2=:filter2, filter3=:filter3, files=:filesJSON, guaranteeInto=:guaranteeInto, supplierId=:supplierId, employeeId=:employeeId, revisionCard=:revisionCard, inStock=:inStock, items=:itemsJSON, itemsHistory=:itemsHistoryJSON
         WHERE id=:id;`,
     data
   );

@@ -143,7 +143,7 @@ export default {
       this.close();
     },
     getPath(file, size = "900x300/969696/ffffff") {
-      if (["peg"].indexOf(file.path.substr(-3)) !== -1) {
+      if (["jpg", "peg", "png", "gif"].indexOf(file.path.substr(-3).toLowerCase()) !== -1) {
         return this.baseApiPath + file.path;
       }
       return `https://via.placeholder.com/${size}.png?text=${file.name}`;

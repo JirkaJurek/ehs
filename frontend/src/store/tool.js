@@ -73,6 +73,7 @@ export default {
       // { text: "Zaměstnanec", value: "employeeId" },
       { text: "Revize", value: "revisions", align: "center" },
       //{ text: "Na skladě", value: "inStock" },
+      { text: "Zkontrolováno", value: "check" },
       { text: "Cena", value: "price" },
       {
         text: "Celkový počet / skladem / servis",

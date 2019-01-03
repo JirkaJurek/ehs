@@ -65,6 +65,11 @@ export default new Router({
       component: () => import('./views/Warehouse')
     },
     {
+      path: '/fe/task',
+      name: 'task',
+      component: () => import('./module/task/views/TaskTable')
+    },
+    {
       path: '/a',
       name: 'a',
       component: () => import('./module/tool/ToolsTable')

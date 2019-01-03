@@ -60,7 +60,7 @@
       <router-view/>
     </v-content>
     <component v-bind:is="mainModal" :myData=mainModalData></component>
-    <render-component :component="getComponent"/>
+    <render-component :component="getComponent" />
   </v-app>
 </template>
 
@@ -69,7 +69,7 @@ import { propEq, find, prop } from "ramda";
 import RenderComponent from "./components/RenderComponent";
 export default {
   components: {
-    'render-component': RenderComponent
+    "render-component": RenderComponent
   },
   data: () => ({
     dialog: false,
@@ -89,7 +89,8 @@ export default {
         text: "Blížící se revize",
         path: "/fe/tools/revision-upcoming"
       },
-      { icon: "store", text: "Historie skladu", path: "/fe/move-history" }
+      { icon: "store", text: "Historie skladu", path: "/fe/move-history" },
+      { icon: "date_range", text: "Úkoly", path: "/fe/task" }
       // {
       //   icon: "keyboard_arrow_up",
       //   "icon-alt": "keyboard_arrow_down",
@@ -121,6 +122,21 @@ export default {
       return this.$store.state.mainModal
         ? this.$store.state.mainModal.myData
         : null;
+    }
+  },
+  created() {
+    if (!localStorage.basicToken) {
+      const password = prompt("Zadejte heslo");
+      console.log(password);
+      this.axios
+        .post("/login", {
+          password
+        })
+        .then(response => {
+          if (response.data.basicToken) {
+            localStorage.basicToken = response.data.basicToken;
+          }
+        });
     }
   },
   props: {

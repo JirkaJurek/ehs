@@ -17,7 +17,7 @@
             <template v-else>
               <v-flex v-for="(file, key) in files" :key="key" xs3 d-flex>
                 <v-card flat tile class="d-flex">
-                  <v-img @click="showDetail(key)" :src="getPath(file)" :lazy-src="getPath(file)" aspect-ratio="1" class="grey lighten-2">
+                  <v-img @click="showDetail(key, file)" :src="getPath(file)" :lazy-src="getPath(file)" aspect-ratio="1" class="grey lighten-2">
                     <v-btn icon>
                       <v-icon large color="white">search</v-icon>
                     </v-btn>
@@ -73,12 +73,25 @@ export default {
       this.files = filesArray;
       this.isOpenDialog = true;
     },
-    showDetail(val = 0) {
-      this.detail = true;
-      this.detailValue = val;
+    showDetail(val = 0, file) {
+      if (
+        file &&
+        ["jpg", "peg", "png", "gif"].indexOf(
+          file.path.substr(-3).toLowerCase()
+        ) === -1
+      ) {
+        window.open(this.baseApiPath + file.path, "_blank");
+      } else {
+        this.detail = true;
+        this.detailValue = val;
+      }
     },
     getPath(file, size = "300x300") {
-      if (["peg"].indexOf(file.path.substr(-3)) !== -1) {
+      if (
+        ["jpg", "peg", "png", "gif"].indexOf(
+          file.path.substr(-3).toLowerCase()
+        ) !== -1
+      ) {
         return this.baseApiPath + file.path;
       }
       return `https://via.placeholder.com/${size}.png?text=${file.name}`;

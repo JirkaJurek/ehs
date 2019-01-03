@@ -82,6 +82,7 @@
           <!--
           <td v-bind:class="textFontSizeClass" v-if="viewStock">{{ props.item.inStock ? 'ano' : 'ne' }}</td>
           -->
+          <td v-bind:class="textFontSizeClass" v-if="viewCheck">{{ props.item.check == 1 ? 'ano' : 'ne' }}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewPrice" class="text-xs-center">{{ props.item.price}}</td>
           <td v-bind:class="textFontSizeClass" v-if="viewCount" @click="showToolItems(props.item)" class="text-xs-center">
             <v-chip>{{ toolItemsCount(props.item.items)}}</v-chip>
@@ -287,6 +288,9 @@ export default {
       return this.headersSelect.indexOf("inStock") !== -1;
     },
     */
+    viewCheck() {
+      return this.headersSelect.indexOf("check") !== -1;
+    },
     viewPrice() {
       return this.headersSelect.indexOf("price") !== -1;
     },

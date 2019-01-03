@@ -12,7 +12,14 @@ const toJson = data => {
   }
 };
 
+const transformData = data => {
+  data.degree = data.degree ? data.degree : '';
+  return data;
+};
+
 function add(data) {
+  data = transformData(data);
+
   const user = execQuery(
     `INSERT INTO ${tableName} (degree, firstName, lastName, personalNumber, description) VALUES (:degree, :firstName, :lastName, :personalNumber, :description);`,
     data
@@ -21,6 +28,8 @@ function add(data) {
 }
 
 function update(id, data) {
+  data = transformData(data);
+  
   const user = execQuery(
     `UPDATE ${tableName} 
         SET degree=:degree, firstName=:firstName, lastName=:lastName, personalNumber=:personalNumber, description=:description

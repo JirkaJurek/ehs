@@ -3,14 +3,19 @@ import axios from "../myAxios";
 
 export default {
   state: {
-    users: []
+    users: [],
+    currentJWT: ""
   },
   getters: {
     getUserById: state => id => {
       return find(propEq("id", id), state.users);
     }
   },
-  mutations: {},
+  mutations: {
+    setJWT(state, jwt) {
+      state.currentJWT = jwt;
+    }
+  },
   actions: {
     async loadAllUsers({ state }, reload = false) {
       if (reload || state.users.length === 0) {
@@ -18,6 +23,13 @@ export default {
           state.users = response.data;
         });
       }
+    },
+    async login({ commit }, { username, password }) {
+      const res = await axios.post("/users/login", {
+        username,
+        password
+      });
+      commit("setJWT", await res.data());
     }
   }
 };

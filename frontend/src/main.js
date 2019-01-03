@@ -39,7 +39,7 @@ Vue.component("tool-items", ToolItems);
 Vue.component("stock-toolbar-button", StockToolbarButton);
 Vue.component("stock-exporter-button", ExporterButton);
 Vue.component("stock-receiver-button", ReceiverButton);
-Vue.filter("dateFormat", (date, format = "DD. MM. YY") => {
+Vue.filter("dateFormat", (date, format = "D. M. YY") => {
   return dateFormat(date, format);
 });
 Vue.filter("employeeName", (item, defaultValue = '') => {

@@ -24,14 +24,14 @@ export default {
     change: Function,
     value: {
       default: undefined
-    }
+    },
+    rules: Array
   },
   created() {
     this.$store.dispatch("loadAllUsers");
   },
   computed: {
     employees() {
-      console.log(this.$store.state.user.users);
       return this.$store.state.user.users;
     },
     currentProps() {

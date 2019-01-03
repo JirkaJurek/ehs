@@ -11,7 +11,7 @@
               <v-combobox v-model="editedItem.supplier" :items="suppliers" label="Dodavatel"></v-combobox>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-select return-object :items="categories" item-text="name" v-model="editedItem.categories" label="Kategorie" multiple></v-select>
+              <v-select return-object :items="categories" item-text="name" v-model="editedItem.categories" label="Kategorie"></v-select>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
@@ -81,6 +81,9 @@
             </v-flex>
             <v-flex xs12 sm6 md4>
               <upload-file v-on:update="updateImages" :selectedFiles="transformFiles(editedItem.files)" ref="uploadFile"></upload-file>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-checkbox label="Zkontrolováno" v-model="editedItem.check"></v-checkbox>
             </v-flex>
             <!--<v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.revizions" label="Revizní karta el. nářadí"></v-text-field>
@@ -206,6 +209,7 @@ export default {
       data.revisionInterval = this.toJson(data.revisionInterval);
       data.employee = this.toJson(data.employee);
       data.revisionTypes = this.toJson(data.revisionTypes);
+      data.check = !!parseInt(data.check);
       this.editedItem = data;
     },
     async open(itemId, duplicate = false) {

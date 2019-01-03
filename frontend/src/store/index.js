@@ -3,6 +3,7 @@ import user from './user';
 import file from './file';
 import stock from './stock';
 import warehouse from './warehouse';
+import task from './task';
 
 export default {
     tool,
@@ -10,4 +11,5 @@ export default {
     file,
     stock,
     warehouse,
+    task,
 }
