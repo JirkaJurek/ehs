@@ -7,6 +7,10 @@ import "./registerServiceWorker";
 import axios from "./myAxios";
 import VueAxios from "vue-axios";
 import { format as dateFormat } from "date-fns";
+// ACL
+import { abilitiesPlugin } from "@casl/vue";
+import { define } from "./resources/ability";
+//
 
 import VueUploadComponent from "vue-upload-component";
 import DialogTool from "./components/DialogTool.vue";
@@ -42,13 +46,31 @@ Vue.component("stock-receiver-button", ReceiverButton);
 Vue.filter("dateFormat", (date, format = "D. M. YY") => {
   return dateFormat(date, format);
 });
-Vue.filter("employeeName", (item, defaultValue = '') => {
-  return item ? `${item.degree} ${item.firstName} ${item.lastName}` : defaultValue;
+Vue.filter("employeeName", (item, defaultValue = "") => {
+  return item
+    ? `${item.degree} ${item.firstName} ${item.lastName}`
+    : defaultValue;
+});
+Vue.mixin({
+  methods: {
+    toJson(data) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return data;
+      }
+    }
+  }
 });
 Vue.use(VueAxios, axios);
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount("#app");
+store.dispatch("loginUserByToken").finally(() => {
+  const abilities = define();
+  Vue.use(abilitiesPlugin, abilities);
+
+  new Vue({
+    router,
+    store,
+    render: h => h(App)
+  }).$mount("#app");
+})

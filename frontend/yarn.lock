@@ -634,6 +634,16 @@
     lodash "^4.17.5"
     to-fast-properties "^2.0.0"
 
+"@casl/ability@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@casl/ability/-/ability-2.5.1.tgz#53f12af45295793472c65b539204226372904594"
+  dependencies:
+    sift "^7.0.1"
+
+"@casl/vue@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@casl/vue/-/vue-0.5.0.tgz#17ed401294b00fce12f23726dcca30ae885ac913"
+
 "@intervolga/optimize-cssnano-plugin@^1.0.5":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@intervolga/optimize-cssnano-plugin/-/optimize-cssnano-plugin-1.0.6.tgz#be7c7846128b88f6a9b1d1261a0ad06eb5c0fdf8"
@@ -6029,6 +6039,10 @@ shell-quote@^1.6.1:
     array-reduce "~0.0.0"
     jsonify "~0.0.0"
 
+sift@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/sift/-/sift-7.0.1.tgz#47d62c50b159d316f1372f8b53f9c10cd21a4b08"
+
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
@@ -6838,6 +6852,10 @@ vue-property-decorator@^7.2.0:
   resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-7.2.0.tgz#8e6b0f4dcc630c357135f76366ba7bd91f1db015"
   dependencies:
     vue-class-component "^6.2.0"
+
+vue-router-permissions@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/vue-router-permissions/-/vue-router-permissions-0.1.5.tgz#f31949b73eff6bd6bae6f15dfb50575a9ce61513"
 
 vue-router@^3.0.1:
   version "3.0.1"

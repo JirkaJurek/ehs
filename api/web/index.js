@@ -21,7 +21,7 @@ const config = {
 const app = new Koa();
 app
   .use(
-    jwt({ secret: "shhhhh" }).unless({
+    jwt({ secret: process.env.JWT_SECRET }).unless({
       method: ["OPTIONS"],
       path: [
         /^\/login/,

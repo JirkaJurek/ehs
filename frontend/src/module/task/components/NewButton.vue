@@ -5,6 +5,9 @@
 <script>
 import taskMixin from "../mixins";
 export default {
-  mixins: [taskMixin]
+  mixins: [taskMixin],
+  auth(ability) {
+    return ability.can("NewButton", "Task");
+  }
 };
 </script>

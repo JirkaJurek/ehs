@@ -14,6 +14,7 @@
           <td class="text-xs-center">{{ item.description }}</td>
           <td class="justify-center layout px-0">
             <edit-user :id="item.id" />
+            <permission-user :id="item.id" />
             <delete-user :id="item.id" />
           </td>
         </tr>
@@ -26,12 +27,18 @@
 </template>
 
 <script>
-import { DeleteButton, NewButton, EditButton } from "../module/user";
+import {
+  DeleteButton,
+  NewButton,
+  EditButton,
+  PermissionButton
+} from "../module/user";
 export default {
   components: {
     "new-user": NewButton,
     "edit-user": EditButton,
-    "delete-user": DeleteButton
+    "delete-user": DeleteButton,
+    "permission-user": PermissionButton
   },
   data: () => ({
     search: "",

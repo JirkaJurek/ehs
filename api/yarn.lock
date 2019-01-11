@@ -303,6 +303,10 @@ couleurs@^1.1.0:
   dependencies:
     x256 "~0.0.1"
 
+crypto-js@^3.1.9-1:
+  version "3.1.9-1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.1.9-1.tgz#fda19e761fc077e01ffbfdc6e9fdfc59e8806cd8"
+
 csv-to-array@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/csv-to-array/-/csv-to-array-1.0.2.tgz#3bb5322f23b439f0ae85784757c397cb29513dd9"

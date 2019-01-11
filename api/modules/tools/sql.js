@@ -230,7 +230,7 @@ const revisionFunction = {
       .from("tool_revision")
       .join(tableName, `tool_revision.id_tool = tool.id`, "tool")
       .where(`tool.deletedAt IS NULL`)
-      .groupBy("id_tool, id_tool_revision_types")
+      .groupBy("tool_revision.id_tool, tool_revision.id_tool_revision_types")
       .having(
         `nextRevision < DATE_SUB(NOW(), INTERVAL -${filter.daysBack || 30} DAY)`
       );

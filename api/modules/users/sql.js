@@ -13,7 +13,7 @@ const toJson = data => {
 };
 
 const transformData = data => {
-  data.degree = data.degree ? data.degree : '';
+  data.degree = data.degree ? data.degree : "";
   return data;
 };
 
@@ -29,7 +29,7 @@ function add(data) {
 
 function update(id, data) {
   data = transformData(data);
-  
+
   const user = execQuery(
     `UPDATE ${tableName} 
         SET degree=:degree, firstName=:firstName, lastName=:lastName, personalNumber=:personalNumber, description=:description
@@ -59,10 +59,44 @@ function deleteById(toolId) {
   ]);
 }
 
+const permissionFunction = {
+  permissionByUserId: userId => {
+    return execQuery(
+      `SELECT userPermissionId FROM user_permission WHERE userId = ?`,
+      [userId]
+    );
+  },
+  permissionByUserIdDetail: userId => {
+    return execQuery(
+      `SELECT ups.* FROM user_permission AS up
+      JOIN user_permissions AS ups ON up.userPermissionId = ups.id
+      WHERE userId = ?`,
+      [userId]
+    );
+  },
+  allPermissions: () => {
+    return execQuery(`SELECT * FROM user_permissions`);
+  },
+  deletePermissionsByUserId: userId => {
+    return execQuery(`DELETE FROM user_permission WHERE userId = ?;`, [userId]);
+  },
+  addPermission: data => {
+    return execQuery(
+      `INSERT INTO user_permission (userId, userPermissionId) VALUES (:userId, :userPermissionId);`,
+      data
+    );
+  }
+};
+
 module.exports = {
   add,
   update,
   list,
   showById,
-  deleteById
+  deleteById,
+  userPermission: permissionFunction.permissionByUserId,
+  userPermissions: permissionFunction.allPermissions,
+  deletePermissionsByUserId: permissionFunction.deletePermissionsByUserId,
+  addUserPermission: permissionFunction.addPermission,
+  userPermissionDetail: permissionFunction.permissionByUserIdDetail,
 };

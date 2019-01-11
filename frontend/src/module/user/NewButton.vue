@@ -3,8 +3,8 @@
 </template>
 
 <script>
-import NewOrEditMixin from "./NewOrEditMixin";
+import UserMixin from "./UserMixin";
 export default {
-  mixins: [NewOrEditMixin]
+  mixins: [UserMixin]
 };
 </script>

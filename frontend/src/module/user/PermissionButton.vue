@@ -1,6 +1,6 @@
 <template>
-  <v-icon small class="mr-2" @click="editItem(id)" title="Editace">
-    edit
+  <v-icon small class="mr-2" @click="userPermission(id)" title="Oprávnění">
+    security
   </v-icon>
 </template>
 
