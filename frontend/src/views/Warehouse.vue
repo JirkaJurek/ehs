@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { NewButton, EditButton, DeleteButton } from "../module/warehouse";
+import { NewButton, EditButton, DeleteButton } from "../module/warehouse/components";
 export default {
   components: {
     "new-warehouse": NewButton,

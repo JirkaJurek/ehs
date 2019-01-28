@@ -6853,10 +6853,6 @@ vue-property-decorator@^7.2.0:
   dependencies:
     vue-class-component "^6.2.0"
 
-vue-router-permissions@^0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/vue-router-permissions/-/vue-router-permissions-0.1.5.tgz#f31949b73eff6bd6bae6f15dfb50575a9ce61513"
-
 vue-router@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
@@ -6886,6 +6882,17 @@ vue-upload-component@^2.8.13:
 vue@^2.5.17:
   version "2.5.17"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.17.tgz#0f8789ad718be68ca1872629832ed533589c6ada"
+
+vuetify-daterange-picker@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/vuetify-daterange-picker/-/vuetify-daterange-picker-2.6.2.tgz#13446e00ad95582f03596b30f99dd5764131c9ce"
+  dependencies:
+    date-fns "^1.29.0"
+    vuetify "^1.0.4"
+
+vuetify@^1.0.4:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-1.4.2.tgz#3e136397463d1e980e8ccdd78e4dcfcdfa4c538c"
 
 vuetify@^1.3.12:
   version "1.3.12"

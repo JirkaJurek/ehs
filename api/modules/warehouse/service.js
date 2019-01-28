@@ -3,11 +3,11 @@
 const sql = require("./sql");
 
 module.exports.add = data => {
-  sql.add(data);
+  return sql.add(data);
 };
 
 module.exports.update = (id, data) => {
-  sql.update(id, data);
+  return sql.update(id, data);
 };
 
 module.exports.showById = id => {

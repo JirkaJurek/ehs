@@ -1,9 +1,10 @@
 "use strict";
 
 const sql = require("./sql");
-const { head } = require("ramda");
+const { head, find, propEq } = require("ramda");
 const moduleUsers = require("../users");
 const moment = require("moment");
+const jwtToken = require("jsonwebtoken");
 
 const toJson = data => {
   try {
@@ -13,16 +14,22 @@ const toJson = data => {
   }
 };
 
-module.exports.add = data => {
-  return sql.add(data);
+module.exports.add = (data, authorization) => {
+  const submitter = jwtToken.verify(
+    authorization.replace("Bearer ", ""),
+    process.env.JWT_SECRET
+  );
+  return sql.add({ ...data, submitter });
 };
 
-module.exports.update = async (id, data) => {
+module.exports.update = async (id, data, authorization) => {
   const task = head(await sql.showById(id));
   const lastFulfillment = head(toJson(task.taskFulfillment));
   const lastDone = lastFulfillment ? lastFulfillment.done : 0;
-  // currentUser změnit na aktuálně přihlášeného uživatele
-  const currentUser = head(await moduleUsers.service.showById(1));
+  const currentUser = jwtToken.verify(
+    authorization.replace("Bearer ", ""),
+    process.env.JWT_SECRET
+  );
   let promiseArray = [];
   const setFulfillment = description => {
     promiseArray.push(
@@ -71,8 +78,29 @@ module.exports.showById = id => {
   return sql.showById(id);
 };
 
-module.exports.list = query => {
-  return sql.list(query);
+module.exports.list = async (query, authorization) => {
+  const currentUser = jwtToken.verify(
+    authorization.replace("Bearer ", ""),
+    process.env.JWT_SECRET
+  );
+  // předělat na komplexnější ACL
+  const permissions = await moduleUsers.service.userPermissionDetail(
+    currentUser.id
+  );
+  const allTasksUnique = find(propEq("action", "AllTasksUnique"), permissions);
+  let defaultFilter = { resolver: [currentUser.id], submitter: [currentUser.id] };
+  if (allTasksUnique && allTasksUnique.config === null) {
+    defaultFilter = {};
+  } else if (allTasksUnique) {
+    const config = toJson(allTasksUnique.config);
+    if (config.watching) {
+      config.watching.forEach(element => {
+        defaultFilter.resolver.push(element);
+        defaultFilter.submitter.push(element);
+      });
+    }
+  }
+  return sql.list(query, defaultFilter);
 };
 
 module.exports.change = async (id, data) => {
@@ -91,7 +119,7 @@ module.exports.delete = id => {
   return sql.deleteById(id);
 };
 
-module.exports.fulfillmentAdd = async (id, data) => {
+module.exports.fulfillmentAdd = async (id, data, authorization) => {
   const task = head(await sql.showById(id));
   let description = "";
   if (task.resolverId != data.resolver.id) {
@@ -112,5 +140,9 @@ module.exports.fulfillmentAdd = async (id, data) => {
     await sql.update(id, task);
   }
   data.description = description + data.description;
-  return sql.fulfillmentAdd(id, data);
+  const currentUser = jwtToken.verify(
+    authorization.replace("Bearer ", ""),
+    process.env.JWT_SECRET
+  );
+  return sql.fulfillmentAdd(id, { ...data, user: currentUser });
 };

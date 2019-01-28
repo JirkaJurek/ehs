@@ -16,11 +16,11 @@ router.get("/:id(\\d+)", async (ctx, next) => {
   ctx.body = head(item);
 });
 router.post("/", async (ctx, next) => {
-  warehouse.service.add(ctx.request.body);
+  await warehouse.service.add(ctx.request.body);
   ctx.status = 200;
 });
 router.post("/:id(\\d+)", async (ctx, next) => {
-  warehouse.service.update(ctx.params.id, ctx.request.body);
+  await warehouse.service.update(ctx.params.id, ctx.request.body);
   ctx.status = 200;
 });
 router.delete("/:id(\\d+)", async (ctx, next) => {

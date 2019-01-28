@@ -2,20 +2,24 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import { define } from "./resources/ability";
-import { path } from "ramda";
+import { path, propEq, find } from "ramda";
+import tool from "./store/tool";
 
 const requireAuth = (to, from, next) => {
-  const abilities = define()
+  const abilities = define();
   const permission = path(["meta", "permission"], to);
   if (permission && abilities.cannot(permission[0], permission[1])) {
     const redirect = path(["meta", "redirect"], to);
-    if(redirect) {
-      next(redirect);
-    } else {
-      next("/fe/login");
+    const page = find(propEq("actions", "page"), abilities.rules);
+    if (redirect) {
+      return next(redirect);
+    } else if (page) {
+      alert("Nemáte dostatečná oprávnění");
+      return next("/");
     }
+    return next("/fe/login");
   }
-  next();
+  return next();
 };
 
 Vue.use(Router);
@@ -25,19 +29,21 @@ export default new Router({
   base: process.env.BASE_URL,
   routes: [
     {
-      path: "/home",
+      path: "/",
       name: "home",
-      component: Home
+      component: Home,
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "Home"]
+      }
     },
     {
-      path: "/",
-      alias: "/fe/tools",
+      path: "/fe/tools",
       name: "tools",
       component: () => import("./views/Tools.vue"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "Tools"],
-        redirect: "/fe/login"
+        permission: ["page", "Tool"]
       }
     },
     {
@@ -46,8 +52,7 @@ export default new Router({
       component: () => import("./views/ToolCategories.vue"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "Categories"],
-        redirect: "/fe/login"
+        permission: ["page", "Categories"]
       }
     },
     {
@@ -56,8 +61,7 @@ export default new Router({
       component: () => import("./views/ToolRevisionType.vue"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "RevisionType"],
-        redirect: "/fe/login"
+        permission: ["page", "RevisionType"]
       }
     },
     {
@@ -66,8 +70,7 @@ export default new Router({
       component: () => import("./views/ToolRevisionTypeDetail.vue"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "RevisionTypeDetail"],
-        redirect: "/fe/login"
+        permission: ["page", "RevisionTypeDetail"]
       }
     },
     {
@@ -76,8 +79,7 @@ export default new Router({
       component: () => import("./views/ToolRevisionUpcoming.vue"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "RevisionUpcoming"],
-        redirect: "/fe/login"
+        permission: ["page", "RevisionUpcoming"]
       }
     },
     {
@@ -86,8 +88,7 @@ export default new Router({
       component: () => import("./views/MoveHistory.vue"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "MoveHistory"],
-        redirect: "/fe/login"
+        permission: ["page", "MoveHistory"]
       }
     },
     {
@@ -101,8 +102,7 @@ export default new Router({
       component: () => import("./views/MoveInStock"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "MoveInStock"],
-        redirect: "/fe/login"
+        permission: ["ReceiverAndExporter", "Stock"]
       }
     },
     {
@@ -111,8 +111,7 @@ export default new Router({
       component: () => import("./views/Users"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "Users"],
-        redirect: "/fe/login"
+        permission: ["page", "User"]
       }
     },
     {
@@ -121,24 +120,30 @@ export default new Router({
       component: () => import("./views/Warehouse"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "Warehouse"],
-        redirect: "/fe/login"
+        permission: ["page", "Warehouse"]
       }
     },
     {
       path: "/fe/task",
       name: "task",
-      component: () => import("./module/task/views/TaskTable"),
+      component: () => import("./module/task/views/PreviewTasks"),
       beforeEnter: requireAuth,
       meta: {
-        permission: ["page", "Task"],
-        redirect: "/fe/login"
+        permission: ["page", "Task"]
       }
     },
     {
       path: "/fe/login",
       name: "login",
       component: () => import("./views/Login")
+    },
+    {
+      path: "/fe/logout",
+      name: "logout",
+      beforeEnter: (to, from, next) => {
+        localStorage.basicToken = '';
+        location.href = "/";
+      }
     },
     {
       path: "/a",

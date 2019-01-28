@@ -9,9 +9,6 @@
           <v-form ref="form">
             <v-layout wrap>
               <v-flex xs12 sm6 md3>
-                <employee-select v-on:change="(value) => {editedItem.user = value}" :value="editedItem.userId" :multiple="false" label="Zapisovatel" :rules="inputRequired" />
-              </v-flex>
-              <v-flex xs12 sm6 md3>
                 <v-select v-model="editedItem.done" :items="done" label="Splněno" suffix="%" :rules="inputRequired" />
               </v-flex>
               <v-flex xs12 sm6 md3>
@@ -67,7 +64,7 @@ export default {
         this.axios
           .post(`/task/${this.task.id}/fulfillment`, this.editedItem)
           .then(() => {
-            this.$store.dispatch("loadAllTasks", true);
+            this.$store.dispatch("loadAllTasks", {reload: true});
           });
         this.close();
       }

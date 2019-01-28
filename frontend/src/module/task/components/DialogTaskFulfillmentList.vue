@@ -55,7 +55,7 @@ export default {
         url += "/" + this.id;
       }
       this.axios.post(url, this.editedItem).then(() => {
-        this.$store.dispatch("loadAllTasks", true);
+        this.$store.dispatch("loadAllTasks", {reload: true});
       });
       this.close();
     },

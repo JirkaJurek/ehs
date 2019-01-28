@@ -2,9 +2,9 @@
   <div>
     <v-layout my-3 display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
     <div xs12 color="white" id="toolTableButtons">
-      <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
+      <tool-new-button />
       <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Zápis provedené revize</v-btn>
-      <v-btn :disabled="bulk" @click.native="deleteItem()" color="primary" class="mb-2">Smazat</v-btn>
+      <tool-bulk-delete-button :bulk="bulk" :selected="selected" />
       <v-btn-toggle v-model="toggleMultiple" multiple>
         <v-btn color="primary">Smazané položky</v-btn>
       </v-btn-toggle>
@@ -193,10 +193,16 @@ import {
 } from "ramda";
 import { getItemVariant } from "../module/stock";
 import WarehouseSelect from "../module/tool/WarehouseSelect";
+import { ExporterButton, ReceiverButton } from "../module/stock/components";
+import { NewButton, BulkDeleteButton } from "../module/tool/components";
 import moment from "moment";
 export default {
   components: {
-    "warehouse-select": WarehouseSelect
+    "warehouse-select": WarehouseSelect,
+    "stock-exporter-button": ExporterButton,
+    "stock-receiver-button": ReceiverButton,
+    "tool-new-button": NewButton,
+    "tool-bulk-delete-button": BulkDeleteButton,
   },
   data: () => ({
     currentComponent: null,

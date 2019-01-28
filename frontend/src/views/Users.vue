@@ -32,7 +32,7 @@ import {
   NewButton,
   EditButton,
   PermissionButton
-} from "../module/user";
+} from "../module/user/components";
 export default {
   components: {
     "new-user": NewButton,

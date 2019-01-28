@@ -13,9 +13,12 @@ export default {
         await this.axios.post(`/task/${id}/change`, {
           type: "done"
         });
-        this.$store.dispatch("loadAllTasks", true);
+        this.$store.dispatch("loadAllTasks", {reload: true});
       }
     }
+  },
+  auth(ability) {
+    return ability.can("DoneButton", "Task");
   }
 };
 </script>

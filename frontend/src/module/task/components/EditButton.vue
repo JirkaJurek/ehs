@@ -8,6 +8,9 @@
 import taskMixin from "../mixins";
 export default {
   props:['id'],
-  mixins: [taskMixin]
+  mixins: [taskMixin],
+  auth(ability) {
+    return ability.can("EditButton", "Task");
+  }
 };
 </script>

@@ -5,6 +5,7 @@ const Router = require("koa-router");
 const router = new Router();
 
 const { users } = require("../../modules");
+const { head } = require("ramda");
 
 router.post("/login", async (ctx, next) => {
   // const { password } = ctx.request.body;
@@ -35,7 +36,7 @@ router.post("/permissions", async (ctx, next) => {
     ]);
 
     ctx.body = {
-      user,
+      user: head(user),
       status: true,
       permissions
     };

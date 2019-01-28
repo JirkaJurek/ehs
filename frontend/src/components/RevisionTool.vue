@@ -13,6 +13,12 @@
             <td>{{ props.item.description }}</td>
             <td>{{ props.item.who }}</td>
             <td>
+              <v-btn round color="primary" dark @click="showFiles(props.item.files)">
+                {{ hasFiles(props.item.files) }}
+                <v-icon>image_search</v-icon>
+              </v-btn>
+            </td>
+            <td>
               <v-icon small class="mr-2" @click="editRevision(props.item)" title="Editace">
                 edit
               </v-icon>
@@ -43,6 +49,7 @@
                 <v-select return-object :items="revisionTypes" v-model="newRevision.revisionType" item-text="name" label="Typy revize" persistent-hint></v-select>
                 <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
                 <v-text-field v-model="newRevision.who" label="Kdo"></v-text-field>
+                <upload-file v-on:update="updateImages" :selectedFiles="transformFiles(newRevision.files)" ref="uploadFile"></upload-file>
               </v-flex>
             </v-layout>
           </v-container>
@@ -54,6 +61,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <show-files ref=showFiles />
   </div>
 </template>
 
@@ -141,12 +149,22 @@ export default {
       this.editRevisonId = item.id;
       this.newRevision = item;
     },
-    toJson(data) {
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        return data;
+    updateImages(data) {
+      this.newRevision.files = data;
+    },
+    transformFiles(files) {
+      if (!files) {
+        return [];
       }
+      return map(prop("id"), this.toJson(files));
+    },
+    hasFiles(files) {
+      const filesArray = this.toJson(files);
+      return filesArray && filesArray.length ? "ano" : "ne";
+    },
+    showFiles(files) {
+      files = files ? this.toJson(files) : [];
+      this.$refs.showFiles.open(files);
     }
   }
 };

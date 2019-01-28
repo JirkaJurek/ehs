@@ -12,3 +12,4 @@ scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi/web/p
 #mysql příklady -> show databases; / DROP DATABASE intranet; / create database intranet;
 #dump databáze -> mysqldump --opt -u root  -p intranet > dbzaloha2019-01-08.sql
 # htaccess
+

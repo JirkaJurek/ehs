@@ -69,11 +69,48 @@ const thisYear = () => {
   );
 };
 
-function list(query) {
+function list(query, defaultFilter) {
   const builder = new queryBuilder();
+  const filter = query.filter ? JSON.parse(query.filter) : {};
   builder.from(tableName).groupBy(`${tableName}.id`);
+  if (filter.submitter && filter.submitter.length) {
+    builder.where(
+      `submitterId IN(${filter.submitter
+        .map(x => parseInt(x))
+        .filter(x => x > 0)
+        .join(",")})`
+    );
+  }
+  //defaultní podmínky, přes ty se nesmí dostat
+  let submitterId, resolverId;
+  if (defaultFilter.submitter && defaultFilter.submitter.length) {
+    submitterId = `submitterId IN(${defaultFilter.submitter
+      .map(x => parseInt(x))
+      .filter(x => x > 0)
+      .join(",")})`;
+  }
+  if (defaultFilter.resolver && defaultFilter.resolver.length) {
+    resolverId = `resolverId IN(${defaultFilter.resolver
+      .map(x => parseInt(x))
+      .filter(x => x > 0)
+      .join(",")})`;
+  }
+  if (submitterId || resolverId) {
+    builder.where(`(${submitterId} OR ${resolverId})`);
+  }
+  //defaultní podmínky
+  if (filter.resolver && filter.resolver.length) {
+    builder.where(
+      `resolverId IN(${filter.resolver
+        .map(x => parseInt(x))
+        .filter(x => x > 0)
+        .join(",")})`
+    );
+  }
+  if (filter.type && filter.type.length) {
+    builder.where(`type IN('${filter.type.join("','")}')`);
+  }
   builder.where("deletedAt IS NULL");
-  builder.orderBy(`${tableName}.id`, "true");
   return execQuery(builder.getSql());
 }
 

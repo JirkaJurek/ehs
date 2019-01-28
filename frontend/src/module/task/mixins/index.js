@@ -27,15 +27,13 @@ export default {
     listFulfillment(task) {
       this.$store.commit(
         "setComponent",
-        <DialogTaskFulfillmentList
-          task={task}
-        />
+        <DialogTaskFulfillmentList task={task} />
       );
     },
     async deleteItem(id) {
       if (confirm(`Opravdu chcete smazat tento úkol?`)) {
         await this.axios.delete(`/task/${id}`);
-        this.$store.dispatch("loadAllTasks", true);
+        this.$store.dispatch("loadAllTasks", { reload: true });
       }
     }
   }

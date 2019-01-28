@@ -1,7 +1,7 @@
 "use strict";
 
 const { execQuery, escape, queryBuilder } = require("../db");
-const {} = require("ramda");
+const { map, omit, values } = require("ramda");
 const tableName = "user";
 
 const toJson = data => {
@@ -41,15 +41,24 @@ function update(id, data) {
   return user;
 }
 
-function list(query) {
+async function list(query, withSecretData) {
   const builder = new queryBuilder();
   builder.from(tableName).groupBy(`${tableName}.id`);
   builder.where("deletedAt IS NULL");
-  return execQuery(builder.getSql());
+  const data = await execQuery(builder.getSql());
+  return withSecretData === true ? data : map(omit(["password"]), data);
 }
 
-function showById(id) {
-  return execQuery(`SELECT * FROM ${tableName} WHERE id = ?`, [id]);
+async function showById(id, withSecretData) {
+  const data = await execQuery(`SELECT * FROM ${tableName} WHERE id = ?`, [id]);
+  return withSecretData === true ? data : omit(["password"], data);
+}
+
+async function showByNick(nick, withSecretData) {
+  const data = await execQuery(`SELECT * FROM ${tableName} WHERE nick = ?`, [
+    nick
+  ]);
+  return withSecretData === true ? data : omit(["password"], data);
 }
 
 function deleteById(toolId) {
@@ -68,7 +77,7 @@ const permissionFunction = {
   },
   permissionByUserIdDetail: userId => {
     return execQuery(
-      `SELECT ups.* FROM user_permission AS up
+      `SELECT ups.*, up.config FROM user_permission AS up
       JOIN user_permissions AS ups ON up.userPermissionId = ups.id
       WHERE userId = ?`,
       [userId]
@@ -93,10 +102,11 @@ module.exports = {
   update,
   list,
   showById,
+  showByNick,
   deleteById,
   userPermission: permissionFunction.permissionByUserId,
   userPermissions: permissionFunction.allPermissions,
   deletePermissionsByUserId: permissionFunction.deletePermissionsByUserId,
   addUserPermission: permissionFunction.addPermission,
-  userPermissionDetail: permissionFunction.permissionByUserIdDetail,
+  userPermissionDetail: permissionFunction.permissionByUserIdDetail
 };

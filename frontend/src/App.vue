@@ -63,9 +63,9 @@
       <v-content>
         <router-view/>
       </v-content>
-      <component v-bind:is="mainModal" :myData=mainModalData></component>
-      <render-component :component="getComponent" />
     </template>
+    <component v-bind:is="mainModal" :myData=mainModalData></component>
+    <render-component :component="getComponent" />
   </v-app>
 </template>
 
@@ -95,7 +95,8 @@ export default {
         path: "/fe/tools/revision-upcoming"
       },
       { icon: "store", text: "Historie skladu", path: "/fe/move-history" },
-      { icon: "date_range", text: "Úkoly", path: "/fe/task" }
+      { icon: "date_range", text: "Úkoly", path: "/fe/task" },
+      { icon: "power_settings_new", text: "Odhlásit se", path: "/fe/logout" }
       // {
       //   icon: "keyboard_arrow_up",
       //   "icon-alt": "keyboard_arrow_down",

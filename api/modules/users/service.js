@@ -1,7 +1,7 @@
 "use strict";
 
 const sql = require("./sql");
-const { head } = require("ramda");
+const { head, omit } = require("ramda");
 const { createHmac } = require("crypto");
 const jwtToken = require("jsonwebtoken");
 
@@ -13,12 +13,16 @@ const update = (id, data) => {
   sql.update(id, data);
 };
 
-const showById = id => {
-  return sql.showById(id);
+const showById = (id, withSecretData) => {
+  return sql.showById(id, withSecretData);
 };
 
-const list = query => {
-  return sql.list(query);
+const showByNick = (nick, withSecretData) => {
+  return sql.showByNick(nick, withSecretData);
+};
+
+const list = (query, withSecretData) => {
+  return sql.list(query, withSecretData);
 };
 
 const isActive = async id => {
@@ -64,11 +68,13 @@ const createPasswordHash = password => {
 };
 
 const login = async ({ username, password }) => {
-  const user = head(await showById(username));
+  const user = head(await showByNick(username, true));
   const hash = createPasswordHash(password);
   console.log(hash);
   const status = user.password === hash;
-  const basicToken = status ? jwtToken.sign(user, process.env.JWT_SECRET) : "";
+  const basicToken = status
+    ? jwtToken.sign(omit(["password"], user), process.env.JWT_SECRET)
+    : "";
 
   return {
     status,
@@ -80,6 +86,7 @@ module.exports = {
   delete: deleteUser,
   createPasswordHash,
   showById,
+  showByNick,
   add,
   update,
   showById,

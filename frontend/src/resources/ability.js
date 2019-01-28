@@ -4,9 +4,10 @@ import axios from "../myAxios";
 
 export const define = () => AbilityBuilder.define(can => {
   let currentUser = store.getters.getCurrentUser();
-  console.log('currentUser');
 
   if (currentUser && currentUser.permissions) {
+    // kdokoliv přihlášený se muže dostat na úvodní stránku
+    can("page", "Home");
     currentUser.permissions.map(item => {
       can(item.action, item.subject);
     });
@@ -16,6 +17,8 @@ export const define = () => AbilityBuilder.define(can => {
         if (!response.data.status) {
           localStorage.basicToken = "";
         } else {
+          // kdokoliv přihlášený se muže dostat na úvodní stránku
+          can("page", "Home");
           store.state.user.currentUser = response.data;
           let currentUser = store.getters.getCurrentUser();
           if (currentUser && currentUser.permissions) {
@@ -27,7 +30,6 @@ export const define = () => AbilityBuilder.define(can => {
       });
     }
   }
-  can("NewButton", "Task");
   // can("page", "Tools");
 });
 // export const defineAbilitiesFor = user => {

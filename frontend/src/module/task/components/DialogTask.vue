@@ -9,9 +9,6 @@
           <v-form ref="form">
             <v-layout wrap>
               <v-flex xs12 sm6 md3>
-                <employee-select :rules="inputRequired" v-on:change="(value) => {editedItem.submitter = value}" :value="editedItem.submitterId" :multiple="false" label="Zadavatel" />
-              </v-flex>
-              <v-flex xs12 sm6 md3>
                 <employee-select :rules="inputRequired" v-on:change="(value) => {editedItem.resolver = value}" :value="editedItem.resolverId" :multiple="false" label="Řešitel" />
               </v-flex>
               <v-flex xs12 sm6 md3>
@@ -72,7 +69,7 @@ export default {
           url += "/" + this.id;
         }
         this.axios.post(url, this.editedItem).then(() => {
-          this.$store.dispatch("loadAllTasks", true);
+          this.$store.dispatch("loadAllTasks", {reload: true});
         });
         this.close();
       }

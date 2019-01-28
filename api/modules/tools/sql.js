@@ -143,7 +143,17 @@ const categoriesFunction = {
 };
 
 const revisionFunction = {
-  afterSaveOrUpdate: async toolId => {
+  afterSaveOrUpdate: async (toolId, toolRevisionId, files) => {
+    if (files) {
+      map(
+        file =>
+          execQuery(
+            "INSERT INTO tool_revision_file (tool_revision_id, file_id) VALUES (?, ?)",
+            [toolRevisionId, file.id]
+          ),
+        files
+      );
+    }
     const revisions = await revisionFunction.allById(toolId);
     await execQuery(
       `UPDATE ${tableName} SET revisions=:revisions WHERE id = :toolId;`,
@@ -167,26 +177,36 @@ const revisionFunction = {
           .add(c, y)
           .format("YYYY-MM-DD")
       : null;
+    data.filesJSON = data.files ? JSON.stringify(data.files) : "[]";
     return data;
   },
   add: async data => {
     data = revisionFunction.transformData(data);
-    await execQuery(
-      `INSERT INTO tool_revision (id_tool, id_tool_revision_types, revisionType, date, nextRevision, description, who) VALUES (:toolId, :revisionTypeId, :revisionTypeJSON, :date, :nextRevision, :description, :who);`,
+    const toolRevision = await execQuery(
+      `INSERT INTO tool_revision (id_tool, id_tool_revision_types, revisionType, date, nextRevision, description, who, files) VALUES (:toolId, :revisionTypeId, :revisionTypeJSON, :date, :nextRevision, :description, :who, :filesJSON);`,
       data
     );
-    await revisionFunction.afterSaveOrUpdate(data.toolId);
+    await revisionFunction.afterSaveOrUpdate(
+      data.toolId,
+      toolRevision.info.insertId,
+      data.files
+    );
     return true;
   },
   update: async (id, data) => {
     data = revisionFunction.transformData(data);
     data.id = id;
     await execQuery(
-      `UPDATE tool_revision SET id_tool_revision_types=:revisionTypeId, revisionType=:revisionTypeJSON, date=:date, nextRevision=:nextRevision, description=:description, who=:who 
+      `UPDATE tool_revision SET id_tool_revision_types=:revisionTypeId, revisionType=:revisionTypeJSON, date=:date, nextRevision=:nextRevision, description=:description, who=:who, files=:filesJSON
         WHERE id = :id;`,
       data
     );
-    await revisionFunction.afterSaveOrUpdate(data.id_tool);
+    // smazat staré soubory
+    await revisionFunction.afterSaveOrUpdate(
+      data.toolId,
+      id,
+      data.files
+    );
     return true;
   },
   allById: async id => {

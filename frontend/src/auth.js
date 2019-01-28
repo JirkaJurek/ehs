@@ -3,8 +3,8 @@ export const auth = Component => ({
   functional: true,
   render(h, context) {
     const ability = path(["parent", "$ability"], context);
-    if (ability && Component.auth && Component.auth(ability)) {
-      return <Component />;
+    if (ability && (!Component.auth || (Component.auth && Component.auth(ability)))) {
+      return <Component {...context} />;
     } else {
       return null;
     }
