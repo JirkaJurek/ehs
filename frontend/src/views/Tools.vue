@@ -3,7 +3,7 @@
     <v-layout my-3 display-2 align-center justify-center>Evidence nemovitosti, strojů, nářadí a nástrojů - plán revizí</v-layout>
     <div xs12 color="white" id="toolTableButtons">
       <tool-new-button />
-      <v-btn :disabled="bulk" @click.native="showDialogNewRevisions(0)" color="primary" class="mb-2">Zápis provedené revize</v-btn>
+      <revision-new-button :selectedIds="selectedIds" :disabled="bulk" color="primary" :flat="false" label="Zápis provedené revize" />
       <tool-bulk-delete-button :bulk="bulk" :selected="selected" />
       <v-btn-toggle v-model="toggleMultiple" multiple>
         <v-btn color="primary">Smazané položky</v-btn>
@@ -94,15 +94,9 @@
             </v-btn>
           </td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
-            <v-icon small class="mr-2" @click="editItem(props.item.id)" title="Editace" v-if="!filter.deletedAt">
-              edit
-            </v-icon>
-            <v-icon small class="mr-2" @click="editItem(props.item.id, true)" title="Klonovat" v-if="!filter.deletedAt">
-              filter_none
-            </v-icon>
-            <v-icon small @click="deleteItem(props.item.id)" title="Smazat" v-if="!filter.deletedAt">
-              delete
-            </v-icon>
+            <tool-edit-button :id="props.item.id" v-if="!filter.deletedAt"/>
+            <tool-clone-button :id="props.item.id" v-if="!filter.deletedAt"/>
+            <tool-delete-button :id="props.item.id" v-if="!filter.deletedAt"/>
             <!--
             <v-icon small @click="showDialogAllServices(props.item)">
               build
@@ -118,7 +112,6 @@
         Nebyl nalezen žádný výsledek pro výraz "{{ search }}".
       </v-alert>
     </v-data-table>
-    <dialog-tool v-if="dialogNewItem" ref=dialogNewItem></dialog-tool>
     <revision-tool ref=revisionTool />
     <show-files ref=showFiles />
     <dialog-tool-service ref=dialogToolService />
@@ -194,7 +187,14 @@ import {
 import { getItemVariant } from "../module/stock";
 import WarehouseSelect from "../module/tool/WarehouseSelect";
 import { ExporterButton, ReceiverButton } from "../module/stock/components";
-import { NewButton, BulkDeleteButton } from "../module/tool/components";
+import {
+  NewButton,
+  BulkDeleteButton,
+  DeleteButton,
+  EditButton,
+  CloneButton,
+} from "../module/tool/components";
+import { NewRevisionButton } from "../module/revision/components";
 import moment from "moment";
 export default {
   components: {
@@ -202,13 +202,16 @@ export default {
     "stock-exporter-button": ExporterButton,
     "stock-receiver-button": ReceiverButton,
     "tool-new-button": NewButton,
+    "tool-edit-button": EditButton,
+    "tool-clone-button": CloneButton,
     "tool-bulk-delete-button": BulkDeleteButton,
+    "tool-delete-button": DeleteButton,
+    "revision-new-button": NewRevisionButton
   },
   data: () => ({
     currentComponent: null,
     search: "",
     totalItems: 0,
-    dialogNewItem: false,
     textFontSizeClass: "test-size-1",
     filter: {
       employee: [],
@@ -317,6 +320,9 @@ export default {
     },
     warehouses() {
       return this.$store.state.warehouse.warehouses;
+    },
+    selectedIds() {
+      return map(prop("id"), this.selected);
     }
   },
 
@@ -380,32 +386,6 @@ export default {
         set(lensProp("class"), this.textFontSizeClass),
         this.headers
       );
-    },
-    editItem(itemId = -1, duplicate = false) {
-      this.dialogNewItem = true;
-      itemId = parseInt(itemId);
-      if (this.$refs.dialogNewItem) {
-        this.$refs.dialogNewItem.open(itemId, duplicate);
-      } else {
-        const selfRefs = this.$refs;
-        setTimeout(function() {
-          selfRefs.dialogNewItem.open(itemId, duplicate);
-        }, 300);
-      }
-    },
-    async deleteItem(itemId) {
-      console.log(this.pagination);
-      if (
-        confirm(
-          `Opravdu chcete smazat ${itemId ? "tuto položku" : "tyto položky"}?`
-        )
-      ) {
-        const items = itemId ? [itemId] : map(prop("id"), this.selected);
-        await this.axios.post("/tools/more-tools", {
-          items
-        });
-        this.initialize();
-      }
     },
     oneRevision(revisions) {
       const dateFormat = x => moment(prop("date", x)).format("MM, YY");

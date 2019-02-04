@@ -36,12 +36,17 @@ export default {
   methods: {
     async login() {
       if (this.$refs.form.validate()) {
-        const response = await this.axios.post("/login", {
-          username: this.username,
-          password: this.password
-        });
-        localStorage.basicToken = response.data.basicToken;
-        location.href = "/";
+        let response;
+        try {
+          response = await this.axios.post("/login", {
+            username: this.username,
+            password: this.password
+          });
+          localStorage.basicToken = response.data.basicToken;
+          location.href = "/";
+        } catch (err) {
+          alert("Nepovedené přihlášení");
+        }
       }
     }
   }

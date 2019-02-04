@@ -27,37 +27,8 @@
         </v-data-table>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="showDialogNewRevisions(itemRevisionsId)">Nová revize</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="closeDialogAllRevisions">Cancel</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="dialogNewRevision">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Zápis provedené revize</span>
-        </v-card-title>
-
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-layout wrap>
-              <v-flex xs12 sm6 md4>
-                <v-date-picker v-model="newRevision.date"></v-date-picker>
-                <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 md4>
-                <v-select return-object :items="revisionTypes" v-model="newRevision.revisionType" item-text="name" label="Typy revize" persistent-hint></v-select>
-                <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
-                <v-text-field v-model="newRevision.who" label="Kdo"></v-text-field>
-                <upload-file v-on:update="updateImages" :selectedFiles="transformFiles(newRevision.files)" ref="uploadFile"></upload-file>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeDialogNewRevision">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="addRevision">Save</v-btn>
+          <new-revision-button :selectedIds="[itemRevisionsId]" />
+          <v-btn color="blue darken-1" flat @click.native="closeDialogAllRevisions">Zrušit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -67,8 +38,14 @@
 
 <script>
 import { map, prop } from "ramda";
+import RevisionMixin from "../module/revision/mixins/RevisionMixin";
+import { NewRevisionButton } from "../module/revision/components";
 export default {
+  components: {
+    'new-revision-button': NewRevisionButton
+  },
   name: "RevisionTool",
+  mixins: [RevisionMixin],
   data: () => ({
     dialogAllRevisions: false,
     dialogNewRevision: false,
@@ -85,6 +62,7 @@ export default {
       { text: "Typ revize", value: "revisionType" },
       { text: "Poznámka", value: "description" },
       { text: "Kdo", value: "who" },
+      { text: "Dokumenty", value: "files" },
       { text: "Akce", value: "action" }
     ]
   }),
@@ -116,38 +94,12 @@ export default {
     closeDialogNewRevision() {
       this.dialogNewRevision = false;
     },
-    addRevision() {
-      if (this.editRevisonId) {
-        this.axios
-          .post(`/tools/revisions/${this.editRevisonId}`, this.newRevision)
-          .then(() => {
-            this.$store.dispatch("loadAllTool");
-          });
-      } else {
-        const items =
-          this.itemRevisionsId > 0
-            ? [this.itemRevisionsId]
-            : map(prop("id"), this.selected);
-        this.axios
-          .post("/tools/revisions", {
-            items,
-            revision: this.newRevision
-          })
-          .then(() => {
-            this.$store.dispatch("loadAllTool");
-          });
-      }
-      this.dialogNewRevision = false;
-    },
     getRevisionTypeName(data) {
       const revisionType = this.toJson(data);
       return revisionType ? revisionType.name : "";
     },
     editRevision(item) {
-      item.revisionType = this.toJson(item.revisionType);
-      this.dialogNewRevision = true;
-      this.editRevisonId = item.id;
-      this.newRevision = item;
+      this.editItem(item.id, item);
     },
     updateImages(data) {
       this.newRevision.files = data;

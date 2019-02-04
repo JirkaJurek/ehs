@@ -54,7 +54,7 @@
                 <v-text-field slot="activator" v-model="editedItem.guaranteeInto" label="Záruka do" prepend-icon="event" readonly></v-text-field>
                 <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.guaranteeInto" no-title scrollable>
                   <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="guaranteeInto = false">Cancel</v-btn>
+                  <v-btn flat color="primary" @click="guaranteeInto = false">Zrušit</v-btn>
                   <v-btn flat color="primary" @click="$refs.menu2.save(editedItem.guaranteeInto)">OK</v-btn>
                 </v-date-picker>
               </v-menu>
@@ -79,8 +79,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-        <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="close">Zrušit</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="save">Uložit</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -114,7 +114,7 @@ export default {
     },
     save() {
       let url = "/tools";
-      if (this.itemId > -1) {
+      if (this.itemId > 0) {
         url += "/" + this.itemId;
       }
       if (

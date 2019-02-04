@@ -1,13 +1,16 @@
 <template>
-    <v-btn @click.native="editItem()" color="primary" dark class="mb-2">Nový nástroj</v-btn>
+  <v-icon small @click="deleteItem(id)" title="Smazat">
+    delete
+  </v-icon>
 </template>
 
 <script>
 import taskMixin from "../../mixins";
 export default {
+  props: ["id"],
   mixins: [taskMixin],
   auth(ability) {
-    return ability.can("NewButton", "Tool");
+    return ability.can("DeleteButton", "Tool");
   }
 };
 </script>

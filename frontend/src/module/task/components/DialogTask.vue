@@ -29,8 +29,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-        <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="close">Zrušit</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="save">Uložit</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

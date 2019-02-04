@@ -71,18 +71,23 @@ const transformData = data => {
   data.categoriesJSON = data.categories
     ? JSON.stringify(data.categories)
     : "[]";
-  data.revisionTypesJSON = data.revisionTypes
-    ? JSON.stringify(data.revisionTypes)
-    : "[]";
+  data.revisionTypesJSON = null;
+  // data.revisionTypesJSON = data.revisionTypes
+  //   ? JSON.stringify(data.revisionTypes)
+  //   : "[]";
   data.filesJSON = data.files ? JSON.stringify(data.files) : null;
   data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
-  data.itemsHistoryJSON = data.itemsHistory
-    ? JSON.stringify(data.itemsHistory)
-    : "[]";
+  data.itemsHistoryJSON = null;
+  // data.itemsHistoryJSON = data.itemsHistory
+  //   ? JSON.stringify(data.itemsHistory)
+  //   : "[]";
   if (data.warehouse) {
     data.warehouseJSON = JSON.stringify(data.warehouse);
     data.warehouseId = data.warehouse.value;
   }
+  data.yearOfManufacture = data.yearOfManufacture
+    ? data.yearOfManufacture
+    : null;
   data.check = data.check ? 1 : 0;
   return data;
 };
@@ -203,7 +208,7 @@ const revisionFunction = {
     );
     // smazat staré soubory
     await revisionFunction.afterSaveOrUpdate(
-      data.toolId,
+      data.id_tool || data.toolId,
       id,
       data.files
     );

@@ -12,6 +12,9 @@
     <v-flex xs12 sm4 mx-1>
       <type-select v-on:change="typeChangeInner" :return-object="false" />
     </v-flex>
+    <v-flex xs12 sm4 mx-1>
+      <status-select v-on:change="statusChangeInner" :return-object="false" />
+    </v-flex>
     <!--
     <v-flex xs12 sm4 mx-1>
       <date-range-picker v-on:change="dateChangeInner" />
@@ -28,11 +31,12 @@
 
 <script>
 import Employee from "../../tool/EmployeeSelect";
-import Type from "./TypeSelect";
+import { TypeSelect, StatusSelect } from ".";
 export default {
   components: {
     "employee-select": Employee,
-    "type-select": Type
+    "type-select": TypeSelect,
+    "status-select": StatusSelect
   },
   props: {
     filterChange: Function,
@@ -43,6 +47,7 @@ export default {
       submitter: [],
       resolver: [],
       type: [],
+      status: [],
       date: []
     }
   }),
@@ -77,6 +82,9 @@ export default {
     },
     typeChangeInner(values) {
       this.filter.type = values;
+    },
+    statusChangeInner(values) {
+      this.filter.status = values;
     },
     dateChangeInner(values) {
       this.filter.date = values;

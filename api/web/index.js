@@ -11,6 +11,7 @@ const cors = require("@koa/cors");
 const Multy = require("multy");
 const jwt = require("koa-jwt");
 
+const Log = require("../modules/db/log");
 const router = require("./router");
 
 const config = {
@@ -45,6 +46,7 @@ app
     })
   )
   .use(cors())
+  .use(Log())
   .use(router())
   .use(koaStatic(__dirname + "/public"))
   .listen(config.port);

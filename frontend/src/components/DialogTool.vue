@@ -11,7 +11,7 @@
               <v-combobox v-model="editedItem.supplier" :items="suppliers" label="Dodavatel"></v-combobox>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-select return-object :items="categories" item-text="name" v-model="editedItem.categories" label="Kategorie"></v-select>
+              <v-select return-object multiple :items="categories" item-text="name" v-model="editedItem.categories" label="Kategorie" ></v-select>
             </v-flex>
             <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.name" label="Název stroje"></v-text-field>
@@ -59,7 +59,7 @@
                 <v-text-field slot="activator" v-model="editedItem.guaranteeInto" label="Záruka do" prepend-icon="event" readonly></v-text-field>
                 <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.guaranteeInto" no-title scrollable>
                   <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="guaranteeInto = false">Cancel</v-btn>
+                  <v-btn flat color="primary" @click="guaranteeInto = false">Zrušit</v-btn>
                   <v-btn flat color="primary" @click="$refs.menu2.save(editedItem.guaranteeInto)">OK</v-btn>
                 </v-date-picker>
               </v-menu>
@@ -133,8 +133,8 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-        <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="close">Zrušit</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="save">Uložit</v-btn>
       </v-card-actions>
     </v-card>
     <!--

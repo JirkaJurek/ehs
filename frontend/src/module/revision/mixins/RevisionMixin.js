@@ -6,16 +6,20 @@ const toJson = data => {
   }
 };
 
-import { DialogRevisionType } from "../components";
+import { DialogRevision } from "../components/dialog";
 export default {
   methods: {
-    async editItem(id = 0, defaultItem= {}) {
+    async editItem(id = 0, defaultItem = {}, selectedIds = []) {
       if (id) {
-        defaultItem.revisionInterval = toJson(defaultItem.revisionInterval);
+        defaultItem = {
+          ...toJson(defaultItem),
+          revisionType: this.toJson(defaultItem.revisionType),
+          files: this.toJson(defaultItem.files)
+        };
       }
       this.$store.commit(
         "setComponent",
-        <DialogRevisionType defaultItem={defaultItem} id={id} />
+        <DialogRevision defaultItem={defaultItem} id={id} selectedIds={selectedIds} />
       );
     }
   }

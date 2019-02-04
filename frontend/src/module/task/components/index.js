@@ -1,4 +1,6 @@
 export { default as NewFulfillmentButton } from "./NewFulfillmentButton.vue";
+export { default as TypeSelect } from "./TypeSelect.vue";
+export { default as StatusSelect } from "./StatusSelect.vue";
 
 import DoneButtonComponent from "./DoneButton.vue"
 import NewButtonComponent from "./NewButton.vue"

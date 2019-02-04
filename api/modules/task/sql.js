@@ -110,7 +110,21 @@ function list(query, defaultFilter) {
   if (filter.type && filter.type.length) {
     builder.where(`type IN('${filter.type.join("','")}')`);
   }
+  if (filter.status && filter.status.length) {
+    let statusWhere = [];
+    if (filter.status.indexOf(1) !== -1) {
+      statusWhere.push(`(doneAt IS NULL AND JSON_LENGTH(taskFulfillment) = 0)`)
+    }
+    if (filter.status.indexOf(2) !== -1) {
+      statusWhere.push(`(doneAt IS NULL AND JSON_LENGTH(taskFulfillment) > 0)`)
+    }
+    if (filter.status.indexOf(3) !== -1) {
+      statusWhere.push(`doneAt IS NOT NULL`)
+    }
+    builder.where(`(${statusWhere.join(' OR ')})`);
+  }
   builder.where("deletedAt IS NULL");
+  builder.orderBy("id", "true");
   return execQuery(builder.getSql());
 }
 

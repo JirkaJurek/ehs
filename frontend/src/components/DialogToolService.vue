@@ -15,7 +15,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" flat @click.native="showDialogNewService(itemRevisionsId)">Nový servis</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="dialogAllService=false">Cancel</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="dialogAllService=false">Zrušit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -41,8 +41,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeDialognewService">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="addRevision">Save</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="closeDialognewService">Zrušit</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="addRevision">Uložit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

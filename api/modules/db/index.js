@@ -2,17 +2,18 @@
 
 require("dotenv").config();
 
-var queryBuilder = require('./queryBuilder');
+const { always, cond, test } = require("ramda");
+const queryBuilder = require("./queryBuilder");
 
-const Client = require('mariasql');
+const Client = require("mariasql");
 function newConect() {
-    return new Client({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        db: process.env.DB_DBNAME,
-        charset: 'utf8',
-    })
+  return new Client({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    db: process.env.DB_DBNAME,
+    charset: "utf8"
+  });
 }
 let db = newConect();
 let destroyDb = null;
@@ -20,27 +21,47 @@ let destroyDb = null;
 module.exports.db = db;
 module.exports.escape = Client.escape;
 
-module.exports.execQuery = (str, values, config, cb) => new Promise((resolve, reject) => {
+module.exports.execQuery = (str, values, config, cb, noLog = false) =>
+  new Promise((resolve, reject) => {
     if (destroyDb) {
-        clearTimeout(destroyDb);
+      clearTimeout(destroyDb);
     }
     if (!db.connecting) {
-        db = newConect();
+      db = newConect();
     }
     db.query(str, values, config, (error, data) => {
-        destroyDb = setTimeout(() => {
-            if (db.connected || db.connecting || !db.closing) {
-                db.end();
-            }
-        }, 60000)
-        db.end();
-        if (error) {
-            reject(error);
-        } else {
-            resolve(data);
+      destroyDb = setTimeout(() => {
+        if (db.connected || db.connecting || !db.closing) {
+          db.end();
         }
+      }, 60000);
+      db.end();
+      if (error) {
+        reject(error);
+      } else {
+        resolve(data);
+      }
     });
-});
+    if (!noLog) {
+      const type = cond([
+        [test(/INSERT INTO /i), always("insert")],
+        [test(/UPDATE /i), always("update")],
+        [test(/DELETE /i), always("delete")],
+        [always(true), always(false)]
+      ])(str);
+      if (type) {
+        db.query(
+          "INSERT INTO `log` (`sql`, `values`, userId, type) VALUES (:str, :values, :userId, :type);",
+          {
+            str,
+            values: JSON.stringify(values),
+            userId: 1,
+            type: type
+          }
+        );
+      }
+    }
+  });
 
 module.exports.queryBuilder = queryBuilder;
 

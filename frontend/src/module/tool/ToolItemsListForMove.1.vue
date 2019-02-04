@@ -5,6 +5,10 @@
         <th>Název nástroje</th>
         <th>Sklad</th>
         <th>Počet nových kusu</th>
+        <th>Cena kus bez DPH</th>
+        <th>Dodavatel</th>
+        <th>Číslo dokladu</th>
+        <th>Datum nákupu</th>
       </tr>
     </template>
     <template slot="items" slot-scope="props">
@@ -18,6 +22,21 @@
       <td class="text-xs-center">
         <v-text-field v-model="props.item.number" :min="0" @change="changeCount(props.item)" type="number"></v-text-field>
       </td>
+      <td class="text-xs-center">
+        <v-text-field v-model="props.item.price" :min="0" type="number"></v-text-field>
+      </td>
+      <td class="text-xs-center">
+        <v-combobox v-model="props.item.supplier" :items="suppliers"></v-combobox>
+      </td>
+      <td class="text-xs-center">
+        <v-text-field v-model="props.item.invoiceNumber"></v-text-field>
+      </td>
+      <td class="text-xs-center">
+        <v-menu :close-on-content-click="false" v-model="purchaseDate" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+          <v-text-field slot="activator" v-model="props.item.purchaseDate" prepend-icon="event" readonly></v-text-field>
+          <v-date-picker locale="cz" :first-day-of-week="1" v-model="props.item.purchaseDate" @input="purchaseDate = false"></v-date-picker>
+        </v-menu>
+      </td>
     </template>
     <template slot="no-data">
       <td colspan="4" class="text-xs-center">
@@ -30,6 +49,7 @@
 
 <script>
 // tahle komponenta je potřeba celé překopat
+// dodělat ukládání u dodavatele
 import {
   append,
   applySpec,
@@ -57,9 +77,13 @@ export default {
     }
   },
   data: () => ({
+    purchaseDate: false,
     items: []
   }),
   computed: {
+    suppliers() {
+      return this.$store.state.tool.suppliers;
+    }
     // items() {
     //   return pipe(
     //     map(y =>
@@ -82,11 +106,11 @@ export default {
   },
   watch: {
     tools(val) {
-      this.init(val)
+      this.init(val);
     }
   },
   created() {
-    this.init(this.tools)
+    this.init(this.tools);
   },
   methods: {
     init(tools) {

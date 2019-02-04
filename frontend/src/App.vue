@@ -6,7 +6,7 @@
     <template v-else>
       <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
         <v-list dense>
-          <template v-for="item in items">
+          <template v-for="item in itemsByPermissions">
             <v-layout v-if="item.heading" :key="item.heading" row align-center>
               <v-flex xs6>
                 <v-subheader v-if="item.heading">
@@ -52,7 +52,9 @@
       <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="blue darken-3" dark app fixed>
         <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
           <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-          <span class="hidden-sm-and-down">MTeZ s.r.o. INTRANET</span>
+          <router-link tag="span" to="/" style="cursor: pointer;">
+            MTeZ s.r.o. INTRANET
+          </router-link>
         </v-toolbar-title>
         <v-autocomplete @change="changeAutocomplete" :items="autocomplete.items" v-model="autocomplete.select" cache-items flat hide-details label="Search" solo-inverted class="hidden-sm-and-down"></v-autocomplete>
         <v-spacer></v-spacer>
@@ -70,7 +72,7 @@
 </template>
 
 <script>
-import { propEq, find, prop } from "ramda";
+import { propEq, find, prop, filter } from "ramda";
 import RenderComponent from "./components/RenderComponent";
 export default {
   components: {
@@ -80,22 +82,54 @@ export default {
     dialog: false,
     drawer: false,
     items: [
-      { icon: "build", text: "Nástroje", path: "/fe/tools" },
-      { icon: "category", text: "Kategorie", path: "/fe/tools/categories" },
-      { icon: "people", text: "Zaměstnanci", path: "/fe/users" },
-      { icon: "store", text: "Sklady", path: "/fe/warehouse" },
+      {
+        icon: "build",
+        text: "Nástroje",
+        path: "/fe/tools",
+        auth: ["page", "Tool"]
+      },
+      {
+        icon: "category",
+        text: "Kategorie",
+        path: "/fe/tools/categories",
+        auth: ["page", "Categories"]
+      },
+      {
+        icon: "people",
+        text: "Zaměstnanci",
+        path: "/fe/users",
+        auth: ["page", "User"]
+      },
+      {
+        icon: "store",
+        text: "Sklady",
+        path: "/fe/warehouse",
+        auth: ["page", "Warehouse"]
+      },
       {
         icon: "schedule",
         text: "Typy revizí",
-        path: "/fe/tools/revision-type"
+        path: "/fe/tools/revision-type",
+        auth: ["page", "RevisionType"]
       },
       {
         icon: "update",
         text: "Blížící se revize",
-        path: "/fe/tools/revision-upcoming"
+        path: "/fe/tools/revision-upcoming",
+        auth: ["page", "RevisionUpcoming"]
       },
-      { icon: "store", text: "Historie skladu", path: "/fe/move-history" },
-      { icon: "date_range", text: "Úkoly", path: "/fe/task" },
+      {
+        icon: "store",
+        text: "Historie skladu",
+        path: "/fe/move-history",
+        auth: ["page", "MoveHistory"]
+      },
+      {
+        icon: "date_range",
+        text: "Úkoly",
+        path: "/fe/task",
+        auth: ["page", "Task"]
+      },
       { icon: "power_settings_new", text: "Odhlásit se", path: "/fe/logout" }
       // {
       //   icon: "keyboard_arrow_up",
@@ -128,6 +162,12 @@ export default {
       return this.$store.state.mainModal
         ? this.$store.state.mainModal.myData
         : null;
+    },
+    itemsByPermissions() {
+      return filter(
+        ({ auth }) => (auth ? this.$ability.can(auth[0], auth[1]) : true),
+        this.items
+      );
     }
   },
   created() {

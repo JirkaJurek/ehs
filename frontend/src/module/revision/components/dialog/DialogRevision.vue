@@ -8,14 +8,14 @@
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12 sm6 md4>
-              <v-date-picker v-model="newRevision.date"></v-date-picker>
-              <v-text-field v-model="newRevision.date" label="Datum"></v-text-field>
+              <v-date-picker v-model="editedItem.date"></v-date-picker>
+              <v-text-field v-model="editedItem.date" label="Datum"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-select return-object :items="revisionTypes" v-model="newRevision.revisionType" item-text="name" label="Typy revize" persistent-hint></v-select>
-              <v-textarea v-model="newRevision.description" label="Popisek"></v-textarea>
-              <v-text-field v-model="newRevision.who" label="Kdo"></v-text-field>
-              <upload-file v-on:update="updateImages" :selectedFiles="transformFiles(newRevision.files)" ref="uploadFile"></upload-file>
+              <v-select return-object :items="revisionTypes" v-model="editedItem.revisionType" :item-text="revisionTypeName" label="Typy revize" persistent-hint></v-select>
+              <v-textarea v-model="editedItem.description" label="Popisek"></v-textarea>
+              <v-text-field v-model="editedItem.who" label="Kdo"></v-text-field>
+              <upload-file v-on:update="updateImages" :selectedFiles="transformFiles(editedItem.files)" ref="uploadFile"></upload-file>
             </v-flex>
           </v-layout>
         </v-container>
@@ -32,8 +32,8 @@
 <script>
 import { map, prop } from "ramda";
 export default {
-  props: ["defaultItem", "id"],
-  name: "DialogToolRevisionType",
+  props: ["defaultItem", "id", "selectedIds"],
+  name: "DialogRevision",
   data: () => ({
     editedItem: {}
   }),
@@ -41,44 +41,39 @@ export default {
     formTitle() {
       return this.id > 0 ? "Editace typů revize" : "Nový typ revize";
     },
-    revisionInterval() {
-      return this.$store.state.tool.revisionInterval;
+    revisionTypes() {
+      return this.$store.state.tool.revisionType;
     }
   },
   created() {
     this.editedItem = this.defaultItem;
   },
   methods: {
+    revisionTypeName({ name, description }) {
+      return `${name} (${description})`;
+    },
     transformFiles(files) {
       if (!files) {
         return [];
       }
       return map(prop("id"), this.toJson(files));
     },
+    updateImages(data) {
+      this.editedItem.files = data;
+    },
     close() {
       this.$store.commit("setComponent", null);
     },
-    save() {
-      if (this.editRevisonId) {
-        this.axios
-          .post(`/tools/revisions/${this.editRevisonId}`, this.newRevision)
-          .then(() => {
-            this.$store.dispatch("loadAllTool");
-          });
+    async save() {
+      if (this.id) {
+        await this.axios.post(`/tools/revisions/${this.id}`, this.editedItem);
       } else {
-        const items =
-          this.itemRevisionsId > 0
-            ? [this.itemRevisionsId]
-            : map(prop("id"), this.selected);
-        this.axios
-          .post("/tools/revisions", {
-            items,
-            revision: this.newRevision
-          })
-          .then(() => {
-            this.$store.dispatch("loadAllTool");
-          });
+        await this.axios.post("/tools/revisions", {
+          items: this.selectedIds,
+          revision: this.editedItem
+        });
       }
+      this.$store.dispatch("loadAllTool");
       this.close();
     }
   }

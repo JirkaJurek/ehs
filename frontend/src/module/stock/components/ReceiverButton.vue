@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { cleanMove, setType, setExporter } from "./index";
+import { cleanMove, setType, setExporter } from "../index";
 export default {
   name: "ReceiverButton",
   data: () => ({}),

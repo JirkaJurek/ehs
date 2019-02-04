@@ -25,6 +25,8 @@ export default {
         let { data } = await this.axios.get(`/tools/${id}`);
         defaultItem = {
           ...data,
+          items: data.items ? toJson(data.items) : [],
+          files: data.files ? toJson(data.files) : [],
           categories: toJson(data.categories),
           check: !!parseInt(data.check)
         };
@@ -38,10 +40,10 @@ export default {
 
       this.$store.commit(
         "setComponent",
-        <DialogTool defaultItem={defaultItem} id={id} formTitle={formTitle} />
+        <DialogTool defaultItem={defaultItem} itemId={id} formTitle={formTitle} />
       );
     },
-    async bulkDeleteItem(id, selected) {
+    async deleteItem(id, selected) {
       if (
         confirm(
           `Opravdu chcete smazat ${id ? "tuto položku" : "tyto položky"}?`
