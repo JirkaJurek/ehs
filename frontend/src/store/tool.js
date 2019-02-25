@@ -22,7 +22,12 @@ export default {
       { value: "24 month", text: "24 měsíců" },
       { value: "36 month", text: "36 měsíců" },
       { value: "48 month", text: "48 měsíců" },
-      { value: "60 month", text: "60 měsíců" }
+      { value: "60 month", text: "60 měsíců" },
+      { value: "72 month", text: "72 měsíců" },
+      { value: "84 month", text: "84 měsíců" },
+      { value: "96 month", text: "96 měsíců" },
+      { value: "108 month", text: "108 měsíců" },
+      { value: "120 month", text: "120 měsíců" },
     ],
     columns: [
       { text: "Dodavatel", value: "supplier", align: "center" },

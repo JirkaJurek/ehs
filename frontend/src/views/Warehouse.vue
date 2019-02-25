@@ -1,31 +1,40 @@
 <template>
   <div>
     <v-layout my-3 display-2 align-center justify-center>Přehled skladů</v-layout>
-    <div xs12 color="white">
-      <new-warehouse />
-    </div>
-    <v-data-table :search=search :headers="headers" :items="warehouses" class="elevation-1" item-key="id" hide-actions>
-      <template slot="items" slot-scope="{item}">
-        <tr>
-          <td class="text-xs-center">{{ item.number }}</td>
-          <td class="text-xs-center">{{ item.name }}</td>
-          <td class="text-xs-center">{{ toJson(item.accountableEmployee) | employeeName }}</td>
-          <td class="text-xs-center">{{ item.description }}</td>
-          <td class="justify-center layout px-0">
-            <edit-warehouse :id="item.id" />
-            <delete-warehouse :id="item.id" />
-          </td>
-        </tr>
-      </template>
-      <v-alert slot="no-results" :value="true" color="error" icon="warning">
-        Nebyl nalezen žádný výsledek pro výraz "{{ search }}".
-      </v-alert>
-    </v-data-table>
+    <v-card class="mx-3">
+      <v-card-text>
+        <div xs12 color="white">
+          <new-warehouse />
+        </div>
+        <v-data-table :search=search :headers="headers" :items="warehouses" class="elevation-1" item-key="id" hide-actions>
+          <template slot="items" slot-scope="{item}">
+            <tr>
+              <td class="text-xs-center">{{ item.number }}</td>
+              <td class="text-xs-center">{{ item.name }}</td>
+              <td class="text-xs-center">{{ toJson(item.accountableEmployee) | employeeName }}</td>
+              <td class="text-xs-center">{{ item.description }}</td>
+              <td class="justify-center layout px-0">
+                <edit-warehouse :id="item.id" />
+                <delete-warehouse :id="item.id" />
+              </td>
+            </tr>
+          </template>
+          <v-alert slot="no-results" :value="true" color="error" icon="warning">
+            Nebyl nalezen žádný výsledek pro výraz "{{ search }}".
+          </v-alert>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
   </div>
+
 </template>
 
 <script>
-import { NewButton, EditButton, DeleteButton } from "../module/warehouse/components";
+import {
+  NewButton,
+  EditButton,
+  DeleteButton
+} from "../module/warehouse/components";
 export default {
   components: {
     "new-warehouse": NewButton,

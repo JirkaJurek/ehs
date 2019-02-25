@@ -1,29 +1,38 @@
 <template>
-  <v-data-table :items="moveStock" class="elevation-1" :rows-per-page-items="rowsItem">
-    <template slot="headers" slot-scope="props">
-      <tr>
-        <th>Typ</th>
-        <th>Upřesnění</th>
-        <th>Datum</th>
-        <th>Akce</th>
-      </tr>
-    </template>
-    <template slot="items" slot-scope="props">
-      <td class="text-xs-center">{{ props.item.exporter == 0 ? 'Přijemka' : 'Výdejka' }}</td>
-      <td class="text-xs-center">{{ getType(props.item.type) }}</td>
-      <td class="text-xs-center">{{ dateFormat(props.item.createdAt) }}</td>
-      <td class="text-xs-center">
-        <v-btn flat icon @click="detail(props.item)" title="detail">
-          <v-icon>remove_red_eye</v-icon>
-        </v-btn>
-      </td>
-    </template>
-    <template slot="no-data">
-      <td colspan="4" class="text-xs-center">
-        Žádná data
-      </td>
-    </template>
-  </v-data-table>
+  <div>
+    <v-layout my-3 display-2 align-center justify-center>Historie skladů</v-layout>
+    <v-card class="mx-3">
+      <v-card-text>
+        <v-data-table :items="moveStock" class="elevation-1" :rows-per-page-items="rowsItem">
+          <template slot="headers" slot-scope="props">
+            <tr>
+              <th>Číslo revize</th>
+              <th>Typ</th>
+              <th>Upřesnění</th>
+              <th>Datum</th>
+              <th>Akce</th>
+            </tr>
+          </template>
+          <template slot="items" slot-scope="props">
+            <td class="text-xs-center">{{ props.item.number }}</td>
+            <td class="text-xs-center">{{ props.item.exporter == 0 ? 'Přijemka' : 'Výdejka' }}</td>
+            <td class="text-xs-center">{{ getType(props.item.type) }}</td>
+            <td class="text-xs-center">{{ dateFormat(props.item.createdAt) }}</td>
+            <td class="text-xs-center">
+              <v-btn flat icon @click="detail(props.item)" title="detail">
+                <v-icon>remove_red_eye</v-icon>
+              </v-btn>
+            </td>
+          </template>
+          <template slot="no-data">
+            <td colspan="4" class="text-xs-center">
+              Žádná data
+            </td>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>

@@ -15,9 +15,9 @@
                 <v-select :rules="inputRequired" v-model="editedItem.type" :items="types" label="Oblast úkolu" />
               </v-flex>
               <v-flex xs12 sm6 md3>
-                <v-menu v-model="presumedEnd" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                <v-menu :close-on-content-click="false" v-model="presumedEnd" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
                   <v-text-field :rules="inputRequired" slot="activator" v-model="editedItem.presumedEnd" label="Předpokládaný termín vyřešení" prepend-icon="event" readonly></v-text-field>
-                  <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.presumedEnd" @input="startWork = false"></v-date-picker>
+                  <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.presumedEnd" @input="presumedEnd = false"></v-date-picker>
                 </v-menu>
               </v-flex>
               <v-flex xs12>

@@ -3,7 +3,7 @@
     <v-toolbar flat color="white" class="filter">
       <slot name="filters" :categoryChange="categoryChange" :searchChange="searchChange" :employeeChange="employeeChange" :warehouseChange="warehouseChange"></slot>
     </v-toolbar>
-    <v-data-table id="toolTable" :search=search :custom-sort="customSort" :headers="headers" :items="tools" class="elevation-1" v-model="selected" item-key="id" select-all :rows-per-page-items="rowsItem">
+    <v-data-table id="toolTable" :search=search :custom-sort="customSort" :headers="headers" :items="tools" class="elevation-3" v-model="selected" item-key="id" select-all :rows-per-page-items="rowsItem">
       <template slot="items" slot-scope="props">
         <tr>
           <td>
@@ -21,7 +21,7 @@
 
 <style>
 #toolTable {
-  border-top: #c1c1c1 2px solid;
+  margin-top: 4px;
 }
 #toolTable .whiteSpace {
   white-space: inherit;

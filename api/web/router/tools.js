@@ -104,7 +104,7 @@ router.post("/move/:id(\\d+)/return-all", async (ctx, next) => {
   ctx.status = 200;
 });
 router.get("/move", async (ctx, next) => {
-  ctx.body = await tools.service.listMove();
+  ctx.body = await tools.service.listMove(ctx.request.query);
 });
 
 module.exports = router;

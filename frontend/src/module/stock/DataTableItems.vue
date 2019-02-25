@@ -9,6 +9,7 @@
         <th v-if="type == 0">Dodavatel</th>
         <th v-if="type == 0">Číslo dokladu</th>
         <th v-if="type == 0">Datum nákupu</th>
+        <th v-if="type == 0">Poznámka</th>
         <th v-if="type == 2">Vráceno kusu</th>
       </tr>
     </template>
@@ -20,6 +21,7 @@
       <td v-if="type == 0" class="text-xs-center">{{ props.item.supplier }}</td>
       <td v-if="type == 0" class="text-xs-center">{{ props.item.invoiceNumber }}</td>
       <td v-if="type == 0" class="text-xs-center">{{ props.item.purchaseDate }}</td>
+      <td v-if="type == 0" class="text-xs-center">{{ props.item.description }}</td>
       <td class="text-xs-center" v-if="type == 2">{{ props.item.returned || 0 }}</td>
     </template>
     <template slot="no-data">

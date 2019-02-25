@@ -2,6 +2,7 @@
   <v-data-table :items="items" hide-actions class="elevation-1">
     <template slot="headers" slot-scope="props">
       <tr>
+        <th></th>
         <th>Název nástroje</th>
         <th>Sklad</th>
         <th>Počet nových kusu</th>
@@ -9,15 +10,21 @@
         <th>Dodavatel</th>
         <th>Číslo dokladu</th>
         <th>Datum nákupu</th>
+        <th>Poznámka</th>
       </tr>
     </template>
     <template slot="items" slot-scope="props">
+      <td class="text-xs-center">
+        <v-btn @click="addItem(props.item, props.index)" fab dark small color="primary">
+          <v-icon dark>add</v-icon>
+        </v-btn>
+      </td>
       <td class="text-xs-center">{{ getToolName(props.item.toolId) }}</td>
       <td class="text-xs-center">
         <span v-if="props.item.count > 0">
           {{ props.item.warehouse.name }}
         </span>
-        <warehouse-select v-else v-on:change="(value) => {props.item.warehouse = value}" :multiple="false" />
+        <warehouse-select v-else :value="props.item.warehouse" v-on:change="(value) => {props.item.warehouse = value}" :multiple="false" />
       </td>
       <td class="text-xs-center">
         <v-text-field v-model="props.item.number" :min="0" @change="changeCount(props.item)" type="number"></v-text-field>
@@ -36,6 +43,9 @@
           <v-text-field slot="activator" v-model="props.item.purchaseDate" prepend-icon="event" readonly></v-text-field>
           <v-date-picker locale="cz" :first-day-of-week="1" v-model="props.item.purchaseDate" @input="purchaseDate = false"></v-date-picker>
         </v-menu>
+      </td>
+      <td class="text-xs-center">
+        <v-text-field v-model="props.item.description"></v-text-field>
       </td>
     </template>
     <template slot="no-data">
@@ -57,6 +67,7 @@ import {
   find,
   flatten,
   head,
+  insert,
   map,
   pipe,
   prop,
@@ -123,6 +134,18 @@ export default {
           });
         })
       )(tools);
+
+      this.items = filter(x => find(propEq("id", x.toolId), tools), this.items);
+    },
+    addItem(item, key) {
+      this.items = insert(
+        ++key,
+        {
+          id_tool: item.toolId,
+          toolId: item.toolId
+        },
+        this.items
+      );
     },
     changeCount(item) {
       addAllItems(
@@ -135,13 +158,6 @@ export default {
           sortBy(prop("toolId"))
         )(this.$store.state.stock.moveItems.items)
       );
-      this.items = pipe(
-        append({
-          id_tool: item.toolId,
-          toolId: item.toolId
-        }),
-        sortBy(prop("toolId"))
-      )(this.items);
     },
     getToolName(toolId) {
       return this.$store.getters.getToolNameById(toolId);
@@ -152,13 +168,6 @@ export default {
         toolId: item.id_tool,
         warehouse: this.toJson(item.warehouse)
       };
-    },
-    toJson(data) {
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        return data;
-      }
     }
   }
 };

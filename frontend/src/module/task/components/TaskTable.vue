@@ -1,10 +1,10 @@
 <template>
   <div id="TaskTable">
     <new-task />
-    <v-toolbar flat color="white" class="filter">
+    <div class="filter">
       <slot name="filters" :filterChange="filterChange" :searchChange="searchChange"></slot>
-    </v-toolbar>
-    <v-data-table :search=search :rows-per-page-items="[25, 50, 100, {text: 'vše', value:-1}]" disable-initial-sort :headers="headers" :items="tasks" class="elevation-1" item-key="id">
+    </div>
+    <v-data-table :search=search :rows-per-page-items="[25, 50, 100, {text: 'vše', value:-1}]" disable-initial-sort :headers="headers" :items="tasks" class="elevation-3 table" item-key="id">
       <template slot="items" slot-scope="props">
         <tr>
           <td class="text-xs-center">{{ props.item.number }}</td>
@@ -38,6 +38,9 @@
 </template>
 
 <style>
+#TaskTable .table {
+  margin-top: 4px;
+}
 #TaskTable .propName {
   min-width: 800px;
 }

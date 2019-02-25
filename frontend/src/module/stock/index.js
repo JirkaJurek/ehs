@@ -107,6 +107,14 @@ export const isCorrectOrRepair = item => {
   return item;
 };
 export const createMove = store => {
+  store.state.stock.moveItems.items.forEach(item => {
+    if (
+      item.supplier &&
+      store.state.tool.suppliers.indexOf(item.supplier) === -1
+    ) {
+      store.commit("newSupplier", item.supplier);
+    }
+  });
   axios.post("/tools/move", store.state.stock.moveItems).then(() => {
     store.dispatch("loadAllTool");
     store.dispatch("allMoveStock");

@@ -17,7 +17,7 @@
 
 <script>
 import { find, pipe, propEq, prop, map, split } from "ramda";
-import moment from "moment";
+import { addMonths, format } from "date-fns";
 export default {
   data() {
     return {
@@ -30,7 +30,7 @@ export default {
       ],
       items: [],
       selected: [],
-      bulk: true,
+      bulk: true
     };
   },
   created() {
@@ -46,7 +46,7 @@ export default {
   watch: {
     selected(val) {
       this.bulk = val.length ? false : true;
-    },
+    }
   },
   methods: {
     getNextRevision(revisions) {
@@ -62,9 +62,8 @@ export default {
           prop("value"),
           split(" ")
         )(newestRevision.revisionType);
-        return moment(newestRevision.date)
-          .add(c, y)
-          .format("D. M. YYYY");
+        // napevno nastavený že je to vždy měsíc, podle y by se dali udělat i jiné podmínky
+        return format(addMonths(newestRevision.date, c), "D. M. YYYY");
       }
       return "";
     },

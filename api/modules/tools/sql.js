@@ -359,15 +359,54 @@ const stockFunction = {
   createRecord: async data => {
     data.itemsJSON = data.items ? JSON.stringify(data.items) : "[]";
     data.exporterN = data.exporter ? 1 : 0;
+    data.number = `${moment(new Date()).format("YY")}${
+      data.type === 0 ? "P" : "V"
+    }${(
+      "000" +
+      (Number(
+        (await stockFunction.list({
+          filter: JSON.stringify({
+            dateRange: [
+              moment()
+                .startOf("year")
+                .format("YYYY-MM-DD")
+            ],
+            type: [data.type]
+          })
+        })).info.numRows
+      ) +
+        1)
+    ).substr(-4)}`;
     await execQuery(
-      `INSERT INTO move_stock (type, exporter, items, createdAt) VALUES (:type, :exporterN, :itemsJSON, NOW());`,
+      `INSERT INTO move_stock (number, type, exporter, items, createdAt) VALUES (:number, :type, :exporterN, :itemsJSON, NOW());`,
       data
     );
     map(x => {
       return itemFunction.add(x, data.type);
     }, data.items);
   },
-  list: () => execQuery(`SELECT * FROM move_stock ORDER BY createdAt DESC;`),
+  list: query => {
+    const builder = new queryBuilder();
+    const filter = query.filter ? JSON.parse(query.filter) : {};
+    builder.from("move_stock").orderBy("createdAt", true);
+    if (filter.dateRange && filter.dateRange.length) {
+      const end =
+        filter.dateRange[1] ||
+        moment()
+          .endOf("year")
+          .format("YYYY-MM-DD");
+      builder.where(`createdAt BETWEEN '${filter.dateRange[0]}' AND '${end}'`);
+    }
+    if (filter.type && filter.type.length) {
+      builder.where(
+        `type IN('${filter.type
+          .map(x => parseInt(x))
+          .filter(x => x > 0)
+          .join(",")}')`
+      );
+    }
+    return execQuery(builder.getSql());
+  },
   showById: id => execQuery(`SELECT * FROM move_stock WHERE id = ?;`, [id]),
   returnedAll: async id => {
     const item = nth(0, await stockFunction.showById(id));
@@ -419,7 +458,7 @@ function list(query) {
     );
   }
   if (filter.revisionTypes && filter.revisionTypes.length) {
-    builder.join("tool_revision_type", `trt.id_tool = ${tableName}.id`, "trt");
+    builder.join("tool_revision", `trt.id_tool = ${tableName}.id`, "trt");
     builder.where(
       `trt.id_tool_revision_types IN(${filter.revisionTypes
         .map(x => parseInt(x))
@@ -453,7 +492,7 @@ function list(query) {
       )}")`
     );
   }
-
+  
   return execQuery(builder.getSql());
 }
 

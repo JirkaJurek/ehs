@@ -146,7 +146,10 @@ export default {
         { text: "Kategorie", path: "/fe/tools/categories" },
         { text: "Typy revizí", path: "/fe/tools/revision-type" },
         { text: "Blížící se revize", path: "/fe/tools/revision-upcoming" },
-        { text: "Historie skladu", path: "/fe/move-history" }
+        { text: "Historie skladu", path: "/fe/move-history" },
+        { text: "Zaměstnanci", path: "/fe/users" },
+        { text: "Zaměstnanci 1", path: "/fe/users-1" },
+        { text: "Zaměstnanci 2", path: "/fe/users-2" },
       ],
       selected: []
     }

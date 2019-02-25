@@ -1,6 +1,6 @@
 <template>
-  <v-stepper v-model="page">
-    <v-stepper-header>
+  <v-stepper v-model="page" style="background-color:#fafafa">
+    <v-stepper-header style="background-color:#ffffff">
       <v-stepper-step :complete="page > 1" editable step="1" @click="page = 1">Výběr nástrojů</v-stepper-step>
       <v-divider></v-divider>
       <v-stepper-step :complete="page > 2" step="2" :editable="page > 2" @click="page = 2">Jednotlivé položky</v-stepper-step>
@@ -13,11 +13,15 @@
         <v-flex offset-xs4 xs4>
           <SelectMoveType />
         </v-flex>
-        <ToolsTable :headers="headers" v-on:selectedItems="selectedTools">
-          <template slot="filters" slot-scope="slotProps">
-            <Filters v-bind="slotProps" />
-          </template>
-        </ToolsTable>
+        <v-card>
+          <v-card-text>
+            <ToolsTable :headers="headers" v-on:selectedItems="selectedTools">
+              <template slot="filters" slot-scope="slotProps">
+                <Filters v-bind="slotProps" />
+              </template>
+            </ToolsTable>
+          </v-card-text>
+        </v-card>
         <router-link tag="v-btn" :to="'/fe/tools'">Zavřít</router-link>
         <div v-bind:style="style.pageButtons">
           <v-btn color="primary" @click="nextPage">Další krok</v-btn>
@@ -36,7 +40,7 @@
       </v-stepper-content>
       <v-stepper-content step="3">
         <ItemsListPreview />
-        
+
         <router-link tag="v-btn" :to="'/fe/tools'">Zavřít</router-link>
         <div v-bind:style="style.pageButtons">
           <v-btn flat @click="previousPage">Zpět</v-btn>
@@ -91,6 +95,11 @@ export default {
       return this.$store.state.stock.moveItems.exporter
         ? "Výdejka"
         : "Přijemka";
+    },
+    createTitle() {
+      return this.$store.state.stock.moveItems.exporter
+        ? "výdejku"
+        : "přijemku";
     }
   },
   methods: {
@@ -109,7 +118,7 @@ export default {
       }, this.$store.state.tool.columns);
     },
     create() {
-      if (confirm(`Opravdu zpracovat tuto výdejku?`)) {
+      if (confirm(`Opravdu zpracovat tuto ${this.createTitle}?`)) {
         createMove(this.$store);
         this.$router.push("/fe/tools");
       }

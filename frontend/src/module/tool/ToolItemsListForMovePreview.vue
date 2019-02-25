@@ -9,6 +9,7 @@
         <th v-if="moveType === 0">Dodavatel</th>
         <th v-if="moveType === 0">Číslo dokladu</th>
         <th v-if="moveType === 0">Datum nákupu</th>
+        <th v-if="moveType === 0">Poznámka</th>
         <th>Akce</th>
       </tr>
     </template>
@@ -20,6 +21,7 @@
         <td v-if="moveType === 0" class="text-xs-center">{{ props.item.supplier }}</td>
         <td v-if="moveType === 0" class="text-xs-center">{{ props.item.invoiceNumber }}</td>
         <td v-if="moveType === 0" class="text-xs-center">{{ props.item.purchaseDate }}</td>
+        <td v-if="moveType === 0" class="text-xs-center">{{ props.item.description }}</td>
         <td class="text-xs-center">
           <v-btn flat icon @click="deleteItem(props.index)">
             <v-icon>delete</v-icon>

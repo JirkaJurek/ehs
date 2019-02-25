@@ -115,6 +115,24 @@ export default new Router({
       }
     },
     {
+      path: "/fe/users-1",
+      name: "users",
+      component: () => import("./views/Users.1"),
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "User"]
+      }
+    },
+    {
+      path: "/fe/users-2",
+      name: "users",
+      component: () => import("./views/Users.2"),
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "User"]
+      }
+    },
+    {
       path: "/fe/warehouse",
       name: "warehouse",
       component: () => import("./views/Warehouse"),

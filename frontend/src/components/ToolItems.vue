@@ -23,7 +23,7 @@
                 </template>
                 <template slot="items" item-key="warehouseId" slot-scope="{item}">
                   <tr>
-                    <td class="text-xs-center">{{ item.warehouse ? toJson(item.warehouse).name : '' }}</td>
+                    <td class="text-xs-center">{{ item.warehouse ? `${toJson(item.warehouse).number} - ${toJson(item.warehouse).name}` : '' }}</td>
                     <td class="text-xs-center">{{ item.warehouse ? (toJson(toJson(item.warehouse).accountableEmployee)) : '' | employeeName }}</td>
                     <td class="text-xs-center">{{ item.count }}</td>
                     <td class="text-xs-center">{{ item.inStock }}</td>

@@ -6,11 +6,11 @@ const { createHmac } = require("crypto");
 const jwtToken = require("jsonwebtoken");
 
 const add = data => {
-  sql.add(data);
+  return sql.add(data);
 };
 
 const update = (id, data) => {
-  sql.update(id, data);
+  return sql.update(id, data);
 };
 
 const showById = (id, withSecretData) => {

@@ -21,7 +21,36 @@ function add(data) {
   data = transformData(data);
 
   const user = execQuery(
-    `INSERT INTO ${tableName} (degree, firstName, lastName, personalNumber, description) VALUES (:degree, :firstName, :lastName, :personalNumber, :description);`,
+    `INSERT INTO ${tableName} (
+      degree,
+      firstName,
+      lastName,
+      personalNumber,
+      description,
+      nick,
+      wardrobe,
+      shirtSize,
+      tShirtSize,
+      sizeWorkTrousers,
+      sizeWorkBlouse,
+      jacketSize,
+      sweatshirtSize,
+      shoeSize
+    ) VALUES (
+      :degree,
+      :firstName,
+      :lastName,
+      :personalNumber,
+      :description,
+      :wardrobe,
+      :shirtSize,
+      :tShirtSize,
+      :sizeWorkTrousers,
+      :sizeWorkBlouse,
+      :jacketSize,
+      :sweatshirtSize,
+      :shoeSize
+    );`,
     data
   );
   return user;
@@ -32,7 +61,20 @@ function update(id, data) {
 
   const user = execQuery(
     `UPDATE ${tableName} 
-        SET degree=:degree, firstName=:firstName, lastName=:lastName, personalNumber=:personalNumber, description=:description
+        SET 
+        degree=:degree,
+        firstName=:firstName,
+        lastName=:lastName,
+        personalNumber=:personalNumber,
+        description=:description,
+        wardrobe=:wardrobe,
+        shirtSize=:shirtSize,
+        tShirtSize=:tShirtSize,
+        sizeWorkTrousers=:sizeWorkTrousers,
+        sizeWorkBlouse=:sizeWorkBlouse,
+        jacketSize=:jacketSize,
+        sweatshirtSize=:sweatshirtSize,
+        shoeSize=:shoeSize
         WHERE id=:id;`,
     data
   );

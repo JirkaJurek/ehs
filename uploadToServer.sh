@@ -13,22 +13,10 @@ scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi/web/p
 #dump databáze -> mysqldump --opt -u root  -p intranet > dbzaloha2019-01-08.sql
 # htaccess
 
+# UPDATE `config` SET
+# `id` = '1',
+# `prettyName` = 'Dodavatelé',
+# `name` = 'tool.supplier',
+# `data` = '[]'
+# WHERE `id` = '1';
 
-#CREATE TABLE `log` (
-#  `sql` longtext NOT NULL,
-#  `userId` int(11) NOT NULL,
-#  `type` varchar(255) NULL,
-#  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-#  FOREIGN KEY (`userId`) REFERENCES `user` (`id`)
-#);
-
-#ALTER TABLE `log`
-#ADD `values` longtext COLLATE 'utf8_general_ci' NULL AFTER `sql`;
-
-#UPDATE `user_permissions` SET `category` = 'Úkoly' WHERE `id` = '12';
-
-#UPDATE `user_permissions` SET `name` = 'Mazání položek', `action` = 'DeleteButton' WHERE `id` = '21';
-
-#ALTER TABLE `tool`
-#CHANGE `revisionTypes` `revisionTypes` longtext COLLATE 'utf8_general_ci' NULL COMMENT 'bude se moct odstranit' AFTER `revisions`,
-#CHANGE `itemsHistory` `itemsHistory` longtext COLLATE 'utf8_general_ci' NULL COMMENT 'bude se moct odstranit' AFTER `items`;

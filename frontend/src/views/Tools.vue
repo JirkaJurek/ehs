@@ -94,9 +94,9 @@
             </v-btn>
           </td>
           <td v-bind:class="textFontSizeClass" class="justify-center layout px-0">
-            <tool-edit-button :id="props.item.id" v-if="!filter.deletedAt"/>
-            <tool-clone-button :id="props.item.id" v-if="!filter.deletedAt"/>
-            <tool-delete-button :id="props.item.id" v-if="!filter.deletedAt"/>
+            <tool-edit-button :id="props.item.id" v-if="!filter.deletedAt" />
+            <tool-clone-button :id="props.item.id" v-if="!filter.deletedAt" />
+            <tool-delete-button :id="props.item.id" v-if="!filter.deletedAt" />
             <!--
             <v-icon small @click="showDialogAllServices(props.item)">
               build
@@ -182,7 +182,8 @@ import {
   find,
   defaultTo,
   reduce,
-  add
+  add,
+  path
 } from "ramda";
 import { getItemVariant } from "../module/stock";
 import WarehouseSelect from "../module/tool/WarehouseSelect";
@@ -192,10 +193,10 @@ import {
   BulkDeleteButton,
   DeleteButton,
   EditButton,
-  CloneButton,
+  CloneButton
 } from "../module/tool/components";
 import { NewRevisionButton } from "../module/revision/components";
-import moment from "moment";
+import { format } from "date-fns";
 export default {
   components: {
     "warehouse-select": WarehouseSelect,
@@ -388,10 +389,10 @@ export default {
       );
     },
     oneRevision(revisions) {
-      const dateFormat = x => moment(prop("date", x)).format("MM, YY");
-      return ifElse(prop("date"), dateFormat, always("Žádná revize"))(
-        head(revisions)
-      );
+      if (revisions.length) {
+        return format(revisions[0].date, "MM, YY");
+      }
+      return "Žádná revize";
     },
     showDialogAllRevisions(itemId) {
       this.$refs.revisionTool.showDialogAllRevisions(itemId);

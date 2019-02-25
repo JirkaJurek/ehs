@@ -20,6 +20,33 @@
               <v-text-field v-model="editedItem.personalNumber" label="Osobní číslo"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.nick" label="Přihlašovací jméno"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.wardrobe" label="Šatní skříňka"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.shirtSize" label="Velikost trička"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.tShirtSize" label="Velikost košile"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.sizeWorkTrousers" label="Velikost monterkových kalhot"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.sizeWorkBlouse" label="Velikost monterkových blůzy"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.jacketSize" label="Velikost bundy"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.sweatshirtSize" label="Velikost mikiny"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.shoeSize" label="Velikost boty"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
               <v-textarea v-model="editedItem.description" label="Poznámka" />
             </v-flex>
           </v-layout>

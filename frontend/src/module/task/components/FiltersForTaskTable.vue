@@ -1,18 +1,18 @@
 <template>
-  <v-toolbar flat color="white">
-    <v-flex xs12 sm4 :class="[$style.search]" mx-1>
+  <v-layout row justify-center>
+    <v-flex xs12 sm3 :class="[$style.search]" px-1>
       <v-text-field @keyup="searchChangeInner" append-icon="search" label="Vyhledávání" single-line hide-details />
     </v-flex>
-    <v-flex xs12 sm4 mx-2>
+    <v-flex xs12 sm2 px-2>
       <employee-select v-on:change="resolverChangeInner" :return-object="false" label="Řešitel" :value="[currentUserId]" />
     </v-flex>
-    <v-flex xs12 sm4 mx-2>
+    <v-flex xs12 sm2 px-2>
       <employee-select v-on:change="submitterChangeInner" :return-object="false" label="Zadavatel" />
     </v-flex>
-    <v-flex xs12 sm4 mx-1>
+    <v-flex xs12 sm2 px-1>
       <type-select v-on:change="typeChangeInner" :return-object="false" />
     </v-flex>
-    <v-flex xs12 sm4 mx-1>
+    <v-flex xs12 sm2 px-1>
       <status-select v-on:change="statusChangeInner" :return-object="false" />
     </v-flex>
     <!--
@@ -20,7 +20,7 @@
       <date-range-picker v-on:change="dateChangeInner" />
     </v-flex>
     -->
-  </v-toolbar>
+  </v-layout>
 </template>
 
 <style module>

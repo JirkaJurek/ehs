@@ -136,7 +136,7 @@ export default {
         return [];
       }
       return map(prop("id"), this.toJson(files));
-    },
+    }
   }
 };
 </script>
