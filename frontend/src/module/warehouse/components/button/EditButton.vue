@@ -5,10 +5,10 @@
 </template>
 
 <script>
-import NewOrEditMixin from "../../mixin/NewOrEditMixin";
+import Basic from "../../mixin/Basic";
 export default {
   props:['id'],
-  mixins: [NewOrEditMixin],
+  mixins: [Basic],
   auth(ability) {
     return ability.can("EditButton", "Warehouse");
   }

@@ -10,6 +10,8 @@ const configRouter = require("./config");
 const warehouseRouter = require("./warehouse");
 const taskRouter = require("./task");
 const baseRouter = require("./base");
+const addressBookRouter = require("./addressBook");
+const iso = require("./iso");
 
 const router = combineRouters(
   toolsRouter,
@@ -18,7 +20,9 @@ const router = combineRouters(
   configRouter,
   warehouseRouter,
   taskRouter,
-  baseRouter
+  baseRouter,
+  addressBookRouter,
+  iso
 );
 
 module.exports = router;

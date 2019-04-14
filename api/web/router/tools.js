@@ -18,11 +18,11 @@ router.get("/:id(\\d+)", async (ctx, next) => {
 });
 router.post("/", validate(tools.validate.postAddTool), async (ctx, next) => {
   //const { file, name2 } = ctx.request.body;
-  tools.service.add(ctx.request.body);
+  await tools.service.add(ctx.request.body);
   ctx.status = 200;
 });
 router.post("/:id(\\d+)", async (ctx, next) => {
-  tools.service.update(ctx.params.id, ctx.request.body);
+  await tools.service.update(ctx.params.id, ctx.request.body);
   ctx.status = 200;
 });
 
@@ -52,7 +52,7 @@ router.post(
 );
 
 router.delete("/:id(\\d+)", async (ctx, next) => {
-  tools.service.delete(ctx.params.id);
+  await tools.service.delete(ctx.params.id);
 });
 
 router.post("/revert/:id(\\d+)", async (ctx, next) => {

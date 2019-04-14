@@ -26,6 +26,33 @@
               <v-text-field v-model="editedItem.wardrobe" label="Šatní skříňka"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
+              <v-menu :close-on-content-click="false" v-model="dateOfOnset" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                <v-text-field slot="activator" v-model="editedItem.dateOfOnset" label="Datum nástupu" prepend-icon="event" readonly></v-text-field>
+                <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.dateOfOnset" @input="dateOfOnset = false"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.personalIdentificationNumber" label="Rodné číslo"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-textarea v-model="editedItem.address" label="Adresa" />
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.phone" label="Telefon"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.healthInsurance" label="Zdravotní pojišťovna"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.foodCart" label="Karta strávníka"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-menu :close-on-content-click="false" v-model="preventiveInspection" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                <v-text-field slot="activator" v-model="editedItem.preventiveInspection" label="Preventivní prohlídka" prepend-icon="event" readonly></v-text-field>
+                <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.preventiveInspection" @input="preventiveInspection = false"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
               <v-text-field v-model="editedItem.shirtSize" label="Velikost trička"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
@@ -47,6 +74,27 @@
               <v-text-field v-model="editedItem.shoeSize" label="Velikost boty"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.halfMask" label="Polomaska"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.phoneNumber" label="Číslo mobilu"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.phoneTariff" label="Mobilní tarif"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-checkbox v-model="editedItem.isCompanyPhone" label="Firemní telefon"></v-checkbox>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-text-field v-model="editedItem.phoneType" label="Typ telefonu"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
+              <v-menu :close-on-content-click="false" v-model="buyPhone" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                <v-text-field slot="activator" v-model="editedItem.buyPhone" label="Pořízen kdy" prepend-icon="event" readonly></v-text-field>
+                <v-date-picker locale="cz" :first-day-of-week="1" v-model="editedItem.buyPhone" @input="buyPhone = false"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-flex xs12 sm6 md4>
               <v-textarea v-model="editedItem.description" label="Poznámka" />
             </v-flex>
           </v-layout>
@@ -65,6 +113,9 @@
 export default {
   props: ['defaultItem', 'id'],
   data: () => ({
+    dateOfOnset: false,
+    preventiveInspection: false,
+    buyPhone: false,
     editedItem: {}
   }),
   computed: {

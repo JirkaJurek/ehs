@@ -1,5 +1,9 @@
+#backend
 scp -r ./api/modules ./api/web ./api/worker ./api/index.js ./api/package.json ./api/yarn.lock ./api/db.sql ./api/.env.example miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi
-scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi/web/public
+#frontend
+scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/intranetFrontend/dist
+
+#scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi/web/public
 #scp -r ./api/modules ./api/web ./api/worker ./api/index.js ./api/package.json ./api/yarn.lock ./api/db.sql ./api/.env.example miki.rosi@192.168.1.240:/home/miki.rosi/nodejsApi
 #scp -r ./frontend/dist/* miki.rosi@192.168.1.240:/home/miki.rosi/nodejsApi/web/public
 #bacha na ty soubory v public
@@ -12,11 +16,3 @@ scp -r ./frontend/dist/* miki.rosi@90.183.137.60:/home/miki.rosi/nodejsApi/web/p
 #mysql příklady -> show databases; / DROP DATABASE intranet; / create database intranet;
 #dump databáze -> mysqldump --opt -u root  -p intranet > dbzaloha2019-01-08.sql
 # htaccess
-
-# UPDATE `config` SET
-# `id` = '1',
-# `prettyName` = 'Dodavatelé',
-# `name` = 'tool.supplier',
-# `data` = '[]'
-# WHERE `id` = '1';
-

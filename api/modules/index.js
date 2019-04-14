@@ -6,6 +6,8 @@ const config = require("./config");
 const users = require("./users");
 const warehouse = require("./warehouse");
 const task = require("./task");
+const addressBook = require("./addressBook");
+const iso = require("./iso");
 
 module.exports = {
   tools,
@@ -14,4 +16,6 @@ module.exports = {
   users,
   warehouse,
   task,
+  addressBook,
+  iso
 };

@@ -1,23 +1,45 @@
 <template>
   <v-app id="inspire">
     <v-content v-if="$route.name == 'login'">
-      <router-view/>
+      <router-view />
     </v-content>
     <template v-else>
-      <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
+      <v-navigation-drawer
+        :clipped="$vuetify.breakpoint.lgAndUp"
+        v-model="drawer"
+        fixed
+        app
+      >
         <v-list dense>
           <template v-for="item in itemsByPermissions">
-            <v-layout v-if="item.heading" :key="item.heading" row align-center>
+            <v-layout
+              v-if="item.heading"
+              :key="item.heading"
+              row
+              align-center
+            >
               <v-flex xs6>
                 <v-subheader v-if="item.heading">
                   {{ item.heading }}
                 </v-subheader>
               </v-flex>
-              <v-flex xs6 class="text-xs-center">
-                <a href="#!" class="body-2 black--text">EDIT</a>
+              <v-flex
+                xs6
+                class="text-xs-center"
+              >
+                <a
+                  href="#!"
+                  class="body-2 black--text"
+                >EDIT</a>
               </v-flex>
             </v-layout>
-            <v-list-group v-else-if="item.children" v-model="item.model" :key="item.text" :prepend-icon="item.model ? item.icon : item['icon-alt']" append-icon="">
+            <v-list-group
+              v-else-if="item.children"
+              v-model="item.model"
+              :key="item.text"
+              :prepend-icon="item.model ? item.icon : item['icon-alt']"
+              append-icon=""
+            >
               <v-list-tile slot="activator">
                 <v-list-tile-content>
                   <v-list-tile-title>
@@ -25,7 +47,12 @@
                   </v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-              <router-link tag="v-list-tile" v-for="(child, i) in item.children" :to="child.path" :key="i">
+              <router-link
+                tag="v-list-tile"
+                v-for="(child, i) in item.children"
+                :to="child.path"
+                :key="i"
+              >
                 <v-list-tile-action v-if="child.icon">
                   <v-icon>{{ child.icon }}</v-icon>
                 </v-list-tile-action>
@@ -36,7 +63,12 @@
                 </v-list-tile-content>
               </router-link>
             </v-list-group>
-            <router-link tag="v-list-tile" v-else :key="item.text" :to="item.path">
+            <router-link
+              tag="v-list-tile"
+              v-else
+              :key="item.text"
+              :to="item.path"
+            >
               <v-list-tile-action>
                 <v-icon>{{ item.icon }}</v-icon>
               </v-list-tile-action>
@@ -49,30 +81,56 @@
           </template>
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="blue darken-3" dark app fixed>
-        <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+      <v-toolbar
+        :clipped-left="$vuetify.breakpoint.lgAndUp"
+        color="blue darken-3"
+        dark
+        app
+        fixed
+      >
+        <v-toolbar-title
+          style="width: 300px"
+          class="ml-0 pl-3"
+        >
           <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-          <router-link tag="span" to="/" style="cursor: pointer;">
+          <router-link
+            tag="span"
+            to="/"
+            style="cursor: pointer;"
+          >
             MTeZ s.r.o. INTRANET
           </router-link>
         </v-toolbar-title>
-        <v-autocomplete @change="changeAutocomplete" :items="autocomplete.items" v-model="autocomplete.select" cache-items flat hide-details label="Search" solo-inverted class="hidden-sm-and-down"></v-autocomplete>
+        <v-autocomplete
+          @change="changeAutocomplete"
+          :items="autocomplete.items"
+          v-model="autocomplete.select"
+          cache-items
+          flat
+          hide-details
+          label="Search"
+          solo-inverted
+          class="hidden-sm-and-down"
+        ></v-autocomplete>
         <v-spacer></v-spacer>
         <!--
       <stock-toolbar-button/>
       -->
       </v-toolbar>
       <v-content>
-        <router-view/>
+        <router-view />
       </v-content>
     </template>
-    <component v-bind:is="mainModal" :myData=mainModalData></component>
+    <component
+      v-bind:is="mainModal"
+      :myData=mainModalData
+    ></component>
     <render-component :component="getComponent" />
   </v-app>
 </template>
 
 <script>
-import { propEq, find, prop, filter } from "ramda";
+import { propEq, find, prop, filter, remove } from "ramda";
 import RenderComponent from "./components/RenderComponent";
 export default {
   components: {
@@ -82,6 +140,30 @@ export default {
     dialog: false,
     drawer: false,
     items: [
+      {
+        icon: "build",
+        text: "ISO",
+        children: [
+          {
+            icon: "build",
+            text: "Směrnice (OS)",
+            path: "/fe/directive-os",
+            auth: ["page", "ISO"]
+          },
+          {
+            icon: "build",
+            text: "Formuláře (IF)",
+            path: "/fe/form-if",
+            auth: ["page", "ISO"]
+          },
+          {
+            icon: "build",
+            text: "Rozhodutí Jednatele Společnosti (RJS)",
+            path: "/fe/decision-rjs",
+            auth: ["page", "ISO"]
+          }
+        ]
+      },
       {
         icon: "build",
         text: "Nástroje",
@@ -130,6 +212,12 @@ export default {
         path: "/fe/task",
         auth: ["page", "Task"]
       },
+      {
+        icon: "tablet_android",
+        text: "Mobily - firemní flotila",
+        path: "/fe/mobile-tariffs",
+        auth: ["page", "MobileTariffs"]
+      },
       { icon: "power_settings_new", text: "Odhlásit se", path: "/fe/logout" }
       // {
       //   icon: "keyboard_arrow_up",
@@ -149,7 +237,7 @@ export default {
         { text: "Historie skladu", path: "/fe/move-history" },
         { text: "Zaměstnanci", path: "/fe/users" },
         { text: "Zaměstnanci 1", path: "/fe/users-1" },
-        { text: "Zaměstnanci 2", path: "/fe/users-2" },
+        { text: "Zaměstnanci 2", path: "/fe/users-2" }
       ],
       selected: []
     }
@@ -167,9 +255,16 @@ export default {
         : null;
     },
     itemsByPermissions() {
+      let items = this.items;
+      const iso = filter(
+        ({ auth }) => (auth ? this.$ability.can(auth[0], auth[1]) : true),
+        items[0].children
+      );
+      items[0].children = iso;
+      items = iso.length === 0 ? remove(0, 1, items) : items;
       return filter(
         ({ auth }) => (auth ? this.$ability.can(auth[0], auth[1]) : true),
-        this.items
+        items
       );
     }
   },

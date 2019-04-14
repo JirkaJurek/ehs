@@ -16,6 +16,7 @@
               <td class="justify-center layout px-0">
                 <edit-warehouse :id="item.id" />
                 <delete-warehouse :id="item.id" />
+                <generate-pdf :id="item.id" />
               </td>
             </tr>
           </template>
@@ -33,13 +34,15 @@
 import {
   NewButton,
   EditButton,
-  DeleteButton
+  DeleteButton,
+  GeneratePdfButton
 } from "../module/warehouse/components";
 export default {
   components: {
     "new-warehouse": NewButton,
     "edit-warehouse": EditButton,
-    "delete-warehouse": DeleteButton
+    "delete-warehouse": DeleteButton,
+    "generate-pdf": GeneratePdfButton
   },
   data: () => ({
     search: "",

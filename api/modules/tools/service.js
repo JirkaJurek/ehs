@@ -27,14 +27,16 @@ module.exports.delete = id => {
   return sql.deleteById(id);
 };
 
-module.exports.deleteMore = data => {
-  return map(x => {
-    return sql.deleteById(x);
-  }, data.items);
+module.exports.deleteMore = async data => {
+  const result = await Promise.all(
+    map(x => {
+      return sql.deleteById(x);
+    }, data.items)
+  );
+  return result;
 };
 
 module.exports.addRevision = data => {
-  console.log(data);
   sql.addRevision(data);
 };
 
@@ -86,7 +88,7 @@ module.exports.revert = id => {
 module.exports.createMoveStock = data => {
   return sql.moveRecord(data);
 };
-module.exports.listMove = (query) => {
+module.exports.listMove = query => {
   return sql.listMove(query);
 };
 module.exports.returnedAllTools = id => {

@@ -4,9 +4,11 @@ const jwtToken = require("jsonwebtoken");
 const Log = options => async (ctx, next) => {
   if (
     ["POST", "PUT", "DELETE"].indexOf(ctx.request.method) !== -1 &&
+    ctx.request.url !== "/files" &&
     ctx.request.url !== "/permissions" &&
     ctx.request.url !== "/login"
   ) {
+    console.log(ctx.request.url)
     const data = jwtToken.verify(
       ctx.header.authorization.replace("Bearer ", ""),
       process.env.JWT_SECRET

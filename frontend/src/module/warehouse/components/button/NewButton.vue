@@ -3,9 +3,9 @@
 </template>
 
 <script>
-import NewOrEditMixin from "../../mixin/NewOrEditMixin";
+import Basic from "../../mixin/Basic";
 export default {
-  mixins: [NewOrEditMixin],
+  mixins: [Basic],
   auth(ability) {
     return ability.can("NewButton", "Warehouse");
   }

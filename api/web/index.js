@@ -15,7 +15,7 @@ const Log = require("../modules/db/log");
 const router = require("./router");
 
 const config = {
-  port: process.env.PORT || 3030,
+  port: process.env.PORT || 3031,
   requestLimit: process.env.REQUEST_LIMIT || "50mb"
 };
 

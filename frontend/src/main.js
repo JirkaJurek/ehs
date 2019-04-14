@@ -40,7 +40,7 @@ Vue.component("tool-items", ToolItems);
 Vue.component("stock-toolbar-button", StockToolbarButton);
 Vue.component("date-range-picker", DateRangePicker);
 Vue.filter("dateFormat", (date, format = "D. M. YY") => {
-  return dateFormat(date, format);
+  return date ? dateFormat(date, format) : '';
 });
 Vue.filter("employeeName", (item, defaultValue = "") => {
   return item

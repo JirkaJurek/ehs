@@ -1,6 +1,6 @@
 "use strict";
 
-const { files } = require('../../modules');
+const { files } = require("../../modules");
 const Router = require("koa-router");
 
 const router = new Router({
@@ -12,8 +12,8 @@ router.get("/", async (ctx, next) => {
 });
 
 router.post("/", async (ctx, next) => {
-    files.service.upload(ctx.request.body["files[]"]);
-    ctx.status = 200;
+  ctx.body = await files.service.upload(ctx.request.body["files[]"]);
+  ctx.status = 200;
 });
 
 router.put("/", async (ctx, next) => {

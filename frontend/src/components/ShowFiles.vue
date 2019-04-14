@@ -53,8 +53,9 @@ export default {
   }),
   computed: {
     baseApiPath() {
-      return process.env.VUE_APP_SERVER_URL;
+      // return process.env.VUE_APP_SERVER_URL;
       // return location.origin;
+      return `${location.protocol}//${location.hostname}:3031`
     }
   },
   created() {},

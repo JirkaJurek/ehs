@@ -11,6 +11,10 @@ function add(data) {
   return tool;
 }
 
+function showById(id) {
+  return execQuery(`SELECT * FROM ${tableName} WHERE id = ?`, [id]);
+}
+
 function list(query) {
   const builder = new queryBuilder();
   builder.from(tableName);
@@ -20,5 +24,6 @@ function list(query) {
 
 module.exports = {
   add,
-  list
+  list,
+  showById,
 };

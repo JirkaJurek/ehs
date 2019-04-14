@@ -14,6 +14,7 @@ const toJson = data => {
 
 const transformData = data => {
   data.degree = data.degree ? data.degree : "";
+  data.isCompanyPhone = data.isCompanyPhone ? 1 : 0;
   return data;
 };
 
@@ -29,27 +30,44 @@ function add(data) {
       description,
       nick,
       wardrobe,
+      dateOfOnset,
+      personalIdentificationNumber,
+      address,
+      phone,
+      healthInsurance,
+      foodCart,
+      preventiveInspection,
       shirtSize,
       tShirtSize,
       sizeWorkTrousers,
       sizeWorkBlouse,
       jacketSize,
       sweatshirtSize,
-      shoeSize
+      shoeSize,
+      halfMask
     ) VALUES (
       :degree,
       :firstName,
       :lastName,
       :personalNumber,
       :description,
+      :nick,
       :wardrobe,
+      :dateOfOnset,
+      :personalIdentificationNumber,
+      :address,
+      :phone,
+      :healthInsurance,
+      :foodCart,
+      :preventiveInspection,
       :shirtSize,
       :tShirtSize,
       :sizeWorkTrousers,
       :sizeWorkBlouse,
       :jacketSize,
       :sweatshirtSize,
-      :shoeSize
+      :shoeSize,
+      :halfMask
     );`,
     data
   );
@@ -68,13 +86,21 @@ function update(id, data) {
         personalNumber=:personalNumber,
         description=:description,
         wardrobe=:wardrobe,
+        dateOfOnset=:dateOfOnset,
+        personalIdentificationNumber=:personalIdentificationNumber,
+        address=:address,
+        phone=:phone,
+        healthInsurance=:healthInsurance,
+        foodCart=:foodCart,
+        preventiveInspection=:preventiveInspection,
         shirtSize=:shirtSize,
         tShirtSize=:tShirtSize,
         sizeWorkTrousers=:sizeWorkTrousers,
         sizeWorkBlouse=:sizeWorkBlouse,
         jacketSize=:jacketSize,
         sweatshirtSize=:sweatshirtSize,
-        shoeSize=:shoeSize
+        shoeSize=:shoeSize,
+        halfMask=:halfMask
         WHERE id=:id;`,
     data
   );

@@ -151,6 +151,42 @@ export default new Router({
       }
     },
     {
+      path: "/fe/mobile-tariffs",
+      name: "mobile-tariffs",
+      component: () => import("./module/addressBook/views/MobileTariffs"),
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "MobileTariffs"]
+      }
+    },
+    {
+      path: "/fe/form-if",
+      name: "form-if",
+      component: () => import("./module/iso/views/FormIf"),
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "ISO"]
+      }
+    },
+    {
+      path: "/fe/directive-os",
+      name: "directive-os",
+      component: () => import("./module/iso/views/DirectiveOs"),
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "ISO"]
+      }
+    },
+    {
+      path: "/fe/decision-rjs",
+      name: "decision-rjs",
+      component: () => import("./module/iso/views/DecisionRjs"),
+      beforeEnter: requireAuth,
+      meta: {
+        permission: ["page", "ISO"]
+      }
+    },
+    {
       path: "/fe/login",
       name: "login",
       component: () => import("./views/Login")

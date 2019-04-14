@@ -40,7 +40,7 @@ router.post("/:id(\\d+)/change", async (ctx, next) => {
   ctx.status = 200;
 });
 router.delete("/:id(\\d+)", async (ctx, next) => {
-  task.service.delete(ctx.params.id);
+  await task.service.delete(ctx.params.id);
   ctx.status = 200;
 });
 
