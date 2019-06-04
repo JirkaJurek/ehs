@@ -1,21 +1,19 @@
 "use strict";
 
-const tools = require("./tools");
-const files = require("./files");
-const config = require("./config");
 const users = require("./users");
-const warehouse = require("./warehouse");
-const task = require("./task");
-const addressBook = require("./addressBook");
-const iso = require("./iso");
+const questions = require("./questions");
+const sections = require("./sections");
+const forms = require("./forms");
+const languages = require("./languages");
+const translations = require("./translations");
+const answers = require("./answers");
 
 module.exports = {
-  tools,
-  files,
-  config,
   users,
-  warehouse,
-  task,
-  addressBook,
-  iso
+  questions,
+  sections,
+  forms,
+  languages,
+  translations,
+  answers,
 };

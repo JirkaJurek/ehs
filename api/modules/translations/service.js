@@ -2,7 +2,19 @@
 
 const sql = require("./sql");
 
-module.exports.add = data => {
+const toJson = data => {
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    return data;
+  }
+};
+
+module.exports.save = async data => {
+  const exist = (await sql.exist(data)).rows;
+  if(exist.length > 0) {
+    return sql.update(exist[0].id, data);
+  }
   return sql.add(data);
 };
 
@@ -14,7 +26,7 @@ module.exports.showById = id => {
   return sql.showById(id);
 };
 
-module.exports.list = query => {
+module.exports.list = async query => {
   return sql.list(query);
 };
 

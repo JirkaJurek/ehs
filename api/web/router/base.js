@@ -4,9 +4,10 @@ const jwtToken = require("jsonwebtoken");
 const Router = require("koa-router");
 const router = new Router();
 
-const { users } = require("../../modules");
+const { users, forms, sections, questions } = require("../../modules");
 const { head } = require("ramda");
 
+/*
 router.post("/login", async (ctx, next) => {
   // const { password } = ctx.request.body;
   //
@@ -46,6 +47,24 @@ router.post("/permissions", async (ctx, next) => {
       status: false
     };
   }
+});
+*/
+
+router.get("/data", async (ctx, next) => {
+  const allForms = (await forms.service.list({})).rows.map(async form => {
+    const sectionsData = (await sections.service.list({
+      filter: { formIds: [form.id] }
+    })).rows.map(async section => {
+      const questionsData = (await questions.service.list({
+        filter: { sectionIds: [section.id] }
+      })).rows;
+      return { ...section, questions: questionsData };
+    });
+    return { ...form, sections:  await Promise.all(sectionsData) };
+  });
+
+  ctx.status = 200;
+  ctx.body = await Promise.all(allForms);
 });
 
 module.exports = router;

@@ -1,28 +1,26 @@
 "use strict";
 
 const combineRouters = require("koa-combine-routers");
-const KoaRouter = require("koa-router");
 
-const toolsRouter = require("./tools");
 const usersRouter = require("./users");
-const filesRouter = require("./files");
-const configRouter = require("./config");
-const warehouseRouter = require("./warehouse");
-const taskRouter = require("./task");
 const baseRouter = require("./base");
-const addressBookRouter = require("./addressBook");
-const iso = require("./iso");
+const questions = require("./questions");
+const sections = require("./sections");
+const forms = require("./forms");
+const languages = require("./languages");
+const translations = require("./translations");
+const answers = require("./answers");
 
 const router = combineRouters(
-  toolsRouter,
   usersRouter,
-  filesRouter,
-  configRouter,
-  warehouseRouter,
-  taskRouter,
+  // je potřeba k oprávnění
   baseRouter,
-  addressBookRouter,
-  iso
+  questions,
+  sections,
+  forms,
+  languages,
+  translations,
+  answers,
 );
 
 module.exports = router;

@@ -15,6 +15,7 @@ const toJson = data => {
 const transformData = data => {
   data.degree = data.degree ? data.degree : "";
   data.isCompanyPhone = data.isCompanyPhone ? 1 : 0;
+  data.hasKey = data.hasKey ? 1 : 0;
   return data;
 };
 
@@ -44,6 +45,8 @@ function add(data) {
       jacketSize,
       sweatshirtSize,
       shoeSize,
+      hasKey,
+      codeEZS,
       halfMask
     ) VALUES (
       :degree,
@@ -67,6 +70,8 @@ function add(data) {
       :jacketSize,
       :sweatshirtSize,
       :shoeSize,
+      :hasKey,
+      :codeEZS,
       :halfMask
     );`,
     data
@@ -100,6 +105,8 @@ function update(id, data) {
         jacketSize=:jacketSize,
         sweatshirtSize=:sweatshirtSize,
         shoeSize=:shoeSize,
+        hasKey=:hasKey,
+        codeEZS=:codeEZS,
         halfMask=:halfMask
         WHERE id=:id;`,
     data

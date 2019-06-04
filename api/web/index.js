@@ -11,31 +11,30 @@ const cors = require("@koa/cors");
 const Multy = require("multy");
 const jwt = require("koa-jwt");
 
-const Log = require("../modules/db/log");
 const router = require("./router");
 
 const config = {
-  port: process.env.PORT || 3031,
+  port: process.env.PORT || 3001,
   requestLimit: process.env.REQUEST_LIMIT || "50mb"
 };
 
 const app = new Koa();
 app
-  .use(
-    jwt({ secret: process.env.JWT_SECRET }).unless({
-      method: ["OPTIONS"],
-      path: [
-        /^\/login/,
-        /^\/public/,
-        /^\/files/,
-        "/",
-        /^\/js/,
-        /^\/css/,
-        /^\/img/
-      ]
-    })
-  )
-  // .use(httpAuth.koa(authBasic))
+  // aktivace oprávnění
+  //.use(
+  //  jwt({ secret: process.env.JWT_SECRET }).unless({
+  //    method: ["OPTIONS"],
+  //    path: [
+  //      /^\/login/,
+  //      /^\/public/,
+  //      /^\/files/,
+  //      "/",
+  //      /^\/js/,
+  //      /^\/css/,
+  //      /^\/img/
+  //    ]
+  //  })
+  //)
   .use(responseTime())
   .use(logger())
   .use(Multy())
@@ -46,7 +45,6 @@ app
     })
   )
   .use(cors())
-  .use(Log())
   .use(router())
   .use(koaStatic(__dirname + "/public"))
   .listen(config.port);
