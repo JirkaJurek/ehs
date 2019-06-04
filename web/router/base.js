@@ -7,6 +7,12 @@ const router = new Router();
 const { users, forms, sections, questions } = require("../../modules");
 const { head } = require("ramda");
 
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+
+const readFile = util.promisify(fs.readFile);
+
 /*
 router.post("/login", async (ctx, next) => {
   // const { password } = ctx.request.body;
@@ -65,6 +71,23 @@ router.get("/data", async (ctx, next) => {
 
   ctx.status = 200;
   ctx.body = await Promise.all(allForms);
+});
+
+router.get("/admin/*", async (ctx, next) => {
+  ctx.set('Content-Type', 'text/html');
+  ctx.body = await readFile(path.join(__dirname, '../public/admin-dist/index.html'));
+});
+router.get("/admin", async (ctx, next) => {
+  ctx.set('Content-Type', 'text/html');
+  ctx.body = await readFile(path.join(__dirname, '../public/admin-dist/index.html'));
+});
+router.get("/public/*", async (ctx, next) => {
+  ctx.set('Content-Type', 'text/html');
+  ctx.body = await readFile(path.join(__dirname, '../public/public-dist/index.html'));
+});
+router.get("/public", async (ctx, next) => {
+  ctx.set('Content-Type', 'text/html');
+  ctx.body = await readFile(path.join(__dirname, '../public/public-dist/index.html'));
 });
 
 module.exports = router;
