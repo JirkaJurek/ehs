@@ -20,7 +20,6 @@ const config = {
 
 const app = new Koa();
 app
-  // aktivace oprávnění
   .use(
     jwt({ secret: process.env.JWT_SECRET }).unless({
       method: ["OPTIONS"],

@@ -34,7 +34,11 @@ module.exports.permissionsByUserId = async id => {
   const groups = (await sql.showByUserId(id)).rows;
   const permissions = groups.reduce((acc, group) => {
     if (group.id === 1) {
-      return [...acc, ["page", ["admin", "backend"]]];
+      return [
+        ...acc,
+        ["page", ["admin", "backend"]],
+        ["DeleteButton", ["Question", "Section", "Form"]]
+      ];
     } else if (group.id === 2) {
       return [...acc, ["page", "backend"]];
     }
