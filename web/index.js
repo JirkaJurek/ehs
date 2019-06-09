@@ -25,6 +25,7 @@ app
     jwt({ secret: process.env.JWT_SECRET }).unless({
       method: ["OPTIONS"],
       path: [
+        /^\/questions\/\d*\/img/,
         /^\/login/,
         /^\/public/,
         /^\/admin/,
