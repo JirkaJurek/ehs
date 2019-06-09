@@ -74,13 +74,13 @@ router.get("/data", async (ctx, next) => {
 router.get("/admin/*", async (ctx, next) => {
   ctx.set("Content-Type", "text/html");
   ctx.body = await readFile(
-    path.join(__dirname, "../public/frontend-dist/index.html")
+    path.join(__dirname, "../public/admin-dist/index.html")
   );
 });
 router.get("/admin", async (ctx, next) => {
   ctx.set("Content-Type", "text/html");
   ctx.body = await readFile(
-    path.join(__dirname, "../public/frontend-dist/index.html")
+    path.join(__dirname, "../public/admin-dist/index.html")
   );
 });
 router.get(["/public/*", "/public"], async (ctx, next) => {
