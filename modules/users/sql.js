@@ -13,6 +13,7 @@ const toJson = data => {
 };
 
 function add(data) {
+  console.log(data)
   return execQuery(
     `INSERT INTO ${tableName} (
       login,

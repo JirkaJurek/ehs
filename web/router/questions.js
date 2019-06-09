@@ -15,6 +15,10 @@ router.get("/:id(\\d+)", async (ctx, next) => {
   const item = await questions.service.showById(ctx.params.id);
   ctx.body = head(item.rows);
 });
+router.get("/:id(\\d+)/img", async (ctx, next) => {
+  const item = await questions.service.showImgById(ctx.params.id);
+  ctx.body = head(item.rows).img;
+});
 router.post("/", async (ctx, next) => {
   await questions.service.add(ctx.request.body);
   ctx.status = 200;

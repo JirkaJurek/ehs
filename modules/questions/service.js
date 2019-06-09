@@ -22,6 +22,10 @@ module.exports.showById = id => {
   return sql.showById(id);
 };
 
+module.exports.showImgById = id => {
+  return sql.showImgById(id);
+};
+
 module.exports.list = async (query) => {
   return sql.list(query);
 };

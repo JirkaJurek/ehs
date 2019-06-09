@@ -15,14 +15,16 @@ const transformData = data => {
 
 const afterSave = async (user, data) => {
   await sql.deletePermissionsByUserId(user.id);
-  await Promise.all(
-    data.gids.map(gid => {
-      return sql.addUserPermission({
-        uid: user.id,
-        gid
-      });
-    })
-  );
+  if (data.gids) {
+    await Promise.all(
+      data.gids.map(gid => {
+        return sql.addUserPermission({
+          uid: user.id,
+          gid
+        });
+      })
+    );
+  }
 };
 
 const add = async data => {
