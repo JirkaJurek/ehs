@@ -7,6 +7,7 @@ const forms = require("./forms");
 const languages = require("./languages");
 const translations = require("./translations");
 const answers = require("./answers");
+const groups = require("./groups");
 
 module.exports = {
   users,
@@ -16,4 +17,5 @@ module.exports = {
   languages,
   translations,
   answers,
+  groups,
 };

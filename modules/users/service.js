@@ -1,67 +1,82 @@
 "use strict";
 
 const sql = require("./sql");
-const { head, omit } = require("ramda");
+const { head, omit, find, propEq } = require("ramda");
 const { createHmac } = require("crypto");
 const jwtToken = require("jsonwebtoken");
+const groupsModule = require("../groups");
 
-const add = data => {
-  return sql.add(data);
+const transformData = data => {
+  if (data.password) {
+    data.password = createPasswordHash(data.password);
+  }
+  return data;
 };
 
-const update = (id, data) => {
-  return sql.update(id, data);
+const afterSave = async (user, data) => {
+  await sql.deletePermissionsByUserId(user.id);
+  await Promise.all(
+    data.gids.map(gid => {
+      return sql.addUserPermission({
+        uid: user.id,
+        gid
+      });
+    })
+  );
 };
 
-const showById = (id, withSecretData) => {
-  return sql.showById(id, withSecretData);
+const add = async data => {
+  data = transformData(data);
+  const user = (await sql.add(data)).rows[0];
+  await afterSave(user, data);
+  return user;
+};
+
+const update = async (id, data) => {
+  data = transformData(data);
+  const user = (await sql.update(id, data)).rows[0];
+  await afterSave(user, data);
+  return user;
+};
+
+const showById = id => {
+  return sql.showById(id);
 };
 
 const showByNick = (nick, withSecretData) => {
   return sql.showByNick(nick, withSecretData);
 };
 
-const list = (query, withSecretData) => {
-  return sql.list(query, withSecretData);
-};
-
-const isActive = async id => {
-  const user = head(await sql.showById(id));
-  return user && user.deletedAt === null;
+const list = async query => {
+  return sql.list(query);
 };
 
 const deleteUser = id => {
   return sql.deleteById(id);
 };
 
-const getUserName = (item, defaultValue = "") => {
-  return item
-    ? `${item.degree} ${item.firstName} ${item.lastName}`
-    : defaultValue;
-};
-
-const userPermission = id => {
-  return sql.userPermission(id);
-};
-
-const userPermissionDetail = id => {
-  return sql.userPermissionDetail(id);
-};
-
-const userPermissions = () => {
-  return sql.userPermissions();
-};
-
-const addUserPermission = async (userId, data) => {
-  await sql.deletePermissionsByUserId(userId);
-  return Promise.all(
-    data.map(permissionId => {
-      return sql.addUserPermission({ userId, userPermissionId: permissionId });
-    })
-  );
-};
-
-const createPasswordHash = password => {
+// const userPermission = id => {
+//   return sql.userPermission(id);
+// };
+//
+// const userPermissionDetail = id => {
+//   return sql.userPermissionDetail(id);
+// };
+//
+// const userPermissions = () => {
+//   return sql.userPermissions();
+// };
+//
+// const addUserPermission = async (userId, data) => {
+//   await sql.deletePermissionsByUserId(userId);
+//   return Promise.all(
+//     data.map(permissionId => {
+//       return sql.addUserPermission({ userId, userPermissionId: permissionId });
+//     })
+//   );
+// };
+//
+const createPasswordHash = (password = "") => {
   return createHmac("md5", password)
     .update(process.env.CRYPTO_SECRET)
     .digest("hex");
@@ -70,32 +85,39 @@ const createPasswordHash = password => {
 const login = async ({ username, password }) => {
   const user = head(await showByNick(username, true));
   const hash = createPasswordHash(password);
-  console.log(hash);
-  const status = user.password === hash;
+  // console.log(hash);
+  const status = user && user.password === hash;
+  const userGroups = await groupsModule.service.showByUserId(user.id);
+
   const basicToken = status
     ? jwtToken.sign(omit(["password"], user), process.env.JWT_SECRET)
     : "";
 
   return {
-    status,
+    status: !!status,
+    goTo: find(propEq("id", 3), userGroups) ? "/public" : "/admin",
     basicToken
   };
 };
 
+const isActive = async id => {
+  const user = await sql.showById(id);
+  return !!user;
+  // return user && user.deletedAt === null;
+};
+
 module.exports = {
   delete: deleteUser,
-  createPasswordHash,
   showById,
-  showByNick,
   add,
   update,
-  showById,
   list,
-  isActive,
-  getUserName,
-  userPermission,
-  userPermissionDetail,
-  userPermissions,
-  addUserPermission,
-  login
+  login,
+  isActive
+  //   getUserName,
+  //   userPermission,
+  //   userPermissionDetail,
+  //   userPermissions,
+  //   addUserPermission,
+  //   login
 };
