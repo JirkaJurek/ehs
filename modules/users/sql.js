@@ -2,7 +2,7 @@
 
 const { execQuery, escape, queryBuilder } = require("../db");
 const { map, omit, values } = require("ramda");
-const tableName = "user";
+const tableName = "users";
 
 const toJson = data => {
   try {
@@ -12,162 +12,97 @@ const toJson = data => {
   }
 };
 
-const transformData = data => {
-  data.degree = data.degree ? data.degree : "";
-  data.isCompanyPhone = data.isCompanyPhone ? 1 : 0;
-  data.hasKey = data.hasKey ? 1 : 0;
-  return data;
-};
-
 function add(data) {
-  data = transformData(data);
-
-  const user = execQuery(
+  return execQuery(
     `INSERT INTO ${tableName} (
-      degree,
-      firstName,
-      lastName,
-      personalNumber,
-      description,
-      nick,
-      wardrobe,
-      dateOfOnset,
-      personalIdentificationNumber,
-      address,
-      phone,
-      healthInsurance,
-      foodCart,
-      preventiveInspection,
-      shirtSize,
-      tShirtSize,
-      sizeWorkTrousers,
-      sizeWorkBlouse,
-      jacketSize,
-      sweatshirtSize,
-      shoeSize,
-      hasKey,
-      codeEZS,
-      halfMask
+      login,
+      password
     ) VALUES (
-      :degree,
-      :firstName,
-      :lastName,
-      :personalNumber,
-      :description,
-      :nick,
-      :wardrobe,
-      :dateOfOnset,
-      :personalIdentificationNumber,
-      :address,
-      :phone,
-      :healthInsurance,
-      :foodCart,
-      :preventiveInspection,
-      :shirtSize,
-      :tShirtSize,
-      :sizeWorkTrousers,
-      :sizeWorkBlouse,
-      :jacketSize,
-      :sweatshirtSize,
-      :shoeSize,
-      :hasKey,
-      :codeEZS,
-      :halfMask
-    );`,
-    data
+      $1,
+      $2
+    ) RETURNING id;`,
+    [data.login, data.password]
   );
-  return user;
 }
 
-function update(id, data) {
-  data = transformData(data);
-
-  const user = execQuery(
+async function update(id, data) {
+  const updateData = [data.login, id];
+  if (data.password && data.password.length > 1) {
+    updateData.push(data.password);
+  }
+  return execQuery(
     `UPDATE ${tableName} 
         SET 
-        degree=:degree,
-        firstName=:firstName,
-        lastName=:lastName,
-        personalNumber=:personalNumber,
-        description=:description,
-        wardrobe=:wardrobe,
-        dateOfOnset=:dateOfOnset,
-        personalIdentificationNumber=:personalIdentificationNumber,
-        address=:address,
-        phone=:phone,
-        healthInsurance=:healthInsurance,
-        foodCart=:foodCart,
-        preventiveInspection=:preventiveInspection,
-        shirtSize=:shirtSize,
-        tShirtSize=:tShirtSize,
-        sizeWorkTrousers=:sizeWorkTrousers,
-        sizeWorkBlouse=:sizeWorkBlouse,
-        jacketSize=:jacketSize,
-        sweatshirtSize=:sweatshirtSize,
-        shoeSize=:shoeSize,
-        hasKey=:hasKey,
-        codeEZS=:codeEZS,
-        halfMask=:halfMask
-        WHERE id=:id;`,
-    data
+        ${data.password && data.password.length > 1 ? "password=$3," : ""}
+        login=$1
+        WHERE id=$2
+        RETURNING id;`,
+    updateData
   );
-
-  // TODO update všech tabulek kde se ukládá user(employee)
-  return user;
 }
 
 async function list(query, withSecretData) {
   const builder = new queryBuilder();
-  builder.from(tableName).groupBy(`${tableName}.id`);
-  builder.where("deletedAt IS NULL");
-  const data = await execQuery(builder.getSql());
+  builder
+    .from(tableName)
+    .columns(`${tableName}.*, array_agg(gur.gid) AS gids`)
+    .leftJoin("groups_user_rel", `gur.uid = ${tableName}.id`, "gur")
+    .groupBy(`${tableName}.id`);
+  const data = (await execQuery(builder.getSql())).rows;
   return withSecretData === true ? data : map(omit(["password"]), data);
 }
 
 async function showById(id, withSecretData) {
-  const data = await execQuery(`SELECT * FROM ${tableName} WHERE id = ?`, [id]);
-  return withSecretData === true ? data : omit(["password"], data);
+  const builder = new queryBuilder();
+  builder
+    .from(tableName)
+    .columns(`${tableName}.*, array_agg(gur.gid) AS gids`)
+    .leftJoin("groups_user_rel", `gur.uid = ${tableName}.id`, "gur")
+    .groupBy(`${tableName}.id`)
+    .where(`id = $1`);
+
+  const data = (await execQuery(builder.getSql(), [id])).rows;
+  return withSecretData === true ? data : map(omit(["password"]), data);
 }
 
 async function showByNick(nick, withSecretData) {
-  const data = await execQuery(`SELECT * FROM ${tableName} WHERE nick = ?`, [
+  const data = (await execQuery(`SELECT * FROM ${tableName} WHERE login = $1`, [
     nick
-  ]);
-  return withSecretData === true ? data : omit(["password"], data);
+  ])).rows;
+  return withSecretData === true ? data : map(omit(["password"]), data);
 }
 
 function deleteById(toolId) {
-  // k name přidat (smazáno) a všude kde je použit to updatnout
-  return execQuery(`UPDATE ${tableName} SET deletedAt=NOW() WHERE id = ?;`, [
-    toolId
-  ]);
+  // return execQuery(`UPDATE ${tableName} SET deletedAt=NOW() WHERE id = $1;`, [
+  //   toolId
+  // ]);
 }
 
 const permissionFunction = {
   permissionByUserId: userId => {
     return execQuery(
-      `SELECT userPermissionId FROM user_permission WHERE userId = ?`,
+      `SELECT userPermissionId FROM groups_user_rel WHERE userId = $1`,
       [userId]
     );
   },
   permissionByUserIdDetail: userId => {
     return execQuery(
-      `SELECT ups.*, up.config FROM user_permission AS up
+      `SELECT ups.*, up.config FROM groups_user_rel AS up
       JOIN user_permissions AS ups ON up.userPermissionId = ups.id
-      WHERE userId = ?`,
+      WHERE userId = $1`,
       [userId]
     );
   },
   allPermissions: () => {
-    return execQuery(`SELECT * FROM user_permissions`);
+    return execQuery(`SELECT * FROM groups_user_rel`);
   },
   deletePermissionsByUserId: userId => {
-    return execQuery(`DELETE FROM user_permission WHERE userId = ?;`, [userId]);
+    return execQuery(`DELETE FROM groups_user_rel WHERE uid = $1;`, [userId]);
   },
   addPermission: data => {
     return execQuery(
-      `INSERT INTO user_permission (userId, userPermissionId) VALUES (:userId, :userPermissionId);`,
-      data
+      `INSERT INTO groups_user_rel (gid, uid) VALUES ($1, $2);`,
+      [data.gid, data.uid]
     );
   }
 };

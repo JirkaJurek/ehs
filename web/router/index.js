@@ -10,6 +10,7 @@ const forms = require("./forms");
 const languages = require("./languages");
 const translations = require("./translations");
 const answers = require("./answers");
+const groups = require("./groups");
 
 const router = combineRouters(
   usersRouter,
@@ -21,6 +22,7 @@ const router = combineRouters(
   languages,
   translations,
   answers,
+  groups,
 );
 
 module.exports = router;
