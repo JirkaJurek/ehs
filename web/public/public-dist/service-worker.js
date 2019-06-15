@@ -1,4 +1,4 @@
-importScripts("/public-dist/precache-manifest.7be7db2e4f5c895aedfee9e29bd342ad.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("/public-dist/precache-manifest.bbf2df97efd42f6824139f2570a2b6fe.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 
 workbox.core.setCacheNameDetails({prefix: "ehs-public"});
