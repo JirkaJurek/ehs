@@ -26,6 +26,7 @@ app
       path: [
         /^\/questions\/\d*\/img/,
         /^\/login/,
+        /^\/service-worker.js/,
         /^\/public/,
         /^\/admin/,
         /^\/files/,
