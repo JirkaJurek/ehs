@@ -27,7 +27,7 @@
     "koa2-validation": "^0.1.0",
     "mariasql": "^0.2.6",
     "mime-types": "^2.1.20",
-    "moment": "^2.22.2",
+    "moment": "^2.29.4",
     "multy": "^0.1.5",
     "pg": "^7.11.0",
     "ramda": "^0.25.0",
